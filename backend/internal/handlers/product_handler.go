@@ -299,6 +299,72 @@ func (h *ProductHandler) GetProduct(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+func (h *ProductHandler) GetRelatedProducts(c echo.Context) error {
+	id := c.Param("id")
+	limit := int32(4)
+	if l := c.QueryParam("limit"); l != "" {
+		if val, err := strconv.Atoi(l); err == nil {
+			limit = int32(val)
+		}
+	}
+
+	products, err := h.Repo.GetRelatedProducts(c.Request().Context(), repository.GetRelatedProductsParams{
+		ProductID: id,
+		Limit:     limit,
+	})
+	if err != nil {
+		c.Logger().Errorf("Failed to fetch related products: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch related products"})
+	}
+
+	// Transform response
+	type ProductResponse struct {
+		ID          string  `json:"id"`
+		Name        string  `json:"name"`
+		Slug        string  `json:"slug"`
+		Description *string `json:"description,omitempty"`
+		BasePrice   string  `json:"base_price"`
+		Category    *string `json:"category,omitempty"`
+		ImageUrl    *string `json:"image_url,omitempty"`
+		IsActive    *bool   `json:"is_active,omitempty"`
+		CreatedAt   string  `json:"created_at"`
+		UpdatedAt   string  `json:"updated_at"`
+	}
+
+	var response []ProductResponse
+	for _, p := range products {
+		pr := ProductResponse{
+			ID:        p.ID,
+			Name:      p.Name,
+			Slug:      p.Slug,
+			BasePrice: p.BasePrice,
+		}
+		if p.Description.Valid {
+			pr.Description = &p.Description.String
+		}
+		if p.Category.Valid {
+			pr.Category = &p.Category.String
+		}
+		if p.ImageUrl.Valid {
+			imageUrl := p.ImageUrl.String
+			pr.ImageUrl = &imageUrl
+		}
+		if p.IsActive.Valid {
+			isActive := p.IsActive.Bool
+			pr.IsActive = &isActive
+		}
+		if p.CreatedAt.Valid {
+			pr.CreatedAt = p.CreatedAt.Time.Format("2006-01-02T15:04:05Z07:00")
+		}
+		if p.UpdatedAt.Valid {
+			pr.UpdatedAt = p.UpdatedAt.Time.Format("2006-01-02T15:04:05Z07:00")
+		}
+		response = append(response, pr)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 type CreateProductRequest struct {
 	Name        string  `json:"name"`
 	Slug        *string `json:"slug"`

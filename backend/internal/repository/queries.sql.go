@@ -1258,6 +1258,74 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]P
 	return items, nil
 }
 
+const getRelatedProducts = `-- name: GetRelatedProducts :many
+SELECT DISTINCT
+    p.id::text as id,
+    p.title as name,
+    p.slug,
+    p.description,
+    COALESCE(p.base_price, 0)::text as base_price,
+    ''::text as category,
+    COALESCE(pi.url, p.thumbnail) as image_url,
+    p.active as is_active,
+    p.created_at,
+    p.updated_at
+FROM products p
+JOIN product_categories pc ON p.id = pc.product_id
+WHERE pc.category_id IN (
+    SELECT category_id FROM product_categories WHERE product_id = $1::bigint
+)
+AND p.id != $1::bigint
+AND p.active = true
+LEFT JOIN LATERAL (
+    SELECT url 
+    FROM product_images 
+    WHERE product_id = p.id 
+    ORDER BY position ASC
+    LIMIT 1
+) pi ON true
+LIMIT $2
+`
+
+type GetRelatedProductsParams struct {
+	ProductID string `json:"product_id"`
+	Limit     int32  `json:"limit"`
+}
+
+func (q *Queries) GetRelatedProducts(ctx context.Context, arg GetRelatedProductsParams) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, getRelatedProducts, arg.ProductID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Slug,
+			&i.Description,
+			&i.BasePrice,
+			&i.Category,
+			&i.ImageUrl,
+			&i.IsActive,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const removeProductCategory = `-- name: RemoveProductCategory :exec
 DELETE FROM product_categories
 WHERE product_id = $1 AND category_id = $2

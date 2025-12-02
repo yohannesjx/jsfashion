@@ -124,6 +124,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB) {
 	// ============================================================================
 	api.GET("/products", productHandler.ListProducts)
 	api.GET("/products/:id", productHandler.GetProduct)
+	api.GET("/products/:id/related", productHandler.GetRelatedProducts)
 	// api.POST("/products", productHandler.CreateProduct) // These are admin-only operations
 	// api.PUT("/products/:id", productHandler.UpdateProduct)
 	// api.DELETE("/products/:id", productHandler.DeleteProduct)
