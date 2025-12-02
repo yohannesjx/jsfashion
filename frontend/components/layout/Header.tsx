@@ -42,11 +42,11 @@ export function Header() {
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="lg:hidden"
                 >
-                    {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    {isMobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
                 </button>
 
                 {/* Logo */}
-                <Link href="/" className="text-2xl font-black tracking-tighter">
+                <Link href="/" className="text-3xl lg:text-2xl font-black tracking-tighter">
                     JsFashion
                 </Link>
 
@@ -70,7 +70,7 @@ export function Header() {
                 <div className="flex items-center gap-4 md:gap-6">
                     {/* Search */}
                     <button onClick={() => setIsSearchOpen(!isSearchOpen)}>
-                        <Search className="w-5 h-5 md:w-6 md:h-6" />
+                        <Search className="w-7 h-7 md:w-6 md:h-6" />
                     </button>
 
                     {/* Profile */}
@@ -80,7 +80,7 @@ export function Header() {
 
                     {/* Cart */}
                     <Link href="/cart" className="relative">
-                        <ShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
+                        <ShoppingBag className="w-7 h-7 md:w-6 md:h-6" />
                         {mounted && cartItemsCount > 0 && (
                             <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1">
                                 {cartItemsCount}
