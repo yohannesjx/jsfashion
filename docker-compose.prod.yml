@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: jsfashion
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - js_postgres_data:/var/lib/postgresql/data
+      - jsfashion_postgres_data:/var/lib/postgresql/data
       - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - jsfashion_network
@@ -68,5 +68,4 @@ networks:
     driver: bridge
 
 volumes:
-  js_postgres_data:
-    external: true
+  jsfashion_postgres_data:
