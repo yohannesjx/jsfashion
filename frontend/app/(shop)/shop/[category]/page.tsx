@@ -27,7 +27,11 @@ export default function CategoryPage({ params }: { params: { category: string } 
 
     useEffect(() => {
         // Load products from API
-        api.get<Product[]>(`/categories/${params.category}/products`)
+        const endpoint = params.category === 'all'
+            ? '/products?limit=100'
+            : `/categories/${params.category}/products`;
+
+        api.get<Product[]>(endpoint)
             .then((data) => {
                 setAllProducts(data || []);
                 setDisplayedProducts((data || []).slice(0, 40));

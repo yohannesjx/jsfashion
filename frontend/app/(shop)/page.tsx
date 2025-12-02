@@ -34,7 +34,7 @@ export default function Home() {
     useEffect(() => {
         // Load products from API
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
-        fetch(`${API_URL}/api/v1/products?limit=100&offset=0`)
+        fetch(`${API_URL}/api/v1/products?limit=1000&offset=0`)
             .then(res => res.json())
             .then((data: Product[]) => {
                 // Randomize products
@@ -59,7 +59,7 @@ export default function Home() {
         setLoadMoreLoading(true);
         setTimeout(() => {
             const currentLength = displayedProducts.length;
-            const newProducts = products.slice(currentLength, currentLength + 20);
+            const newProducts = products.slice(currentLength, currentLength + 40);
             setDisplayedProducts([...displayedProducts, ...newProducts]);
             setLoadMoreLoading(false);
         }, 500);
