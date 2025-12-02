@@ -86,13 +86,13 @@ export default function Home() {
                 {/* Scrolling Marquee */}
                 <div className="absolute bottom-0 w-full bg-black text-white py-3 overflow-hidden whitespace-nowrap z-20">
                     <div className="animate-marquee inline-block">
-                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000Br</span>
+                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000BR</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
                         <span className="text-lg font-mono tracking-widest mx-8">NEW COLLECTION DROPPING EVERYDAY</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
                         <span className="text-lg font-mono tracking-widest mx-8">LIMITED EDITION PIECES</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
-                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000Br</span>
+                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000BR</span>
                     </div>
                 </div>
             </section>
