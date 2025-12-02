@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
+import RelatedProducts from "@/components/shop/RelatedProducts";
 
 interface ProductVariant {
     id: string; // UUID
@@ -414,6 +415,9 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                     </div>
                 </div>
             )}
+
+            {/* Related Products */}
+            {product && <RelatedProducts productId={product.id} />}
 
             {/* Back to Shop */}
             <div className="container mx-auto px-4 py-8">
