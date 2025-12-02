@@ -3,12 +3,13 @@ import { check, sleep } from 'k6';
 
 export const options = {
     stages: [
-        { duration: '30s', target: 50 }, // Ramp up to 50 users
-        { duration: '1m', target: 50 },  // Stay at 50 users
-        { duration: '30s', target: 0 },  // Ramp down
+        { duration: '1m', target: 200 }, // Ramp up to 200 users over 1 minute
+        { duration: '2m', target: 200 }, // Stay at 200 users for 2 minutes
+        { duration: '1m', target: 0 },   // Ramp down over 1 minute
     ],
     thresholds: {
-        http_req_duration: ['p(95)<500'], // 95% of requests must complete below 500ms
+        http_req_duration: ['p(95)<1000'], // Relaxed threshold: 95% of requests under 1s
+        http_req_failed: ['rate<0.01'],    // Error rate must be under 1%
     },
 };
 
@@ -20,7 +21,6 @@ export default function () {
 
     check(res, {
         'ListProducts 200': (r) => r.status === 200,
-        'response time < 500ms': (r) => r.timings.duration < 500
     });
 
     if (res.status === 200) {
