@@ -40,6 +40,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+	e.Use(middleware.Gzip())
 
 	// Routes
 	e.GET("/health", func(c echo.Context) error {
