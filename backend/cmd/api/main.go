@@ -19,7 +19,7 @@ func main() {
 	dbUser := getEnv("DB_USER", "postgres")
 	dbPass := getEnv("DB_PASSWORD", "postgres")
 	dbName := getEnv("DB_NAME", "luxe_db")
-	dbPort := getEnv("DB_PORT", "5433") // Default to 5433 as per docker-compose mapping
+	dbPort := getEnv("DB_PORT", "5432")
 
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPass, dbName)
