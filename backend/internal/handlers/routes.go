@@ -111,6 +111,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB) {
 	admin.POST("/categories", categoryHandler.CreateCategory, auth.RequireRole("super_admin", "admin", "editor"))
 	admin.PUT("/categories/:id", categoryHandler.UpdateCategory, auth.RequireRole("super_admin", "admin", "editor"))
 	admin.DELETE("/categories/:id", categoryHandler.DeleteCategory, auth.RequireRole("super_admin", "admin"))
+	admin.PUT("/categories/reorder", categoryHandler.ReorderCategories, auth.RequireRole("super_admin", "admin", "editor"))
 	admin.GET("/products/:productId/categories", categoryHandler.GetProductCategories)
 	admin.PUT("/products/:productId/categories", categoryHandler.SetProductCategories, auth.RequireRole("super_admin", "admin", "editor"))
 

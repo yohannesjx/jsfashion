@@ -27,21 +27,23 @@ func (h *CategoryHandler) ListCategories(c echo.Context) error {
 
 	// Transform categories to ensure proper JSON serialization
 	type CategoryResponse struct {
-		ID        string  `json:"id"`
-		Name      string  `json:"name"`
-		Slug      string  `json:"slug"`
-		ImageUrl  *string `json:"image_url,omitempty"`
-		IsActive  *bool   `json:"is_active,omitempty"`
-		CreatedAt string  `json:"created_at"`
-		UpdatedAt string  `json:"updated_at"`
+		ID           string  `json:"id"`
+		Name         string  `json:"name"`
+		Slug         string  `json:"slug"`
+		ImageUrl     *string `json:"image_url,omitempty"`
+		IsActive     *bool   `json:"is_active,omitempty"`
+		DisplayOrder int32   `json:"display_order"`
+		CreatedAt    string  `json:"created_at"`
+		UpdatedAt    string  `json:"updated_at"`
 	}
 
 	var response []CategoryResponse
 	for _, cat := range categories {
 		cr := CategoryResponse{
-			ID:   cat.ID,
-			Name: cat.Name,
-			Slug: cat.Slug,
+			ID:           cat.ID,
+			Name:         cat.Name,
+			Slug:         cat.Slug,
+			DisplayOrder: cat.DisplayOrder,
 		}
 
 		if cat.ImageUrl.Valid {
@@ -194,7 +196,35 @@ func (h *CategoryHandler) DeleteCategory(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete category"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Category deleted successfully"})
+	return c.NoContent(http.StatusNoContent)
+}
+
+type ReorderCategoriesRequest struct {
+	Categories []struct {
+		ID           string `json:"id"`
+		DisplayOrder int32  `json:"display_order"`
+	} `json:"categories"`
+}
+
+func (h *CategoryHandler) ReorderCategories(c echo.Context) error {
+	var req ReorderCategoriesRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	ctx := c.Request().Context()
+
+	// Update display_order for each category
+	for _, cat := range req.Categories {
+		query := `UPDATE categories SET display_order = $1, updated_at = NOW() WHERE id = $2::bigint`
+		_, err := h.Repo.DB().ExecContext(ctx, query, cat.DisplayOrder, cat.ID)
+		if err != nil {
+			c.Logger().Errorf("Failed to update category %s display_order: %v", cat.ID, err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update category order"})
+		}
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Category order updated successfully"})
 }
 
 func (h *CategoryHandler) GetProductCategories(c echo.Context) error {
@@ -240,7 +270,7 @@ func (h *CategoryHandler) SetProductCategories(c echo.Context) error {
 			c.Logger().Errorf("Failed to add category %s to product %s: %v", catID, productID, err)
 			// Return error instead of silently continuing
 			return c.JSON(http.StatusInternalServerError, map[string]string{
-				"error": "Failed to add category to product",
+				"error":   "Failed to add category to product",
 				"details": err.Error(),
 			})
 		}
@@ -252,17 +282,17 @@ func (h *CategoryHandler) SetProductCategories(c echo.Context) error {
 func (h *CategoryHandler) GetCategoryProducts(c echo.Context) error {
 	slug := c.Param("slug")
 	ctx := c.Request().Context()
-	
+
 	// Parse pagination parameters
 	limit := int32(100) // Default limit
 	offset := int32(0)  // Default offset
-	
+
 	if limitStr := c.QueryParam("limit"); limitStr != "" {
 		if parsedLimit, err := strconv.ParseInt(limitStr, 10, 32); err == nil && parsedLimit > 0 {
 			limit = int32(parsedLimit)
 		}
 	}
-	
+
 	if pageStr := c.QueryParam("page"); pageStr != "" {
 		if parsedPage, err := strconv.ParseInt(pageStr, 10, 32); err == nil && parsedPage > 0 {
 			offset = int32((parsedPage - 1) * int64(limit))
@@ -272,7 +302,7 @@ func (h *CategoryHandler) GetCategoryProducts(c echo.Context) error {
 			offset = int32(parsedOffset)
 		}
 	}
-	
+
 	products, err := h.Repo.ListProductsByCategorySlug(ctx, repository.ListProductsByCategorySlugParams{
 		Slug:   slug,
 		Limit:  limit,

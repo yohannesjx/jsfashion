@@ -327,12 +327,12 @@ SELECT * FROM customers WHERE id = $1 LIMIT 1;
 
 -- Categories
 -- name: ListCategories :many
-SELECT id, name, slug, image_url, is_active, created_at, updated_at FROM categories
+SELECT id, name, slug, image_url, is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at FROM categories
 WHERE is_active = true
-ORDER BY name ASC;
+ORDER BY display_order ASC, name ASC;
 
 -- name: GetCategory :one
-SELECT id, name, slug, image_url, is_active, created_at, updated_at FROM categories WHERE id = $1 LIMIT 1;
+SELECT id, name, slug, image_url, is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at FROM categories WHERE id = $1 LIMIT 1;
 
 -- name: CreateCategory :one
 INSERT INTO categories (name, slug, image_url, is_active)

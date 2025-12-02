@@ -11,13 +11,14 @@ import (
 )
 
 type Category struct {
-	ID        string         `json:"id"`
-	Name      string         `json:"name"`
-	Slug      string         `json:"slug"`
-	ImageUrl  sql.NullString `json:"image_url"`
-	IsActive  sql.NullBool   `json:"is_active"`
-	CreatedAt sql.NullTime   `json:"created_at"`
-	UpdatedAt sql.NullTime   `json:"updated_at"`
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Slug         string         `json:"slug"`
+	ImageUrl     sql.NullString `json:"image_url"`
+	IsActive     sql.NullBool   `json:"is_active"`
+	DisplayOrder int32          `json:"display_order"`
+	CreatedAt    sql.NullTime   `json:"created_at"`
+	UpdatedAt    sql.NullTime   `json:"updated_at"`
 }
 
 type Customer struct {
