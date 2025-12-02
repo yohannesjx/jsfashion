@@ -33,7 +33,7 @@ func (q *Queries) AddProductCategory(ctx context.Context, arg AddProductCategory
 const createCategory = `-- name: CreateCategory :one
 INSERT INTO categories (name, slug, image, active)
 VALUES ($1, $2, $3, $4)
-RETURNING id::text as id, name, slug, image as image_url, active as is_active, created_at, updated_at
+RETURNING id::text as id, name, slug, image as image_url, active as is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at
 `
 
 type CreateCategoryParams struct {
@@ -57,6 +57,7 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 		&i.Slug,
 		&i.ImageUrl,
 		&i.IsActive,
+		&i.DisplayOrder,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -335,7 +336,7 @@ func (q *Queries) DeleteProductVariant(ctx context.Context, id string) error {
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT id::text as id, name, slug, image as image_url, active as is_active, created_at, updated_at FROM categories WHERE id = $1::bigint LIMIT 1
+SELECT id::text as id, name, slug, image as image_url, active as is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at FROM categories WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetCategory(ctx context.Context, id string) (Category, error) {
@@ -347,6 +348,7 @@ func (q *Queries) GetCategory(ctx context.Context, id string) (Category, error) 
 		&i.Slug,
 		&i.ImageUrl,
 		&i.IsActive,
+		&i.DisplayOrder,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -629,9 +631,9 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const listCategories = `-- name: ListCategories :many
-SELECT id::text as id, name, slug, image as image_url, active as is_active, created_at, updated_at FROM categories
+SELECT id::text as id, name, slug, image as image_url, active as is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at FROM categories
 WHERE active = true
-ORDER BY name ASC
+ORDER BY display_order ASC, name ASC
 `
 
 // Categories
@@ -650,6 +652,7 @@ func (q *Queries) ListCategories(ctx context.Context) ([]Category, error) {
 			&i.Slug,
 			&i.ImageUrl,
 			&i.IsActive,
+			&i.DisplayOrder,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1282,8 +1285,8 @@ func (q *Queries) SetProductCategories(ctx context.Context, productID string) er
 const updateCategory = `-- name: UpdateCategory :one
 UPDATE categories
 SET name = $2, slug = $3, image = $4, active = $5, updated_at = NOW()
-WHERE id = $1::bigint
-RETURNING id::text as id, name, slug, image as image_url, active as is_active, created_at, updated_at
+WHERE id = $1
+RETURNING id::text as id, name, slug, image as image_url, active as is_active, COALESCE(display_order, 0) as display_order, created_at, updated_at
 `
 
 type UpdateCategoryParams struct {
@@ -1309,6 +1312,7 @@ func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) 
 		&i.Slug,
 		&i.ImageUrl,
 		&i.IsActive,
+		&i.DisplayOrder,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

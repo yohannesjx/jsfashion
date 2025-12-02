@@ -216,7 +216,7 @@ func (h *CategoryHandler) ReorderCategories(c echo.Context) error {
 
 	// Update display_order for each category
 	for _, cat := range req.Categories {
-		query := `UPDATE categories SET display_order = $1, updated_at = NOW() WHERE id = $2::bigint`
+		query := `UPDATE categories SET display_order = $1, updated_at = NOW() WHERE id = $2`
 		_, err := h.Repo.DB().ExecContext(ctx, query, cat.DisplayOrder, cat.ID)
 		if err != nil {
 			c.Logger().Errorf("Failed to update category %s display_order: %v", cat.ID, err)
