@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -40,7 +40,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useCategories, useSetProductCategories } from '@/lib/api/admin/categories';
-import { useCreateVariant, useUpdateVariant, useDeleteVariant } from '@/lib/api/admin/products';
+import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct } from '@/lib/api/admin/products';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -69,10 +69,12 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Bulk category assignment
     const [isBulkCategoryDialogOpen, setIsBulkCategoryDialogOpen] = useState(false);
@@ -86,8 +88,17 @@ export default function ProductsPage() {
     const updateVariant = useUpdateVariant();
     const createVariant = useCreateVariant();
     const deleteVariant = useDeleteVariant();
+    const deleteProduct = useDeleteProduct();
 
     const limit = 100;
+
+    // Debounce search query
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     useEffect(() => {
         setProducts([]);
@@ -95,7 +106,7 @@ export default function ProductsPage() {
         setHasMore(true);
         setSelectedIds(new Set());
         fetchProducts(1, false);
-    }, [searchQuery]);
+    }, [debouncedSearch]);
 
     const fetchProducts = async (pageNum: number, append: boolean = false) => {
         setIsLoading(!append);
@@ -105,7 +116,7 @@ export default function ProductsPage() {
             const params = new URLSearchParams({
                 page: pageNum.toString(),
                 limit: limit.toString(),
-                ...(searchQuery && { search: searchQuery }),
+                ...(debouncedSearch && { search: debouncedSearch }),
             });
 
             const response = await fetch(`${API_URL}/api/v1/admin/products?${params}`, {
@@ -317,6 +328,47 @@ export default function ProductsPage() {
         }
     };
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.size === 0) return;
+
+        if (!confirm(`Are you sure you want to delete ${selectedIds.size} product(s)? This action cannot be undone.`)) {
+            return;
+        }
+
+        setIsDeleting(true);
+        const toastId = toast.loading(`Deleting ${selectedIds.size} products...`);
+        let successCount = 0;
+        let failCount = 0;
+
+        try {
+            for (const productId of selectedIds) {
+                try {
+                    await deleteProduct.mutateAsync(productId);
+                    successCount++;
+                } catch (error) {
+                    console.error(`Failed to delete product ${productId}:`, error);
+                    failCount++;
+                }
+            }
+
+            // Update local state
+            setProducts(prev => prev.filter(p => !selectedIds.has(p.id)));
+            setSelectedIds(new Set());
+
+            toast.dismiss(toastId);
+            if (failCount === 0) {
+                toast.success(`Successfully deleted ${successCount} product(s)`);
+            } else {
+                toast.warning(`Deleted ${successCount} product(s), ${failCount} failed`);
+            }
+        } catch (error) {
+            toast.dismiss(toastId);
+            toast.error('Failed to delete products');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -333,9 +385,13 @@ export default function ProductsPage() {
                                 <Tags className="h-4 w-4 mr-2" />
                                 Assign Categories ({selectedIds.size})
                             </Button>
-                            <Button variant="destructive">
+                            <Button
+                                variant="destructive"
+                                onClick={handleBulkDelete}
+                                disabled={isDeleting}
+                            >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Delete ({selectedIds.size})
+                                {isDeleting ? 'Deleting...' : `Delete (${selectedIds.size})`}
                             </Button>
                         </>
                     )}
