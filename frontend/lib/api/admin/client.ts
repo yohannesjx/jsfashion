@@ -19,6 +19,12 @@ async function handleResponse<T>(response: Response): Promise<T> {
         const error: ApiError = await response.json().catch(() => ({ error: response.statusText }));
         throw new Error(error.error || error.message || response.statusText);
     }
+
+    // Handle 204 No Content - no body to parse
+    if (response.status === 204) {
+        return {} as T;
+    }
+
     return response.json();
 }
 
