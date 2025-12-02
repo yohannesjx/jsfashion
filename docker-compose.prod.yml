@@ -32,6 +32,11 @@ services:
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
       PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: jsfashion
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: jsfashion
     ports:
       - "8080:8080"
     depends_on:
