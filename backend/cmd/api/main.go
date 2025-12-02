@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -28,6 +29,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Configure connection pool
+	// SetMaxOpenConns sets the maximum number of open connections to the database.
+	// A value of 25 is conservative and safe for t2.micro/small instances.
+	db.SetMaxOpenConns(25)
+
+	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+	db.SetMaxIdleConns(25)
+
+	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
+	db.SetConnMaxLifetime(5 * time.Minute)
+
 	defer db.Close()
 
 	// Initialize queries
