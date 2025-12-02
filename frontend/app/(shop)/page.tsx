@@ -86,38 +86,18 @@ export default function Home() {
                 {/* Scrolling Marquee */}
                 <div className="absolute bottom-0 w-full bg-black text-white py-3 overflow-hidden whitespace-nowrap z-20">
                     <div className="animate-marquee inline-block">
-                        <span className="text-lg font-mono tracking-widest mx-8">FREE WORLDWIDE SHIPPING ON ORDERS OVER $300</span>
+                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000Br</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
-                        <span className="text-lg font-mono tracking-widest mx-8">NEW COLLECTION DROPPING FRIDAY</span>
+                        <span className="text-lg font-mono tracking-widest mx-8">NEW COLLECTION DROPPING EVERYDAY</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
                         <span className="text-lg font-mono tracking-widest mx-8">LIMITED EDITION PIECES</span>
                         <span className="text-lg font-mono tracking-widest mx-8">•</span>
-                        <span className="text-lg font-mono tracking-widest mx-8">FREE WORLDWIDE SHIPPING ON ORDERS OVER $300</span>
+                        <span className="text-lg font-mono tracking-widest mx-8">FREE DELIVERY IN ADDIS ON ORDERS OVER 5000Br</span>
                     </div>
                 </div>
             </section>
 
-            {/* Featured Categories - Brutalist Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-2 border-b border-black">
-                <Link href="/shop/ready-to-wear" className="h-[60vh] border-b md:border-b-0 md:border-r border-black p-8 flex flex-col justify-between hover:bg-neutral-50 transition-colors group cursor-pointer relative overflow-hidden">
-                    <div className="absolute inset-0 bg-neutral-200 -z-10 group-hover:scale-105 transition-transform duration-700" />
-                    <span className="text-sm font-mono border border-black w-fit px-2 py-1 bg-white">01</span>
-                    <div className="space-y-2">
-                        <h2 className="text-6xl font-bold tracking-tighter group-hover:translate-x-2 transition-transform">READY TO WEAR</h2>
-                        <p className="text-lg text-neutral-600 max-w-md">Essentials for the modern wardrobe. Structured silhouettes meets fluid drapes.</p>
-                    </div>
-                    <ArrowRight className="w-12 h-12 self-end group-hover:-rotate-45 transition-transform duration-300" />
-                </Link>
-                <Link href="/shop/accessories" className="h-[60vh] p-8 flex flex-col justify-between hover:bg-neutral-50 transition-colors group cursor-pointer relative overflow-hidden">
-                    <div className="absolute inset-0 bg-neutral-300 -z-10 group-hover:scale-105 transition-transform duration-700" />
-                    <span className="text-sm font-mono border border-black w-fit px-2 py-1 bg-white">02</span>
-                    <div className="space-y-2">
-                        <h2 className="text-6xl font-bold tracking-tighter group-hover:translate-x-2 transition-transform">ACCESSORIES</h2>
-                        <p className="text-lg text-neutral-600 max-w-md">Curated pieces that complete the look. From minimal to statement.</p>
-                    </div>
-                    <ArrowRight className="w-12 h-12 self-end group-hover:-rotate-45 transition-transform duration-300" />
-                </Link>
-            </section>
+
 
             {/* New Arrivals Grid */}
             <section className="py-12">
