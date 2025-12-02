@@ -1282,6 +1282,13 @@ SELECT DISTINCT
     p.updated_at
 FROM products p
 JOIN product_categories pc ON p.id = pc.product_id
+LEFT JOIN LATERAL (
+    SELECT url 
+    FROM product_images 
+    WHERE product_id = p.id 
+    ORDER BY position ASC
+    LIMIT 1
+) pi ON true
 WHERE pc.category_id IN (
     SELECT category_id FROM product_categories WHERE product_id = $1::bigint
 )
@@ -1292,13 +1299,6 @@ AND EXISTS (
     WHERE pv.product_id = p.id 
     AND pv.stock_quantity > 0
 )
-LEFT JOIN LATERAL (
-    SELECT url 
-    FROM product_images 
-    WHERE product_id = p.id 
-    ORDER BY position ASC
-    LIMIT 1
-) pi ON true
 LIMIT $2
 `
 
