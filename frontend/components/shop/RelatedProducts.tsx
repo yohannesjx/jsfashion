@@ -11,6 +11,16 @@ interface Product {
     image_url: string | null;
 }
 
+// Shuffle array function
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 export default function RelatedProducts({ productId }: { productId: string }) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -22,7 +32,7 @@ export default function RelatedProducts({ productId }: { productId: string }) {
                 const res = await fetch(`${API_URL}/api/v1/products/${productId}/related`);
                 if (res.ok) {
                     const data = await res.json();
-                    setProducts(data || []);
+                    setProducts(shuffleArray(data || []));
                 }
             } catch (e) {
                 console.error('Failed to load related products:', e);

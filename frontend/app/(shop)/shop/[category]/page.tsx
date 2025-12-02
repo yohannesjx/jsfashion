@@ -18,6 +18,16 @@ interface Product {
     updated_at: string;
 }
 
+// Shuffle array function
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+};
+
 export default function CategoryPage({ params }: { params: { category: string } }) {
     const categoryName = params.category.replace(/-/g, " ").toUpperCase();
     const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -28,13 +38,14 @@ export default function CategoryPage({ params }: { params: { category: string } 
     useEffect(() => {
         // Load products from API
         const endpoint = params.category === 'all'
-            ? '/products?limit=100'
+            ? '/products?limit=1000'
             : `/categories/${params.category}/products`;
 
         api.get<Product[]>(endpoint)
             .then((data) => {
-                setAllProducts(data || []);
-                setDisplayedProducts((data || []).slice(0, 40));
+                const shuffled = shuffleArray(data || []);
+                setAllProducts(shuffled);
+                setDisplayedProducts(shuffled.slice(0, 40));
                 setIsLoading(false);
             })
             .catch(err => {
