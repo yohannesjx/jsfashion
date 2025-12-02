@@ -111,10 +111,17 @@ func (h *CategoryHandler) CreateCategory(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
+
+	// Handle ImageUrl - DB requires non-null string, default to empty string
+	imgUrl := ""
+	if req.ImageUrl != nil {
+		imgUrl = *req.ImageUrl
+	}
+
 	category, err := h.Repo.CreateCategory(ctx, repository.CreateCategoryParams{
 		Name:     req.Name,
 		Slug:     slug,
-		ImageUrl: sql.NullString{String: getStringValue(req.ImageUrl), Valid: req.ImageUrl != nil},
+		ImageUrl: sql.NullString{String: imgUrl, Valid: true}, // Always valid, empty string if missing
 		IsActive: sql.NullBool{Bool: isActive, Valid: true},
 	})
 
@@ -165,6 +172,9 @@ func (h *CategoryHandler) UpdateCategory(c echo.Context) error {
 	imageUrl := existing.ImageUrl
 	if req.ImageUrl != nil {
 		imageUrl = sql.NullString{String: *req.ImageUrl, Valid: true}
+	} else if !existing.ImageUrl.Valid {
+		// Ensure we don't pass invalid/null back if it was somehow null
+		imageUrl = sql.NullString{String: "", Valid: true}
 	}
 
 	isActive := existing.IsActive
