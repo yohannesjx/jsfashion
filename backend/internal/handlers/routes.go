@@ -6,11 +6,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/luxe-fashion/backend/internal/auth"
 	"github.com/luxe-fashion/backend/internal/repository"
+	"github.com/redis/go-redis/v9"
 )
 
-func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB) {
+func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *redis.Client) {
 	// Handlers
-	productHandler := NewProductHandler(repo)
+	productHandler := NewProductHandler(repo, rdb)
 	orderHandler := NewOrderHandler(repo)
 	customerHandler := NewCustomerHandler(repo)
 	dashboardHandler := NewDashboardHandler(repo, db)

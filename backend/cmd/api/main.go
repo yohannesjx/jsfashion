@@ -7,11 +7,14 @@ import (
 	"os"
 	"time"
 
+	"context"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
 	"github.com/luxe-fashion/backend/internal/handlers"
 	"github.com/luxe-fashion/backend/internal/repository"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -47,6 +50,22 @@ func main() {
 	queries := repository.New(db)
 	_ = queries // Prevent unused error for now
 
+	// Initialize Redis
+	redisURL := getEnv("REDIS_URL", "redis://localhost:6379")
+	opt, err := redis.ParseURL(redisURL)
+	if err != nil {
+		log.Printf("Warning: Invalid REDIS_URL: %v", err)
+	}
+	var rdb *redis.Client
+	if opt != nil {
+		rdb = redis.NewClient(opt)
+		if err := rdb.Ping(context.Background()).Err(); err != nil {
+			log.Printf("Warning: Failed to connect to Redis: %v", err)
+		} else {
+			log.Println("Connected to Redis")
+		}
+	}
+
 	e := echo.New()
 
 	// Middleware
@@ -61,7 +80,7 @@ func main() {
 	})
 
 	// Register API Routes
-	handlers.RegisterRoutes(e, queries, db)
+	handlers.RegisterRoutes(e, queries, db, rdb)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

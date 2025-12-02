@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,14 +11,16 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/luxe-fashion/backend/internal/repository"
+	"github.com/redis/go-redis/v9"
 )
 
 type ProductHandler struct {
-	Repo *repository.Queries
+	Repo  *repository.Queries
+	Redis *redis.Client
 }
 
-func NewProductHandler(repo *repository.Queries) *ProductHandler {
-	return &ProductHandler{Repo: repo}
+func NewProductHandler(repo *repository.Queries, rdb *redis.Client) *ProductHandler {
+	return &ProductHandler{Repo: repo, Redis: rdb}
 }
 
 func (h *ProductHandler) ListProducts(c echo.Context) error {
@@ -35,6 +39,20 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 
 	// Get search query
 	searchQuery := c.QueryParam("search")
+
+	// Cache Key
+	cacheKey := fmt.Sprintf("products:list:%d:%d:%s", limit, offset, searchQuery)
+
+	// Check Cache
+	if h.Redis != nil {
+		val, err := h.Redis.Get(ctx, cacheKey).Result()
+		if err == nil {
+			// Cache hit
+			c.Response().Header().Set("Content-Type", "application/json")
+			c.Response().Header().Set("X-Cache", "HIT")
+			return c.String(http.StatusOK, val)
+		}
+	}
 
 	var products []repository.Product
 	var err error
@@ -157,6 +175,12 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 		}
 
 		response = append(response, pr)
+	}
+
+	// Cache Result
+	if h.Redis != nil {
+		jsonBytes, _ := json.Marshal(response)
+		h.Redis.Set(ctx, cacheKey, string(jsonBytes), 1*time.Minute) // Cache for 1 minute
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -314,7 +338,22 @@ func (h *ProductHandler) GetRelatedProducts(c echo.Context) error {
 		}
 	}
 
-	products, err := h.Repo.GetRelatedProducts(c.Request().Context(), repository.GetRelatedProductsParams{
+	ctx := c.Request().Context()
+
+	// Cache Key
+	cacheKey := fmt.Sprintf("products:related:%s:%d", id, limit)
+
+	// Check Cache
+	if h.Redis != nil {
+		val, err := h.Redis.Get(ctx, cacheKey).Result()
+		if err == nil {
+			c.Response().Header().Set("Content-Type", "application/json")
+			c.Response().Header().Set("X-Cache", "HIT")
+			return c.String(http.StatusOK, val)
+		}
+	}
+
+	products, err := h.Repo.GetRelatedProducts(ctx, repository.GetRelatedProductsParams{
 		ProductID: id,
 		Limit:     limit,
 	})
@@ -366,6 +405,12 @@ func (h *ProductHandler) GetRelatedProducts(c echo.Context) error {
 			pr.UpdatedAt = p.UpdatedAt.Time.Format("2006-01-02T15:04:05Z07:00")
 		}
 		response = append(response, pr)
+	}
+
+	// Cache Result
+	if h.Redis != nil {
+		jsonBytes, _ := json.Marshal(response)
+		h.Redis.Set(ctx, cacheKey, string(jsonBytes), 5*time.Minute) // Cache for 5 minutes
 	}
 
 	return c.JSON(http.StatusOK, response)
