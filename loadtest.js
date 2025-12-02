@@ -3,12 +3,12 @@ import { check, sleep } from 'k6';
 
 export const options = {
     stages: [
-        { duration: '1m', target: 200 }, // Ramp up to 200 users over 1 minute
-        { duration: '2m', target: 200 }, // Stay at 200 users for 2 minutes
-        { duration: '1m', target: 0 },   // Ramp down over 1 minute
+        { duration: '1m', target: 300 }, // Ramp up to 300 users
+        { duration: '2m', target: 300 }, // Stay at 300 users
+        { duration: '1m', target: 0 },   // Ramp down
     ],
     thresholds: {
-        http_req_duration: ['p(95)<1000'], // Relaxed threshold: 95% of requests under 1s
+        http_req_duration: ['p(95)<1000'], // 95% of requests must complete below 1s
         http_req_failed: ['rate<0.01'],    // Error rate must be under 1%
     },
 };
