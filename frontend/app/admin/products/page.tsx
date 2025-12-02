@@ -480,7 +480,7 @@ export default function ProductsPage() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     {product.image_url && (
-                                                        <div className="relative h-10 w-10 rounded overflow-hidden bg-neutral-100">
+                                                        <div className="relative h-10 w-10 rounded overflow-hidden bg-neutral-100 group">
                                                             <Image
                                                                 src={product.image_url}
                                                                 alt={product.name}
@@ -488,6 +488,18 @@ export default function ProductsPage() {
                                                                 className="object-cover"
                                                                 sizes="40px"
                                                             />
+                                                            {/* Hover zoom preview */}
+                                                            <div className="absolute left-12 top-0 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                                                <div className="relative h-64 w-64 rounded-lg overflow-hidden shadow-2xl border-2 border-white">
+                                                                    <Image
+                                                                        src={product.image_url}
+                                                                        alt={product.name}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                        sizes="256px"
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     )}
                                                     <Link
