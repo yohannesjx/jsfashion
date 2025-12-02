@@ -337,29 +337,29 @@ export default function ProductsPage() {
 
         setIsDeleting(true);
         const toastId = toast.loading(`Deleting ${selectedIds.size} products...`);
-        let successCount = 0;
-        let failCount = 0;
+        const successIds: string[] = [];
+        const failedIds: string[] = [];
 
         try {
             for (const productId of selectedIds) {
                 try {
                     await deleteProduct.mutateAsync(productId);
-                    successCount++;
+                    successIds.push(productId);
                 } catch (error) {
                     console.error(`Failed to delete product ${productId}:`, error);
-                    failCount++;
+                    failedIds.push(productId);
                 }
             }
 
-            // Update local state
-            setProducts(prev => prev.filter(p => !selectedIds.has(p.id)));
+            // Update local state - remove only successfully deleted products
+            setProducts(prev => prev.filter(p => !successIds.includes(p.id)));
             setSelectedIds(new Set());
 
             toast.dismiss(toastId);
-            if (failCount === 0) {
-                toast.success(`Successfully deleted ${successCount} product(s)`);
+            if (failedIds.length === 0) {
+                toast.success(`Successfully deleted ${successIds.length} product(s)`);
             } else {
-                toast.warning(`Deleted ${successCount} product(s), ${failCount} failed`);
+                toast.warning(`Deleted ${successIds.length} product(s), ${failedIds.length} failed`);
             }
         } catch (error) {
             toast.dismiss(toastId);

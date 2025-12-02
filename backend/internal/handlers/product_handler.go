@@ -33,16 +33,75 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 	}
 	offset := (page - 1) * limit
 
-	params := repository.ListProductsParams{
-		Limit:  int32(limit),
-		Offset: int32(offset),
-	}
+	// Get search query
+	searchQuery := c.QueryParam("search")
 
-	products, err := h.Repo.ListProducts(ctx, params)
-	if err != nil {
-		// Log the actual error for debugging
-		c.Logger().Errorf("Failed to fetch products: %v", err)
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch products"})
+	var products []repository.Product
+	var err error
+
+	if searchQuery != "" {
+		// Search products by name
+		query := `
+			SELECT 
+				p.id::text,
+				p.title as name,
+				p.slug,
+				p.description,
+				COALESCE(p.base_price, 0)::text as base_price,
+				NULL::text as category,
+				(
+					SELECT pi.url 
+					FROM product_images pi 
+					WHERE pi.product_id = p.id 
+					ORDER BY pi.position ASC 
+					LIMIT 1
+				) as image_url,
+				p.active as is_active,
+				p.created_at,
+				p.updated_at
+			FROM products p
+			WHERE p.title ILIKE $1
+			ORDER BY p.created_at DESC
+			LIMIT $2 OFFSET $3
+		`
+		rows, err := h.Repo.DB().QueryContext(ctx, query, "%"+searchQuery+"%", limit, offset)
+		if err != nil {
+			c.Logger().Errorf("Failed to search products: %v", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to search products"})
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var p repository.Product
+			if err := rows.Scan(
+				&p.ID,
+				&p.Name,
+				&p.Slug,
+				&p.Description,
+				&p.BasePrice,
+				&p.Category,
+				&p.ImageUrl,
+				&p.IsActive,
+				&p.CreatedAt,
+				&p.UpdatedAt,
+			); err != nil {
+				c.Logger().Errorf("Failed to scan product: %v", err)
+				continue
+			}
+			products = append(products, p)
+		}
+	} else {
+		// Regular list without search
+		params := repository.ListProductsParams{
+			Limit:  int32(limit),
+			Offset: int32(offset),
+		}
+
+		products, err = h.Repo.ListProducts(ctx, params)
+		if err != nil {
+			c.Logger().Errorf("Failed to fetch products: %v", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch products"})
+		}
 	}
 
 	// Transform products to ensure proper JSON serialization
@@ -494,7 +553,7 @@ func (h *ProductHandler) DeleteProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete product"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Product deleted successfully"})
+	return c.NoContent(http.StatusNoContent)
 }
 
 // Variant Handlers
