@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface Product {
@@ -56,10 +57,12 @@ export default function RelatedProducts({ productId }: { productId: string }) {
                         <Link key={product.id} href={`/product/${product.slug}`} className="group block">
                             <div className="aspect-[3/4] bg-neutral-100 mb-4 overflow-hidden relative">
                                 {product.image_url ? (
-                                    <img
+                                    <Image
                                         src={product.image_url}
                                         alt={product.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        fill
+                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-neutral-400">

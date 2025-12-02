@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import QuickViewModal from "@/components/shop/QuickViewModal";
@@ -126,13 +127,12 @@ export default function Home() {
                                     <Link href={`/product/${product.slug}`} key={product.id} className="group cursor-pointer">
                                         <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                             {product.image_url ? (
-                                                <img
+                                                <Image
                                                     src={product.image_url}
                                                     alt={product.name}
-                                                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                                                    onError={(e) => {
-                                                        (e.target as HTMLImageElement).src = '/placeholder-1.jpg';
-                                                    }}
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                                                 />
                                             ) : (
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />

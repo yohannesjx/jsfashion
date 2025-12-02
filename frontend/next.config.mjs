@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    unoptimized: true, // Disable image optimization to avoid Docker networking issues
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: 'http',

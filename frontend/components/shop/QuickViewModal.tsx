@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ProductVariant {
     id: string;
@@ -155,10 +156,12 @@ export default function QuickViewModal({
                         <div className="flex flex-col md:flex-row h-full">
                             {/* Image Gallery */}
                             <div className="w-full md:w-1/2 bg-neutral-100 relative min-h-[300px] md:min-h-[500px]">
-                                <img
+                                <Image
                                     src={product.images[currentImageIndex] || product.image_url || '/placeholder.jpg'}
                                     alt={product.name}
-                                    className="absolute inset-0 w-full h-full object-cover"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-cover"
                                 />
                                 {product.images.length > 1 && (
                                     <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
