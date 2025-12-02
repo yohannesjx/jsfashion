@@ -2361,12 +2361,13 @@ JOIN variants v ON oi.variant_id = v.id
 WHERE v.product_id = $1::bigint
 `
 
-func (q *Queries) CountOrderItemsByProductID(ctx context.Context, productID string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countOrderItemsByProductID, productID)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
-}
+// COMMENTED OUT: This method is overridden in custom.go to use product_variants table
+// func (q *Queries) CountOrderItemsByProductID(ctx context.Context, productID string) (int64, error) {
+// 	row := q.db.QueryRowContext(ctx, countOrderItemsByProductID, productID)
+// 	var count int64
+// 	err := row.Scan(&count)
+// 	return count, err
+// }
 
 const deleteProductPrices = `-- name: DeleteProductPrices :exec
 DELETE FROM prices WHERE variant_id IN (SELECT id FROM variants WHERE product_id = $1::bigint)
