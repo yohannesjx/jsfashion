@@ -103,3 +103,17 @@ func (q *Queries) DeleteProductByStringID(ctx context.Context, id string) error 
 	_, err := q.db.ExecContext(ctx, query, id)
 	return err
 }
+
+// CountOrderItemsByProductID counts order items for a product
+// This overrides the generated method to properly join product_variants instead of variants
+func (q *Queries) CountOrderItemsByProductID(ctx context.Context, productID string) (int64, error) {
+	query := `
+		SELECT COUNT(*) 
+		FROM order_items oi
+		JOIN product_variants pv ON oi.variant_id = pv.id
+		WHERE pv.product_id = $1::bigint
+	`
+	var count int64
+	err := q.db.QueryRowContext(ctx, query, productID).Scan(&count)
+	return count, err
+}
