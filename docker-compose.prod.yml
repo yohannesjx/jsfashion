@@ -69,3 +69,4 @@ networks:
 
 volumes:
   js_postgres_data:
+    external: true
