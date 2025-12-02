@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import QuickViewModal from "@/components/shop/QuickViewModal";
 
 interface Product {
     id: string;
@@ -30,6 +31,8 @@ export default function Home() {
     const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [loadMoreLoading, setLoadMoreLoading] = useState(false);
+    const [quickViewOpen, setQuickViewOpen] = useState(false);
+    const [quickViewProductSlug, setQuickViewProductSlug] = useState<string | null>(null);
 
     useEffect(() => {
         // Load products from API
@@ -135,7 +138,17 @@ export default function Home() {
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />
                                             )}
                                             <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
-                                                <div className="w-full bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white border border-black/10 rounded-none shadow-sm h-10 flex items-center justify-center text-sm font-medium transition-colors">QUICK ADD</div>
+                                                <Button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        setQuickViewProductSlug(product.slug || product.id);
+                                                        setQuickViewOpen(true);
+                                                    }}
+                                                    className="w-full bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white border border-black/10 rounded-none shadow-sm h-10 flex items-center justify-center text-sm font-medium transition-colors"
+                                                >
+                                                    QUICK ADD
+                                                </Button>
                                             </div>
                                         </div>
                                         <div className="flex flex-col px-2 py-3">
@@ -186,6 +199,12 @@ export default function Home() {
                     </Button>
                 </div>
             </section>
+
+            <QuickViewModal
+                isOpen={quickViewOpen}
+                onClose={setQuickViewOpen}
+                productSlug={quickViewProductSlug}
+            />
         </main>
     );
 }
