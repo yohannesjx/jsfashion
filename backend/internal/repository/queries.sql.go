@@ -1013,6 +1013,11 @@ LEFT JOIN LATERAL (
     LIMIT 1
 ) pi ON true
 WHERE c.slug = $1 AND p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
 ORDER BY p.created_at DESC
 LIMIT $2 OFFSET $3
 `
@@ -1215,6 +1220,11 @@ LEFT JOIN LATERAL (
     LIMIT 1
 ) pi ON true
 WHERE p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
 ORDER BY p.created_at DESC NULLS LAST, p.id DESC
 LIMIT $1 OFFSET $2
 `
@@ -1277,6 +1287,11 @@ WHERE pc.category_id IN (
 )
 AND p.id != $1::bigint
 AND p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
 LEFT JOIN LATERAL (
     SELECT url 
     FROM product_images 

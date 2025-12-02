@@ -61,6 +61,12 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 				p.updated_at
 			FROM products p
 			WHERE p.title ILIKE $1
+            AND p.active = true
+            AND EXISTS (
+                SELECT 1 FROM product_variants pv 
+                WHERE pv.product_id = p.id 
+                AND pv.stock_quantity > 0
+            )
 			ORDER BY p.created_at DESC
 			LIMIT $2 OFFSET $3
 		`

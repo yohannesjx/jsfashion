@@ -98,6 +98,11 @@ LEFT JOIN LATERAL (
     LIMIT 1
 ) pi ON true
 WHERE p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
 ORDER BY p.created_at DESC NULLS LAST, p.id DESC
 LIMIT $1 OFFSET $2;
 
@@ -120,6 +125,11 @@ WHERE pc.category_id IN (
 )
 AND p.id != $1::bigint
 AND p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
 LEFT JOIN LATERAL (
     SELECT url 
     FROM product_images 
@@ -486,3 +496,33 @@ RETURNING *;
 UPDATE product_variants
 SET stock_quantity = stock_quantity - $2
 WHERE id = $1::uuid;
+
+-- name: ListProductsByCategorySlug :many
+SELECT 
+    p.id::text as id,
+    p.title as name,
+    p.description,
+    COALESCE(p.base_price, 0)::text as base_price,
+    c.name as category,
+    COALESCE(pi.url, p.thumbnail) as image_url,
+    p.active as is_active,
+    p.created_at,
+    p.updated_at
+FROM products p
+JOIN product_categories pc ON p.id = pc.product_id
+JOIN categories c ON pc.category_id = c.id
+LEFT JOIN LATERAL (
+    SELECT url 
+    FROM product_images 
+    WHERE product_id = p.id 
+    ORDER BY id 
+    LIMIT 1
+) pi ON true
+WHERE c.slug = $1 AND p.active = true
+AND EXISTS (
+    SELECT 1 FROM product_variants pv 
+    WHERE pv.product_id = p.id 
+    AND pv.stock_quantity > 0
+)
+ORDER BY p.created_at DESC
+LIMIT $2 OFFSET $3;
