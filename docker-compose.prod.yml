@@ -68,4 +68,4 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  js_postgres_data:
