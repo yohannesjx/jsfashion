@@ -34,10 +34,7 @@ func SendTelegramOrder(n OrderNotification) error {
 	}
 	chatID := os.Getenv("TELEGRAM_CHAT_ID")
 	if chatID == "" {
-		// Try to look for a default or return error
-		// For development, we can print this to console
-		fmt.Println("TELEGRAM_CHAT_ID is not set. Skipping Telegram notification.")
-		return nil
+		chatID = "358753046" // Default to admin's chat ID
 	}
 
 	// Format message
