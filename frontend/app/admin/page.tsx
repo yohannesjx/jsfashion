@@ -21,6 +21,7 @@ interface DashboardStats {
     total_inventory_value: number;
     product_count: number;
     variant_count: number;
+    total_variant_price: number;
 }
 
 interface SalesDataPoint {
@@ -191,6 +192,11 @@ export default function AdminDashboard() {
                             <p className="text-3xl font-bold mt-2">
                                 {stats?.total_inventory_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} Birr
                             </p>
+                            {stats?.total_variant_price && stats.total_variant_price > 0 && (
+                                <p className="text-xs text-neutral-400 mt-1">
+                                    Catalog: {stats.total_variant_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Birr
+                                </p>
+                            )}
                         </div>
                         <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
                             <Tags className="h-6 w-6 text-orange-600" />
