@@ -963,3 +963,45 @@ func getStringValue(s *string) string {
 	}
 	return *s
 }
+
+// GetVariantBySku retrieves a variant and its product by SKU (for barcode scanning)
+func (h *ProductHandler) GetVariantBySku(c echo.Context) error {
+	ctx := c.Request().Context()
+	sku := c.Param("sku")
+
+	if sku == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "SKU is required"})
+	}
+
+	result, err := h.Repo.GetVariantBySku(ctx, sku)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Variant not found"})
+	}
+
+	// Format response
+	response := map[string]interface{}{
+		"variant": map[string]interface{}{
+			"id":               result.VariantID,
+			"sku":              result.VariantSku,
+			"size":             nullStringValue(result.Size),
+			"color":            nullStringValue(result.Color),
+			"price_adjustment": nullStringValue(result.PriceAdjustment),
+			"stock_quantity":   result.StockQuantity,
+		},
+		"product": map[string]interface{}{
+			"id":         result.ProductID,
+			"name":       result.ProductName,
+			"base_price": result.ProductPrice,
+			"image_url":  nullStringValue(result.ProductImage),
+		},
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func nullStringValue(ns sql.NullString) interface{} {
+	if ns.Valid {
+		return ns.String
+	}
+	return nil
+}

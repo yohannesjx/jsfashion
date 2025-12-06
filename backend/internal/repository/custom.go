@@ -201,3 +201,53 @@ func (q *Queries) ListOrderItemsByOrderNumber(ctx context.Context, orderNumber i
 	}
 	return items, rows.Err()
 }
+
+// VariantWithProduct holds variant and product data for SKU lookup
+type VariantWithProduct struct {
+	VariantID       string
+	VariantSku      string
+	Size            sql.NullString
+	Color           sql.NullString
+	PriceAdjustment sql.NullString
+	StockQuantity   int32
+	ProductID       string
+	ProductName     string
+	ProductPrice    string
+	ProductImage    sql.NullString
+}
+
+// GetVariantBySku retrieves a variant and its product by SKU
+func (q *Queries) GetVariantBySku(ctx context.Context, sku string) (VariantWithProduct, error) {
+	query := `
+		SELECT 
+			v.id::text,
+			v.sku,
+			v.size,
+			v.color,
+			v.price_adjustment::text,
+			COALESCE(v.stock_quantity, 0),
+			p.id::text,
+			p.title,
+			COALESCE(p.base_price, 0)::text,
+			p.thumbnail
+		FROM product_variants v
+		JOIN products p ON v.product_id = p.id
+		WHERE LOWER(v.sku) = LOWER($1)
+		LIMIT 1
+	`
+	row := q.db.QueryRowContext(ctx, query, sku)
+	var v VariantWithProduct
+	err := row.Scan(
+		&v.VariantID,
+		&v.VariantSku,
+		&v.Size,
+		&v.Color,
+		&v.PriceAdjustment,
+		&v.StockQuantity,
+		&v.ProductID,
+		&v.ProductName,
+		&v.ProductPrice,
+		&v.ProductImage,
+	)
+	return v, err
+}

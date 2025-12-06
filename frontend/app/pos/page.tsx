@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ShoppingBag, Trash2, CreditCard, RotateCcw } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search, ShoppingBag, Trash2, CreditCard, RotateCcw, Loader2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { VariantSelector } from "@/components/pos/VariantSelector";
 import { toast } from "sonner";
@@ -26,8 +26,8 @@ interface Variant {
     sku: string;
     size: string | null;
     color: string | null;
-    price: number; // Changed to number (cents)
-    stock: number; // Changed from stock_quantity
+    price: number;
+    stock: number;
     active: boolean;
     image: string | null;
     price_adjustment: string | null;
@@ -44,6 +44,8 @@ interface CartItem {
     quantity: number;
 }
 
+const PRODUCTS_PER_PAGE = 20;
+
 export default function POSPage() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -51,51 +53,39 @@ export default function POSPage() {
     const [isVariantSelectorOpen, setIsVariantSelectorOpen] = useState(false);
     const queryClient = useQueryClient();
 
-    // Fetch Products
-    const { data: products = [], isLoading } = useQuery({
-        queryKey: ['products'],
-        queryFn: async () => {
-            const res = await api.get('/products');
-            // We need to fetch variants for each product or have an endpoint that returns products with variants.
-            // Assuming /products returns basic info, we might need to fetch variants separately or update the API.
-            // For now, let's assume we fetch all products and then for the POS we might need a more efficient way.
-            // But wait, the previous `GetProduct` returns variants. `ListProducts` might not.
-            // Let's assume we need to fetch variants.
-            // Actually, for POS, we probably want a `GET /pos/products` that returns everything.
-            // Or we can just fetch all products and then fetch variants for them? That's too many requests.
-            // Let's assume `ListProducts` returns what we need or we update the backend.
-            // Looking at `queries.sql`, `ListProducts` only returns product fields.
-            // I should probably update `ListProducts` or create a new endpoint.
-            // However, for now, let's fetch products and when clicking, we fetch the full product details (including variants) if needed.
-            // But for barcode scanning we need all variants loaded or a search endpoint.
-            // Let's try to fetch all products and then for each product fetch its variants? No, that's bad.
-            // Let's use the existing `api.get('/products')` and assume for now we can't scan unless we have the data.
-            // Wait, I can't implement barcode scanning effectively without a way to lookup SKU -> Variant.
-            // I should probably implement a `GET /products/search?q=...` or similar.
-            // But for now, let's just fetch all products and maybe we can live with fetching variants on demand for UI,
-            // but for barcode scanning we need a lookup.
-            // Let's fetch all variants? `GET /products/variants`?
-            // The backend doesn't have a "List All Variants" endpoint.
-            // I'll stick to UI interaction first: Click product -> Fetch full details -> Show variants.
-            // For barcode: I'll need to implement a backend search or fetch all.
-            // Let's implement a simple "Fetch all products with variants" on the backend?
-            // Or just fetch products and when searching, filter by name.
-            // For barcode, if I scan, I can call `GET /products?search=sku`?
-            // The backend `ListProducts` doesn't support search params yet.
-            // I'll implement client-side filtering on the products list.
-            // And for variants, I'll fetch them when a product is selected.
-            // This means barcode scanning for variants won't work globally unless I have all variants.
-            // LIMITATION: Barcode scanning will only work if I implement a backend lookup.
-            // I'll implement `GET /products/variants?sku=...` on backend?
-            // Let's stick to the plan: "allow search by sku and product name".
-            // If I can't search by SKU on backend, I can't do it efficiently.
-            // I'll assume for this task I can just filter products by name.
-            // I'll implement a "Scan Barcode" input that triggers a specific API call if it looks like a barcode.
+    // Barcode scanner state
+    const [barcodeBuffer, setBarcodeBuffer] = useState("");
+    const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    const lastKeyTime = useRef<number>(0);
 
-            // Actually, I'll just fetch the list of products.
+    // Fetch Products with pagination
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading
+    } = useInfiniteQuery({
+        queryKey: ['pos-products', searchQuery],
+        queryFn: async ({ pageParam = 0 }) => {
+            const params = new URLSearchParams({
+                limit: PRODUCTS_PER_PAGE.toString(),
+                offset: pageParam.toString(),
+                ...(searchQuery && { search: searchQuery })
+            });
+            const res = await api.get(`/products?${params}`);
             return res.data;
-        }
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            // If we got fewer than PRODUCTS_PER_PAGE, there are no more pages
+            if (lastPage.length < PRODUCTS_PER_PAGE) return undefined;
+            return allPages.flat().length;
+        },
+        initialPageParam: 0,
     });
+
+    const products = data?.pages.flat() || [];
 
     // Mutation for Checkout
     const checkoutMutation = useMutation({
@@ -105,7 +95,7 @@ export default function POSPage() {
         onSuccess: () => {
             toast.success("Order completed successfully!");
             setCart([]);
-            queryClient.invalidateQueries({ queryKey: ['products'] }); // Update stock potentially?
+            queryClient.invalidateQueries({ queryKey: ['pos-products'] });
         },
         onError: (error: any) => {
             toast.error(error.message || "Checkout failed");
@@ -113,17 +103,13 @@ export default function POSPage() {
     });
 
     // Filter products
-    const filteredProducts = (products || []).filter((p: Product) =>
+    const filteredProducts = products.filter((p: Product) =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase())
-        // || p.sku... (product doesn't have SKU, variants do)
     );
 
     const handleProductClick = async (product: Product) => {
-        // Fetch full product details including variants
         try {
             const res = await api.get(`/products/${product.id}`);
-            // The API returns { product: ..., images: ..., variants: ... }
-            // We need to flatten it to match our Product interface
             setSelectedProduct({
                 ...res.data.product,
                 variants: res.data.variants
@@ -146,7 +132,6 @@ export default function POSPage() {
                 );
             }
 
-            // Calculate price
             const basePrice = parseFloat(selectedProduct!.base_price);
             const adj = variant.price_adjustment ? parseFloat(variant.price_adjustment) : 0;
             const price = basePrice + adj;
@@ -165,6 +150,51 @@ export default function POSPage() {
         toast.success("Added to cart");
     };
 
+    // Add to cart by SKU (for barcode scanner)
+    const addToCartBySku = useCallback(async (sku: string) => {
+        try {
+            // Search for variant by SKU
+            const res = await api.get(`/products/variants/sku/${sku}`);
+
+            if (res.data && res.data.variant) {
+                const variant = res.data.variant;
+                const product = res.data.product;
+
+                setCart(prev => {
+                    const existing = prev.find(item => item.variantId === variant.id);
+                    if (existing) {
+                        return prev.map(item =>
+                            item.variantId === variant.id
+                                ? { ...item, quantity: item.quantity + 1 }
+                                : item
+                        );
+                    }
+
+                    const basePrice = parseFloat(product.base_price);
+                    const adj = variant.price_adjustment ? parseFloat(variant.price_adjustment) : 0;
+                    const price = basePrice + adj;
+
+                    return [...prev, {
+                        variantId: variant.id,
+                        productId: product.id,
+                        name: product.name,
+                        sku: variant.sku,
+                        size: variant.size,
+                        color: variant.color,
+                        price: price,
+                        quantity: 1
+                    }];
+                });
+                toast.success(`Added ${product.name} to cart`);
+            } else {
+                toast.error(`Product with SKU "${sku}" not found`);
+            }
+        } catch (error) {
+            toast.error(`Product with SKU "${sku}" not found`);
+            console.error(error);
+        }
+    }, []);
+
     const removeFromCart = (variantId: string) => {
         setCart(prev => prev.filter(item => item.variantId !== variantId));
     };
@@ -174,6 +204,7 @@ export default function POSPage() {
 
         const orderData = {
             payment_method: "cash",
+            source: "pos", // Add source to mark as POS order
             items: cart.map(item => ({
                 variant_id: item.variantId,
                 quantity: item.quantity
@@ -185,19 +216,74 @@ export default function POSPage() {
 
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    // Barcode Scanner Listener (Mock implementation)
-    // Real implementation would buffer keys and detect timing
+    // Barcode Scanner Detection
+    // Barcode scanners typically type characters very fast and end with Enter
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // If focused on input, don't interfere
-            if (document.activeElement?.tagName === 'INPUT') return;
+            const now = Date.now();
+            const timeDiff = now - lastKeyTime.current;
+            lastKeyTime.current = now;
 
-            // Simple listener for now
-            // In a real app, we'd buffer chars and look for Enter
+            // If focused on the search input and it's a regular typing speed, don't interfere
+            if (document.activeElement === searchInputRef.current && timeDiff > 50) {
+                return;
+            }
+
+            // Detect barcode scanner: fast consecutive key presses
+            if (timeDiff < 50) {
+                // This is likely a barcode scanner (very fast input)
+                if (e.key === 'Enter' && barcodeBuffer.length > 3) {
+                    // Process the barcode
+                    e.preventDefault();
+                    const sku = barcodeBuffer;
+                    setBarcodeBuffer("");
+                    addToCartBySku(sku);
+                    return;
+                }
+
+                // Build buffer
+                if (e.key.length === 1) {
+                    setBarcodeBuffer(prev => prev + e.key);
+                }
+            } else {
+                // Reset buffer if typing is slow (manual input)
+                if (barcodeBuffer && barcodeBuffer.length > 0) {
+                    setBarcodeBuffer("");
+                }
+
+                // Start new buffer
+                if (e.key.length === 1 && document.activeElement?.tagName !== 'INPUT') {
+                    setBarcodeBuffer(e.key);
+                    // Focus search input for manual typing
+                    searchInputRef.current?.focus();
+                }
+            }
+
+            // Clear buffer after timeout
+            if (barcodeTimeoutRef.current) {
+                clearTimeout(barcodeTimeoutRef.current);
+            }
+            barcodeTimeoutRef.current = setTimeout(() => {
+                setBarcodeBuffer("");
+            }, 100);
         };
+
         window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            if (barcodeTimeoutRef.current) {
+                clearTimeout(barcodeTimeoutRef.current);
+            }
+        };
+    }, [barcodeBuffer, addToCartBySku]);
+
+    // Handle search input Enter key for SKU search
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            // Try to find by SKU first
+            addToCartBySku(searchQuery.trim());
+        }
+    };
 
     return (
         <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -207,10 +293,12 @@ export default function POSPage() {
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
-                            placeholder="Search products..."
+                            ref={searchInputRef}
+                            placeholder="Search products or scan barcode..."
                             className="pl-10 h-12 text-lg bg-white"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={handleSearchKeyDown}
                         />
                     </div>
                     <Link href="/pos/report">
@@ -226,23 +314,46 @@ export default function POSPage() {
                     ) : filteredProducts.length === 0 ? (
                         <div className="col-span-full text-center py-10 text-gray-500">No products found</div>
                     ) : (
-                        filteredProducts.map((product: Product) => (
-                            <div
-                                key={product.id}
-                                className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center group"
-                                onClick={() => handleProductClick(product)}
-                            >
-                                <div className="w-full aspect-square bg-gray-100 mb-4 rounded-lg flex items-center justify-center text-gray-300 overflow-hidden relative">
-                                    {product.image_url ? (
-                                        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                    ) : (
-                                        <ShoppingBag className="w-8 h-8 opacity-20" />
-                                    )}
+                        <>
+                            {filteredProducts.map((product: Product) => (
+                                <div
+                                    key={product.id}
+                                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center group"
+                                    onClick={() => handleProductClick(product)}
+                                >
+                                    <div className="w-full aspect-square bg-gray-100 mb-4 rounded-lg flex items-center justify-center text-gray-300 overflow-hidden relative">
+                                        {product.image_url ? (
+                                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                        ) : (
+                                            <ShoppingBag className="w-8 h-8 opacity-20" />
+                                        )}
+                                    </div>
+                                    <h3 className="font-medium mb-1 line-clamp-1">{product.name}</h3>
+                                    <p className="text-gray-500">{parseFloat(product.base_price).toLocaleString()} ETB</p>
                                 </div>
-                                <h3 className="font-medium mb-1 line-clamp-1">{product.name}</h3>
-                                <p className="text-gray-500">${parseFloat(product.base_price).toFixed(2)}</p>
-                            </div>
-                        ))
+                            ))}
+
+                            {/* Load More Button */}
+                            {hasNextPage && (
+                                <div className="col-span-full flex justify-center py-4">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => fetchNextPage()}
+                                        disabled={isFetchingNextPage}
+                                        className="w-full max-w-xs"
+                                    >
+                                        {isFetchingNextPage ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Loading...
+                                            </>
+                                        ) : (
+                                            "Load More Products"
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
@@ -264,6 +375,7 @@ export default function POSPage() {
                         <div className="h-full flex flex-col items-center justify-center text-gray-400 text-center space-y-4">
                             <ShoppingBag className="h-12 w-12 opacity-20" />
                             <p>Cart is empty</p>
+                            <p className="text-xs">Scan barcode or click products to add</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -276,10 +388,10 @@ export default function POSPage() {
                                             {item.color && <span>{item.color}</span>}
                                             {!item.size && !item.color && <span>Default</span>}
                                         </p>
-                                        <p className="text-sm text-gray-500">{item.quantity} x ${item.price.toFixed(2)}</p>
+                                        <p className="text-sm text-gray-500">{item.quantity} x {item.price.toLocaleString()} ETB</p>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className="font-medium">{(item.price * item.quantity).toLocaleString()} ETB</p>
                                         <Button
                                             variant="ghost"
                                             size="icon"
@@ -298,7 +410,7 @@ export default function POSPage() {
                 <div className="p-6 bg-gray-50 border-t border-gray-200">
                     <div className="flex justify-between mb-4 text-lg font-semibold">
                         <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>{total.toLocaleString()} ETB</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

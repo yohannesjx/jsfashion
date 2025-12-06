@@ -29,6 +29,7 @@ type CreateOrderRequest struct {
 	PaymentMethod   string           `json:"payment_method"`
 	Items           []OrderItemInput `json:"items"`
 	ShippingAddress *ShippingAddress `json:"shipping_address"` // For guest checkout
+	Source          string           `json:"source"`           // "pos" or "web"
 }
 
 type ShippingAddress struct {
@@ -168,9 +169,15 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		}
 	}
 
+	// Determine order status - POS orders are completed immediately
+	orderStatus := "pending"
+	if req.Source == "pos" {
+		orderStatus = "completed"
+	}
+
 	order, err := h.Repo.CreateOrder(ctx, repository.CreateOrderParams{
 		CustomerID:    customerUUID,
-		Status:        "pending",
+		Status:        orderStatus,
 		TotalAmount:   strconv.FormatInt(totalAmount, 10), // Convert int64 to string
 		PaymentMethod: sql.NullString{String: req.PaymentMethod, Valid: req.PaymentMethod != ""},
 	})
