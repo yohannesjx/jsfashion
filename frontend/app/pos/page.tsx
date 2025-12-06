@@ -58,7 +58,7 @@ export default function POSPage() {
 
     // Load cached products from localStorage
     const getCachedProducts = useCallback(() => {
-        if (typeof window === 'undefined') return [];
+        if (typeof window === 'undefined') return undefined;
         try {
             const cached = localStorage.getItem('pos-products-cache');
             if (cached) {
@@ -71,7 +71,7 @@ export default function POSPage() {
         } catch (e) {
             console.error('Failed to load cached products:', e);
         }
-        return [];
+        return undefined;
     }, []);
 
     // Fetch ALL products at once for fast POS checkout with persistent cache
@@ -320,7 +320,7 @@ export default function POSPage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto pb-20 pr-2">
-                    {isLoading && products.length === 0 ? (
+                    {(isLoading || (isFetching && products.length === 0)) ? (
                         <div className="col-span-full text-center py-10">Loading products...</div>
                     ) : filteredProducts.length === 0 ? (
                         <div className="col-span-full text-center py-10 text-gray-500">No products found</div>
