@@ -170,6 +170,10 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	// Upload Routes
 	api.POST("/upload", uploadHandler.UploadFile)
 
+	// Telegram Webhook
+	telegramHandler := NewTelegramWebhookHandler(repo)
+	api.POST("/telegram/webhook", telegramHandler.HandleWebhook)
+
 	// Static Files
 	e.Static("/uploads", "./uploads")
 }

@@ -28,17 +28,27 @@ type OrderNotification struct {
 	ImageURL      string
 }
 
+// Default chat IDs - add more as needed
+var defaultChatIDs = []string{
+	"358753046", // Main admin
+}
+
 func SendTelegramOrder(n OrderNotification) error {
 	token := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if token == "" {
 		token = "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
 	}
-	chatID := os.Getenv("TELEGRAM_CHAT_ID")
-	if chatID == "" {
-		chatID = "358753046"
+
+	// Get chat IDs from env or use defaults
+	chatIDsStr := os.Getenv("TELEGRAM_CHAT_IDS")
+	var chatIDs []string
+	if chatIDsStr != "" {
+		chatIDs = strings.Split(chatIDsStr, ",")
+	} else {
+		chatIDs = defaultChatIDs
 	}
 
-	// Format message - simple plain text first to avoid formatting issues
+	// Format message
 	var msg strings.Builder
 	msg.WriteString(fmt.Sprintf("🛍 NEW ORDER #%d\n\n", n.OrderNumber))
 	msg.WriteString(fmt.Sprintf("👤 Customer: %s\n", n.CustomerName))
@@ -65,32 +75,150 @@ func SendTelegramOrder(n OrderNotification) error {
 	}
 
 	msg.WriteString(fmt.Sprintf("\n💰 TOTAL: %d ETB\n\n", n.TotalAmount))
-	msg.WriteString(fmt.Sprintf("🔗 View Order: https://jsfashion.et/thank-you/%d", n.OrderNumber))
+	msg.WriteString(fmt.Sprintf("🔗 View: https://jsfashion.et/thank-you/%d", n.OrderNumber))
 
-	// Send as plain text message (no photo, no special formatting)
-	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+	// Create inline keyboard with action buttons
+	inlineKeyboard := map[string]interface{}{
+		"inline_keyboard": [][]map[string]interface{}{
+			{
+				{
+					"text":          "✅ Deliver",
+					"callback_data": fmt.Sprintf("deliver_%d", n.OrderNumber),
+				},
+				{
+					"text":          "❌ Cancel",
+					"callback_data": fmt.Sprintf("cancel_%d", n.OrderNumber),
+				},
+			},
+			{
+				{
+					"text": "📞 Call Customer",
+					"url":  fmt.Sprintf("tel:%s", n.CustomerPhone),
+				},
+			},
+		},
+	}
 
+	// Send to all chat IDs
+	var lastErr error
+	for _, chatID := range chatIDs {
+		chatID = strings.TrimSpace(chatID)
+		if chatID == "" {
+			continue
+		}
+
+		apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+
+		payload := map[string]interface{}{
+			"chat_id":      chatID,
+			"text":         msg.String(),
+			"reply_markup": inlineKeyboard,
+		}
+		reqBody, _ := json.Marshal(payload)
+
+		resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			lastErr = fmt.Errorf("http error for chat %s: %v", chatID, err)
+			continue
+		}
+
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			lastErr = fmt.Errorf("telegram api returned status %d for chat %s: %s", resp.StatusCode, chatID, string(body))
+		} else {
+			fmt.Printf("Telegram notification sent to chat %s for Order #%d\n", chatID, n.OrderNumber)
+		}
+	}
+
+	return lastErr
+}
+
+// SendTelegramMessage sends a simple message to all configured chat IDs
+func SendTelegramMessage(message string) error {
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if token == "" {
+		token = "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
+	}
+
+	chatIDsStr := os.Getenv("TELEGRAM_CHAT_IDS")
+	var chatIDs []string
+	if chatIDsStr != "" {
+		chatIDs = strings.Split(chatIDsStr, ",")
+	} else {
+		chatIDs = defaultChatIDs
+	}
+
+	var lastErr error
+	for _, chatID := range chatIDs {
+		chatID = strings.TrimSpace(chatID)
+		if chatID == "" {
+			continue
+		}
+
+		apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+		payload := map[string]interface{}{
+			"chat_id": chatID,
+			"text":    message,
+		}
+		reqBody, _ := json.Marshal(payload)
+
+		resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		resp.Body.Close()
+	}
+
+	return lastErr
+}
+
+// AnswerCallbackQuery responds to a callback query from inline button
+func AnswerCallbackQuery(callbackQueryID, text string) error {
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if token == "" {
+		token = "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
+	}
+
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/answerCallbackQuery", token)
 	payload := map[string]interface{}{
-		"chat_id": chatID,
-		"text":    msg.String(),
+		"callback_query_id": callbackQueryID,
+		"text":              text,
+		"show_alert":        true,
 	}
 	reqBody, _ := json.Marshal(payload)
 
-	fmt.Printf("Telegram Request: %s\n", string(reqBody))
-
 	resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
-		return fmt.Errorf("http error: %v", err)
+		return err
 	}
 	defer resp.Body.Close()
 
-	// Read response body for debugging
-	body, _ := io.ReadAll(resp.Body)
-	fmt.Printf("Telegram Response: %s\n", string(body))
+	return nil
+}
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("telegram api returned status %d: %s", resp.StatusCode, string(body))
+// EditMessageText updates the original message after an action
+func EditMessageText(chatID int64, messageID int, newText string) error {
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if token == "" {
+		token = "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
 	}
+
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/editMessageText", token)
+	payload := map[string]interface{}{
+		"chat_id":    chatID,
+		"message_id": messageID,
+		"text":       newText,
+	}
+	reqBody, _ := json.Marshal(payload)
+
+	resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
 	return nil
 }
