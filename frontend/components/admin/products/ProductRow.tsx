@@ -5,9 +5,9 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight, Edit } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useVariants } from "@/lib/api/admin/products";
+import { useVariants, useDeleteVariant } from "@/lib/api/admin/products";
 import { Input } from "@/components/ui/input";
 import { useUpdateVariant } from "@/lib/api/admin/products";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ export function ProductRow({
     const [expanded, setExpanded] = useState(false);
     const { data: variants = [], isLoading: variantsLoading } = useVariants(product.id);
     const updateVariant = useUpdateVariant();
+    const deleteVariant = useDeleteVariant();
 
     const handleVariantUpdate = async (variantId: string, field: string, value: any) => {
         try {
@@ -209,6 +210,23 @@ export function ProductRow({
                                                         className="h-8 text-sm"
                                                     />
                                                 </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                    onClick={async () => {
+                                                        if (confirm('Are you sure you want to delete this variant?')) {
+                                                            try {
+                                                                await deleteVariant.mutateAsync({ id: variant.id, productId: product.id });
+                                                                toast.success('Variant deleted');
+                                                            } catch (error) {
+                                                                toast.error('Failed to delete variant');
+                                                            }
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </div>
                                         );
                                     })}

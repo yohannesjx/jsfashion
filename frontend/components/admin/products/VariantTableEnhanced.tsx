@@ -541,6 +541,13 @@ export function VariantTableEnhanced({ productId, variants: initialVariants, bas
 
         // Create variants
         try {
+            // Calculate default price adjustment from existing variants
+            let defaultAdj = '0';
+            if (variants.length > 0) {
+                const v = variants[0];
+                defaultAdj = (v.price - basePrice).toFixed(2);
+            }
+
             for (const combo of combinations) {
                 const name = combo.map((c: any) => c.value).join(' / ');
                 const size = combo.find((c: any) => c.name === 'Size')?.value || null;
@@ -552,7 +559,7 @@ export function VariantTableEnhanced({ productId, variants: initialVariants, bas
                     sku,
                     size,
                     color,
-                    price_adjustment: '0',
+                    price_adjustment: defaultAdj,
                     stock_quantity: 0,
                 });
             }
@@ -906,10 +913,17 @@ export function VariantTableEnhanced({ productId, variants: initialVariants, bas
                     </Dialog>
                     <Button size="sm" onClick={async () => {
                         try {
+                            // Calculate default price adjustment from existing variants
+                            let defaultAdj = '0';
+                            if (variants.length > 0) {
+                                const v = variants[0];
+                                defaultAdj = (v.price - basePrice).toFixed(2);
+                            }
+
                             await createVariant.mutateAsync({
                                 product_id: productId,
                                 sku: `${productId.slice(0, 8)}-NEW-${Date.now()}`,
-                                price_adjustment: '0',
+                                price_adjustment: defaultAdj,
                                 stock_quantity: 0,
                             });
                             toast.success('Variant created');
