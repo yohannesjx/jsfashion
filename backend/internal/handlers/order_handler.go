@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/luxe-fashion/backend/internal/notification"
 	"github.com/luxe-fashion/backend/internal/repository"
 )
 
@@ -74,6 +75,9 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		Quantity      int32
 		UnitPrice     int64
 		PreviousStock int32
+		ProductName   string
+		VariantName   string
+		ImageURL      string
 	}
 	itemsWithPrices := make([]ItemWithPrice, 0, len(req.Items))
 	var totalAmount int64
@@ -86,6 +90,13 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 			}
 			c.Logger().Errorf("Failed to get variant %s: %v", item.VariantID, err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to validate stock"})
+		}
+
+		// Fetch product for name and image fallback
+		product, err := h.Repo.GetProduct(ctx, variant.ProductID)
+		if err != nil {
+			c.Logger().Errorf("Failed to get product %s: %v", variant.ProductID, err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch product details"})
 		}
 
 		// Check stock (handle sql.NullInt32)
@@ -104,11 +115,21 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		subtotal := variant.Price * int64(item.Quantity)
 		totalAmount += subtotal
 
+		imageUrl := ""
+		if variant.Image.Valid {
+			imageUrl = variant.Image.String
+		} else if product.ImageUrl.Valid {
+			imageUrl = product.ImageUrl.String
+		}
+
 		itemsWithPrices = append(itemsWithPrices, ItemWithPrice{
 			VariantID:     item.VariantID,
 			Quantity:      item.Quantity,
 			UnitPrice:     variant.Price,
 			PreviousStock: stockQty,
+			ProductName:   product.Name,
+			VariantName:   variant.Name,
+			ImageURL:      imageUrl,
 		})
 	}
 
@@ -202,6 +223,39 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	}
 
 	// Step 4: Return created order
+	// Send Telegram Notification (Async)
+	go func() {
+		if req.ShippingAddress != nil {
+			notifItems := make([]notification.OrderItem, len(itemsWithPrices))
+			var firstImage string
+			for i, item := range itemsWithPrices {
+				notifItems[i] = notification.OrderItem{
+					Name:     item.ProductName,
+					Quantity: item.Quantity,
+					Price:    item.UnitPrice,
+					Variant:  item.VariantName,
+				}
+				if firstImage == "" && item.ImageURL != "" {
+					firstImage = item.ImageURL
+				}
+			}
+
+			n := notification.OrderNotification{
+				OrderNumber:   order.OrderNumber,
+				CustomerName:  req.ShippingAddress.FullName,
+				CustomerPhone: req.ShippingAddress.Phone,
+				Address:       req.ShippingAddress.Address,
+				City:          req.ShippingAddress.City,
+				TotalAmount:   totalAmount,
+				Items:         notifItems,
+				ImageURL:      firstImage,
+			}
+
+			// Use a hardcoded token if env var is missing for now, or rely on the package default
+			_ = notification.SendTelegramOrder(n)
+		}
+	}()
+
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"order":   order,
 		"message": "Order created successfully",
