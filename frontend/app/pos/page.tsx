@@ -99,7 +99,7 @@ export default function POSPage() {
     const filteredProducts = useMemo(() => {
         if (!searchQuery) return products;
         const q = searchQuery.toLowerCase();
-        return products.filter(p => p.name.toLowerCase().includes(q));
+        return products.filter((p: Product) => p.name.toLowerCase().includes(q));
     }, [products, searchQuery]);
 
     // Mutation for Checkout
@@ -116,11 +116,6 @@ export default function POSPage() {
             toast.error(error.message || "Checkout failed");
         }
     });
-
-    // Filter products
-    const filteredProducts = products.filter((p: Product) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     const handleProductClick = async (product: Product) => {
         try {
