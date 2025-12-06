@@ -93,12 +93,6 @@ func SendTelegramOrder(n OrderNotification) error {
 					"callback_data": fmt.Sprintf("cancel_%d", n.OrderNumber),
 				},
 			},
-			{
-				{
-					"text": "📞 Call Customer",
-					"url":  fmt.Sprintf("tel:%s", n.CustomerPhone),
-				},
-			},
 		},
 	}
 
