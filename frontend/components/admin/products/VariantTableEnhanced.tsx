@@ -175,6 +175,63 @@ const EditableCell = ({
     );
 };
 
+// Editable Variant Field for Size/Color
+const EditableVariantField = ({
+    value,
+    placeholder,
+    onSave,
+}: {
+    value: string;
+    placeholder: string;
+    onSave: (newValue: string) => Promise<void>;
+}) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [inputValue, setInputValue] = useState(value);
+
+    useEffect(() => {
+        setInputValue(value);
+    }, [value]);
+
+    const handleSave = async () => {
+        if (inputValue !== value) {
+            await onSave(inputValue);
+        }
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            setInputValue(value);
+            setIsEditing(false);
+        }
+    };
+
+    if (!isEditing) {
+        return (
+            <button
+                onClick={() => setIsEditing(true)}
+                className="px-2 py-0.5 text-xs rounded border border-dashed border-muted-foreground/30 hover:border-muted-foreground hover:bg-muted/50 transition-colors min-w-[40px] text-left"
+            >
+                {value || placeholder}
+            </button>
+        );
+    }
+
+    return (
+        <Input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            autoFocus
+            placeholder={placeholder}
+            className="h-6 w-16 text-xs px-1"
+        />
+    );
+};
+
 export function VariantTableEnhanced({ productId, variants: initialVariants, basePrice, productImageUrl, onVariantsChange }: VariantTableEnhancedProps) {
     const mapVariants = useCallback((variants: ProductVariant[], price: number, img: string | null | undefined) => {
         return variants.map(v => {
@@ -609,12 +666,12 @@ export function VariantTableEnhanced({ productId, variants: initialVariants, bas
         },
         {
             accessorKey: "name",
-            header: "Variant Name",
+            header: "Variant",
             cell: ({ row }) => {
                 const variant = initialVariants.find(v => v.id === row.original.id);
                 if (!variant) return <div className="px-2 py-1">Default</div>;
 
-                // Handle both object and string formats
+                // Extract size and color
                 let size = '';
                 let color = '';
 
@@ -638,21 +695,22 @@ export function VariantTableEnhanced({ productId, variants: initialVariants, bas
                     }
                 }
 
-                // Build display name
-                let displayName = '';
-                if (size && color) {
-                    displayName = `${size} / ${color}`;
-                } else if (size) {
-                    displayName = size;
-                } else if (color) {
-                    displayName = color;
-                } else {
-                    displayName = variant.sku || 'Variant';
-                }
-
                 return (
-                    <div className="px-2 py-1">
-                        {displayName}
+                    <div className="flex items-center gap-1 px-1">
+                        <EditableVariantField
+                            value={size}
+                            placeholder="Size"
+                            onSave={async (newValue) => {
+                                await handleSave(row.original, 'name', `${newValue}/${color}`.trim());
+                            }}
+                        />
+                        <EditableVariantField
+                            value={color}
+                            placeholder="Color"
+                            onSave={async (newValue) => {
+                                await handleSave(row.original, 'name', `${size}/${newValue}`.trim());
+                            }}
+                        />
                     </div>
                 );
             },
