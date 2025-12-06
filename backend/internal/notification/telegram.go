@@ -39,12 +39,12 @@ func SendTelegramOrder(n OrderNotification) error {
 
 	// Format message
 	var msg strings.Builder
-	msg.WriteString(fmt.Sprintf("🛍️ *New Order #%d*\n\n", n.OrderNumber))
-	msg.WriteString(fmt.Sprintf("👤 *Customer:* %s\n", escapeMarkdown(n.CustomerName)))
-	msg.WriteString(fmt.Sprintf("📞 *Phone:* `%s`\n", escapeMarkdown(n.CustomerPhone)))
-	msg.WriteString(fmt.Sprintf("📍 *Address:* %s, %s\n\n", escapeMarkdown(n.Address), escapeMarkdown(n.City)))
+	msg.WriteString(fmt.Sprintf("🛍️ <b>New Order #%d</b>\n\n", n.OrderNumber))
+	msg.WriteString(fmt.Sprintf("👤 <b>Customer:</b> %s\n", escapeHTML(n.CustomerName)))
+	msg.WriteString(fmt.Sprintf("📞 <b>Phone:</b> <code>%s</code>\n", escapeHTML(n.CustomerPhone)))
+	msg.WriteString(fmt.Sprintf("📍 <b>Address:</b> %s, %s\n\n", escapeHTML(n.Address), escapeHTML(n.City)))
 
-	msg.WriteString("🛒 *Items:*\n")
+	msg.WriteString("🛒 <b>Items:</b>\n")
 	for _, item := range n.Items {
 		variantInfo := ""
 		if item.Variant != "" {
@@ -52,12 +52,12 @@ func SendTelegramOrder(n OrderNotification) error {
 		}
 		msg.WriteString(fmt.Sprintf("• %dx %s%s - %s ETB\n",
 			item.Quantity,
-			escapeMarkdown(item.Name),
-			escapeMarkdown(variantInfo),
+			escapeHTML(item.Name),
+			escapeHTML(variantInfo),
 			formatPrice(item.Price*int64(item.Quantity))))
 	}
 
-	msg.WriteString(fmt.Sprintf("\n💰 *Total: %s ETB*", formatPrice(n.TotalAmount)))
+	msg.WriteString(fmt.Sprintf("\n💰 <b>Total: %s ETB</b>", formatPrice(n.TotalAmount)))
 
 	// Send request
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s", token)
@@ -71,7 +71,7 @@ func SendTelegramOrder(n OrderNotification) error {
 			"chat_id":    chatID,
 			"photo":      n.ImageURL,
 			"caption":    msg.String(),
-			"parse_mode": "MarkdownV2",
+			"parse_mode": "HTML",
 		}
 		reqBody, _ = json.Marshal(payload)
 	} else {
@@ -79,7 +79,7 @@ func SendTelegramOrder(n OrderNotification) error {
 		payload := map[string]interface{}{
 			"chat_id":    chatID,
 			"text":       msg.String(),
-			"parse_mode": "MarkdownV2",
+			"parse_mode": "HTML",
 		}
 		reqBody, _ = json.Marshal(payload)
 	}
@@ -97,12 +97,11 @@ func SendTelegramOrder(n OrderNotification) error {
 	return nil
 }
 
-func escapeMarkdown(text string) string {
-	// MarkdownV2 requires escaping specific characters
+func escapeHTML(text string) string {
 	replacer := strings.NewReplacer(
-		"_", "\\_", "*", "\\*", "[", "\\[", "]", "\\]", "(", "\\(", ")", "\\)", "~", "\\~",
-		"`", "\\`", ">", "\\>", "#", "\\#", "+", "\\+", "-", "\\-", "=", "\\=", "|", "\\|",
-		"{", "\\{", "}", "\\}", ".", "\\.", "!", "\\!",
+		"<", "&lt;",
+		">", "&gt;",
+		"&", "&amp;",
 	)
 	return replacer.Replace(text)
 }
