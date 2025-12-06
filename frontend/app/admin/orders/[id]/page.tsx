@@ -35,7 +35,8 @@ import {
     Package,
     Calendar,
     Mail,
-    Phone
+    Phone,
+    Check
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -194,23 +195,28 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Select
-                        value={order.status}
-                        onValueChange={handleStatusChange}
-                        disabled={isUpdating}
-                    >
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Change Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="shipped">Shipped</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                    </Select>
+                <div className="flex flex-wrap items-center gap-2">
+                    {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => {
+                        const isActive = order.status === status;
+                        return (
+                            <button
+                                key={status}
+                                onClick={() => handleStatusChange(status)}
+                                disabled={isUpdating}
+                                className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors border
+                                    ${isActive
+                                        ? 'bg-red-600 text-white border-red-600'
+                                        : 'bg-white text-red-600 border-red-600 hover:bg-red-50'
+                                    }
+                                    ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}
+                                `}
+                            >
+                                {isActive && <Check className="h-4 w-4" />}
+                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 

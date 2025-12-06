@@ -157,13 +157,15 @@ export default function OrdersPage() {
                             orders.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell className="font-mono font-medium">
-                                        #{order.order_number}
+                                        <Link href={`/admin/orders/${order.id}`} className="hover:underline text-blue-600">
+                                            #{order.order_number}
+                                        </Link>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <span className="font-medium">
+                                            <Link href={`/admin/orders/${order.id}`} className="font-medium hover:underline">
                                                 {order.customer_first_name} {order.customer_last_name}
-                                            </span>
+                                            </Link>
                                             <span className="text-xs text-neutral-500">
                                                 {order.customer_email}
                                             </span>
