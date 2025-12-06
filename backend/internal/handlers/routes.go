@@ -141,6 +141,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	// api.GET("/orders", orderHandler.ListOrders) // Public shop routes should not list all orders
 	// api.GET("/orders/:id", orderHandler.GetOrder) // Public shop routes should not get arbitrary orders
 	api.POST("/orders", orderHandler.CreateOrder)
+	api.GET("/orders/number/:orderNumber", orderHandler.GetOrderPublic) // Public order lookup by order number
 	// api.PUT("/orders/:id", orderHandler.UpdateOrder)
 
 	// Customer Routes (Public for shop)

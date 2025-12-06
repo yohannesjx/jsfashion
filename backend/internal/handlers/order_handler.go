@@ -544,3 +544,69 @@ func (h *OrderHandler) UpdateOrderStatus(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, updatedOrder)
 }
+
+// GetOrderPublic returns order details by order number for the public thank-you page
+func (h *OrderHandler) GetOrderPublic(c echo.Context) error {
+	orderNumStr := c.Param("orderNumber")
+	orderNum, err := strconv.ParseInt(orderNumStr, 10, 32)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid order number"})
+	}
+
+	ctx := c.Request().Context()
+
+	// Get order details
+	order, err := h.Repo.GetOrderByNumber(ctx, int32(orderNum))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Order not found"})
+		}
+		c.Logger().Errorf("Failed to fetch order %d: %v", orderNum, err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch order"})
+	}
+
+	// Get order items
+	items, err := h.Repo.ListOrderItemsByOrderNumber(ctx, int32(orderNum))
+	if err != nil {
+		c.Logger().Errorf("Failed to fetch order items for %d: %v", orderNum, err)
+		items = []repository.OrderItemPublic{}
+	}
+
+	type ItemResponse struct {
+		ProductName string  `json:"product_name"`
+		VariantName string  `json:"variant_name"`
+		Quantity    int32   `json:"quantity"`
+		UnitPrice   string  `json:"unit_price"`
+		ImageUrl    *string `json:"image_url"`
+	}
+
+	itemsResponse := make([]ItemResponse, len(items))
+	for i, item := range items {
+		var imageUrl *string
+		if item.ImageUrl.Valid && item.ImageUrl.String != "" {
+			imageUrl = &item.ImageUrl.String
+		}
+		itemsResponse[i] = ItemResponse{
+			ProductName: item.ProductName,
+			VariantName: item.VariantName,
+			Quantity:    item.Quantity,
+			UnitPrice:   item.UnitPrice,
+			ImageUrl:    imageUrl,
+		}
+	}
+
+	response := map[string]interface{}{
+		"order_number": order.OrderNumber,
+		"status":       order.Status,
+		"total_amount": order.TotalAmount,
+		"created_at": func() string {
+			if order.CreatedAt.Valid {
+				return order.CreatedAt.Time.Format(time.RFC3339)
+			}
+			return ""
+		}(),
+		"items": itemsResponse,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

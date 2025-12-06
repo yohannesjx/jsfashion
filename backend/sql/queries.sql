@@ -256,6 +256,22 @@ FROM orders o
 LEFT JOIN customers c ON o.customer_id = c.id
 WHERE o.id = $1 LIMIT 1;
 
+-- name: GetOrderByNumber :one
+SELECT 
+    o.id, 
+    o.order_number,
+    o.customer_id, 
+    o.status, 
+    o.total_amount, 
+    o.payment_method, 
+    o.created_at, 
+    o.updated_at,
+    c.first_name as customer_first_name,
+    c.last_name as customer_last_name
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.id
+WHERE o.order_number = $1 LIMIT 1;
+
 -- name: UpdateOrderStatus :one
 UPDATE orders
 SET status = $2, updated_at = NOW()

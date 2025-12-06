@@ -90,6 +90,9 @@ type Querier interface {
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdateProductVariant(ctx context.Context, arg UpdateProductVariantParams) (ProductVariant, error)
 	UpdateVariantStock(ctx context.Context, arg UpdateVariantStockParams) error
+	// Public order lookup
+	GetOrderByNumber(ctx context.Context, orderNumber int32) (GetOrderByNumberRow, error)
+	ListOrderItemsByOrderNumber(ctx context.Context, orderNumber int32) ([]OrderItemPublic, error)
 }
 
 var _ Querier = (*Queries)(nil)

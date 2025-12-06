@@ -2,25 +2,59 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Check, Phone } from "lucide-react";
+import { Check, Phone, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useCartStore } from "@/store/cart";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.jsfashion.et';
+
+interface OrderItem {
+    product_name: string;
+    variant_name: string;
+    quantity: number;
+    unit_price: string;
+    image_url: string | null;
+}
+
+interface OrderData {
+    order_number: number;
+    status: string;
+    total_amount: string;
+    created_at: string;
+    items: OrderItem[];
+}
 
 export default function ThankYouPage({ params }: { params: { orderNumber?: string[] } }) {
     const [mounted, setMounted] = useState(false);
-    // Get order number from URL params (it's an array due to [[...orderNumber]])
-    const orderNumber = params?.orderNumber?.[0] || "—";
+    const [order, setOrder] = useState<OrderData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const cartItems = useCartStore((state) => state.items);
-    const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+    const orderNumber = params?.orderNumber?.[0] || "";
 
     useEffect(() => {
-        // Scroll to top
         window.scrollTo(0, 0);
         setMounted(true);
-    }, []);
 
-    const total = getTotalPrice();
+        // Fetch order from API
+        if (orderNumber && !isNaN(parseInt(orderNumber))) {
+            fetch(`${API_URL}/api/v1/orders/number/${orderNumber}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Order not found');
+                    return res.json();
+                })
+                .then((data: OrderData) => {
+                    setOrder(data);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error('Failed to fetch order:', err);
+                    setError('Order not found');
+                    setLoading(false);
+                });
+        } else {
+            setLoading(false);
+        }
+    }, [orderNumber]);
 
     return (
         <main className="min-h-screen bg-white text-black py-12 px-4">
@@ -54,21 +88,29 @@ export default function ThankYouPage({ params }: { params: { orderNumber?: strin
                 {/* Order Number */}
                 <div className="bg-neutral-50 border border-neutral-200 p-6 rounded-lg text-center">
                     <p className="text-sm text-neutral-600 mb-2">Order Number</p>
-                    <p className="text-3xl font-bold tracking-wider">{orderNumber}</p>
+                    <p className="text-3xl font-bold tracking-wider">#{order?.order_number || orderNumber || "—"}</p>
                 </div>
 
                 {/* Ordered Products */}
-                {mounted && cartItems.length > 0 && (
+                {loading ? (
+                    <div className="border border-neutral-200 rounded-lg p-8 flex items-center justify-center">
+                        <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                    </div>
+                ) : error ? (
+                    <div className="border border-neutral-200 rounded-lg p-6 text-center text-neutral-500">
+                        {error}
+                    </div>
+                ) : order && order.items && order.items.length > 0 ? (
                     <div className="border border-neutral-200 rounded-lg p-4">
                         <h2 className="font-bold text-lg mb-4">Order Summary</h2>
                         <div className="space-y-3">
-                            {cartItems.map((item) => (
-                                <div key={item.variantId} className="flex gap-3 items-center">
+                            {order.items.map((item, index) => (
+                                <div key={index} className="flex gap-3 items-center">
                                     <div className="w-16 h-16 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
-                                        {item.thumbnail ? (
+                                        {item.image_url ? (
                                             <img
-                                                src={item.thumbnail}
-                                                alt={item.productTitle}
+                                                src={item.image_url}
+                                                alt={item.product_name}
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
@@ -76,22 +118,24 @@ export default function ThankYouPage({ params }: { params: { orderNumber?: strin
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-sm truncate">{item.productTitle}</p>
-                                        <p className="text-xs text-neutral-500">{item.variantName}</p>
+                                        <p className="font-medium text-sm truncate">{item.product_name}</p>
+                                        {item.variant_name && item.variant_name !== ' / ' && (
+                                            <p className="text-xs text-neutral-500">{item.variant_name}</p>
+                                        )}
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm font-medium">Qty: {item.quantity}</p>
-                                        <p className="text-sm text-neutral-600">{item.price} {item.currency}</p>
+                                        <p className="text-sm text-neutral-600">{item.unit_price} ETB</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <div className="border-t border-neutral-200 mt-4 pt-4 flex justify-between items-center">
                             <span className="font-bold">Total</span>
-                            <span className="font-bold text-lg">{total} ETB</span>
+                            <span className="font-bold text-lg">{order.total_amount} ETB</span>
                         </div>
                     </div>
-                )}
+                ) : null}
 
                 {/* What's Next */}
                 <div className="bg-neutral-50 p-6 rounded-lg space-y-4">

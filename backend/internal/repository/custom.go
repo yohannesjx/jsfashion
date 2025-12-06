@@ -117,3 +117,87 @@ func (q *Queries) CountOrderItemsByProductID(ctx context.Context, productID stri
 	err := q.db.QueryRowContext(ctx, query, productID).Scan(&count)
 	return count, err
 }
+
+// GetOrderByNumber gets an order by its order_number for public display
+type GetOrderByNumberRow struct {
+	ID                string
+	OrderNumber       int32
+	Status            string
+	TotalAmount       string
+	CreatedAt         sql.NullTime
+	CustomerFirstName sql.NullString
+	CustomerLastName  sql.NullString
+}
+
+func (q *Queries) GetOrderByNumber(ctx context.Context, orderNumber int32) (GetOrderByNumberRow, error) {
+	query := `
+		SELECT 
+			o.id::text, 
+			o.order_number,
+			o.status, 
+			o.total_amount, 
+			o.created_at,
+			c.first_name as customer_first_name,
+			c.last_name as customer_last_name
+		FROM orders o
+		LEFT JOIN customers c ON o.customer_id = c.id
+		WHERE o.order_number = $1 LIMIT 1
+	`
+	var i GetOrderByNumberRow
+	err := q.db.QueryRowContext(ctx, query, orderNumber).Scan(
+		&i.ID,
+		&i.OrderNumber,
+		&i.Status,
+		&i.TotalAmount,
+		&i.CreatedAt,
+		&i.CustomerFirstName,
+		&i.CustomerLastName,
+	)
+	return i, err
+}
+
+// ListOrderItemsByOrderNumber gets order items by order_number
+type OrderItemPublic struct {
+	ProductName string
+	VariantName string
+	Quantity    int32
+	UnitPrice   string
+	ImageUrl    sql.NullString
+}
+
+func (q *Queries) ListOrderItemsByOrderNumber(ctx context.Context, orderNumber int32) ([]OrderItemPublic, error) {
+	query := `
+		SELECT 
+			COALESCE(p.title, 'Product') as product_name,
+			COALESCE(CONCAT_WS(' / ', pv.size, pv.color), pv.sku) as variant_name,
+			oi.quantity,
+			oi.unit_price,
+			COALESCE(pv.image, p.thumbnail) as image_url
+		FROM order_items oi
+		JOIN orders o ON oi.order_id = o.id
+		LEFT JOIN product_variants pv ON oi.variant_id = pv.id
+		LEFT JOIN products p ON pv.product_id = p.id
+		WHERE o.order_number = $1
+	`
+	rows, err := q.db.QueryContext(ctx, query, orderNumber)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []OrderItemPublic
+	for rows.Next() {
+		var i OrderItemPublic
+		if err := rows.Scan(
+			&i.ProductName,
+			&i.VariantName,
+			&i.Quantity,
+			&i.UnitPrice,
+			&i.ImageUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	return items, rows.Err()
+}
