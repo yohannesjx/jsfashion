@@ -85,7 +85,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5 -mx-4 md:mx-0">
                             {displayedProducts.map((product) => {
-                                const price = parseFloat(product.base_price) / 100;
+                                const price = parseInt(product.base_price) || 0;
                                 const currency = 'Br';
 
                                 return (
@@ -119,7 +119,7 @@ export default function CategoryPage({ params }: { params: { category: string } 
                                         <div className="flex flex-col px-2 py-3">
                                             <h3 className="text-xs font-medium tracking-tight mb-1 line-clamp-2">{product.name}</h3>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm font-bold">{price.toFixed(2)} {currency}</span>
+                                                <span className="text-sm font-bold">{price} {currency}</span>
                                             </div>
                                         </div>
                                     </Link>
