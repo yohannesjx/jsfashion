@@ -28,9 +28,12 @@ type OrderNotification struct {
 	ImageURL      string
 }
 
-// Default chat IDs - add more as needed
+// Default chat IDs - all admins who should receive order notifications
 var defaultChatIDs = []string{
-	"358753046", // Main admin
+	"358753046",  // @jj_admin (Main admin)
+	"6734086506", // Kakidan Wondwessen
+	"7399604556", // @jsfashionsupport (Customer Support)
+	"2097854740", // @jsfashionaddis (J's Fashion)
 }
 
 func SendTelegramOrder(n OrderNotification) error {

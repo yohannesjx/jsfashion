@@ -37,6 +37,9 @@ services:
       DB_USER: jsfashion
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: jsfashion
+      # Telegram Bot Configuration
+      TELEGRAM_BOT_TOKEN: "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
+      TELEGRAM_CHAT_IDS: "358753046,6734086506,7399604556,2097854740"
     ports:
       - "8080:8080"
     depends_on:
