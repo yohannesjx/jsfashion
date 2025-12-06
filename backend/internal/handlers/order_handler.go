@@ -42,8 +42,8 @@ type ShippingAddress struct {
 }
 
 type OrderItemInput struct {
-	VariantID uuid.UUID `json:"variant_id"`
-	Quantity  int32     `json:"quantity"`
+	VariantID string `json:"variant_id"`
+	Quantity  int32  `json:"quantity"`
 }
 
 // splitName splits a full name into first and last name
@@ -86,7 +86,13 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 	var totalAmount int64
 
 	for _, item := range req.Items {
-		variant, err := h.Repo.GetProductVariant(ctx, item.VariantID.String())
+		// Parse variant ID string to UUID
+		variantUUID, err := uuid.Parse(item.VariantID)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid variant ID format"})
+		}
+
+		variant, err := h.Repo.GetProductVariant(ctx, item.VariantID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Variant not found"})
@@ -111,7 +117,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		if stockQty < item.Quantity {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"error":      "Insufficient stock",
-				"variant_id": item.VariantID.String(),
+				"variant_id": item.VariantID,
 			})
 		}
 
@@ -126,7 +132,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		}
 
 		itemsWithPrices = append(itemsWithPrices, ItemWithPrice{
-			VariantID:     item.VariantID,
+			VariantID:     variantUUID,
 			Quantity:      item.Quantity,
 			UnitPrice:     variant.Price,
 			PreviousStock: stockQty,
