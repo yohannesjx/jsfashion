@@ -12,7 +12,7 @@ import (
 func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *redis.Client) {
 	// Handlers
 	productHandler := NewProductHandler(repo, rdb)
-	orderHandler := NewOrderHandler(repo)
+	orderHandler := NewOrderHandler(repo, db)
 	customerHandler := NewCustomerHandler(repo)
 	dashboardHandler := NewDashboardHandler(repo, db)
 	settingsHandler := NewSettingsHandler(repo)

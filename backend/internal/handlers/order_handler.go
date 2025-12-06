@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,21 +14,44 @@ import (
 
 type OrderHandler struct {
 	Repo repository.Querier
+	DB   *sql.DB
 }
 
-func NewOrderHandler(repo repository.Querier) *OrderHandler {
-	return &OrderHandler{Repo: repo}
+func NewOrderHandler(repo repository.Querier, db *sql.DB) *OrderHandler {
+	return &OrderHandler{Repo: repo, DB: db}
 }
 
 type CreateOrderRequest struct {
-	CustomerID    *uuid.UUID       `json:"customer_id"` // Nullable for guest checkout
-	PaymentMethod string           `json:"payment_method"`
-	Items         []OrderItemInput `json:"items"`
+	CustomerID      *uuid.UUID       `json:"customer_id"` // Nullable for guest checkout
+	PaymentMethod   string           `json:"payment_method"`
+	Items           []OrderItemInput `json:"items"`
+	ShippingAddress *ShippingAddress `json:"shipping_address"` // For guest checkout
+}
+
+type ShippingAddress struct {
+	FullName       string `json:"full_name"`
+	Phone          string `json:"phone"`
+	Email          string `json:"email"`
+	Address        string `json:"address"`
+	City           string `json:"city"`
+	DeliveryMethod string `json:"delivery_method"`
 }
 
 type OrderItemInput struct {
 	VariantID uuid.UUID `json:"variant_id"`
 	Quantity  int32     `json:"quantity"`
+}
+
+// splitName splits a full name into first and last name
+func splitName(fullName string) []string {
+	parts := strings.Fields(fullName)
+	if len(parts) == 0 {
+		return []string{"", ""}
+	}
+	if len(parts) == 1 {
+		return []string{parts[0], ""}
+	}
+	return []string{parts[0], strings.Join(parts[1:], " ")}
 }
 
 // CreateOrder creates a new order with stock deduction
@@ -88,12 +112,36 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		})
 	}
 
-	// Step 2: Create order
+	// Step 2: Create or use customer
 	var customerUUID uuid.NullUUID
 	if req.CustomerID != nil {
 		customerUUID = uuid.NullUUID{
 			UUID:  *req.CustomerID,
 			Valid: true,
+		}
+	} else if req.ShippingAddress != nil && req.ShippingAddress.FullName != "" {
+		// Guest checkout: Create a customer record from shipping address
+		// Split full name into first/last name
+		nameParts := splitName(req.ShippingAddress.FullName)
+
+		var newCustomerID uuid.UUID
+		err := h.DB.QueryRowContext(ctx, `
+			INSERT INTO customers (first_name, last_name, email, phone)
+			VALUES ($1, $2, $3, $4)
+			RETURNING id
+		`, nameParts[0], nameParts[1],
+			sql.NullString{String: req.ShippingAddress.Email, Valid: req.ShippingAddress.Email != ""},
+			req.ShippingAddress.Phone,
+		).Scan(&newCustomerID)
+
+		if err != nil {
+			c.Logger().Errorf("Failed to create customer: %v", err)
+			// Don't fail the order, just proceed without customer
+		} else {
+			customerUUID = uuid.NullUUID{
+				UUID:  newCustomerID,
+				Valid: true,
+			}
 		}
 	}
 
