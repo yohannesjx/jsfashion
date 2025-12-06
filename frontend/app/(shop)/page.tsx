@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import QuickViewModal from "@/components/shop/QuickViewModal";
 
 interface Product {
@@ -27,37 +27,137 @@ const shuffleArray = <T,>(array: T[]): T[] => {
     return shuffled;
 };
 
+// Product Skeleton Component
+const ProductSkeleton = () => (
+    <div className="group cursor-pointer animate-pulse">
+        <div className="relative aspect-[3/4] bg-neutral-200 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-neutral-200 via-neutral-100 to-neutral-200 animate-shimmer"
+                style={{ backgroundSize: '200% 100%' }} />
+        </div>
+        <div className="flex flex-col px-2 py-3 space-y-2">
+            <div className="h-3 bg-neutral-200 rounded w-3/4" />
+            <div className="h-4 bg-neutral-200 rounded w-1/3" />
+        </div>
+    </div>
+);
+
+// Cache utilities
+const CACHE_KEY = 'shop-products-cache';
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
+const getCachedProducts = (): Product[] | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                return data;
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load cached products:', e);
+    }
+    return null;
+};
+
+const setCachedProducts = (products: Product[]) => {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+            data: products,
+            timestamp: Date.now()
+        }));
+    } catch (e) {
+        console.error('Failed to cache products:', e);
+    }
+};
+
+// Preload images for faster display
+const preloadImages = (products: Product[], count: number = 20) => {
+    if (typeof window === 'undefined') return;
+
+    products.slice(0, count).forEach((product) => {
+        if (product.image_url) {
+            const img = new window.Image();
+            img.src = product.image_url;
+        }
+    });
+};
+
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isFetching, setIsFetching] = useState(false);
     const [loadMoreLoading, setLoadMoreLoading] = useState(false);
     const [quickViewOpen, setQuickViewOpen] = useState(false);
     const [quickViewProductSlug, setQuickViewProductSlug] = useState<string | null>(null);
 
     useEffect(() => {
-        // Load products from API
+        // Try to load from cache first for instant display
+        const cached = getCachedProducts();
+        if (cached && cached.length > 0) {
+            const shuffled = shuffleArray(cached);
+            setProducts(shuffled);
+            setDisplayedProducts(shuffled.slice(0, 40));
+            setIsLoading(false);
+            // Preload first batch of images
+            preloadImages(shuffled, 20);
+
+            // Still fetch fresh data in background
+            setIsFetching(true);
+        }
+
+        // Fetch fresh products from API
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
         fetch(`${API_URL}/api/v1/products?limit=1000&offset=0`)
             .then(res => res.json())
             .then((data: Product[]) => {
-                // Randomize products
                 if (!data) {
-                    setProducts([]);
-                    setDisplayedProducts([]);
+                    if (!cached) {
+                        setProducts([]);
+                        setDisplayedProducts([]);
+                    }
                     setIsLoading(false);
+                    setIsFetching(false);
                     return;
                 }
-                const shuffled = shuffleArray(data);
-                setProducts(shuffled);
-                setDisplayedProducts(shuffled.slice(0, 40));
+
+                // Cache the fresh data
+                setCachedProducts(data);
+
+                // Only update if we don't have cached data or it's a fresh load
+                if (!cached || cached.length === 0) {
+                    const shuffled = shuffleArray(data);
+                    setProducts(shuffled);
+                    setDisplayedProducts(shuffled.slice(0, 40));
+                    preloadImages(shuffled, 20);
+                } else {
+                    // Update products silently for next load more
+                    const shuffled = shuffleArray(data);
+                    setProducts(shuffled);
+                }
+
                 setIsLoading(false);
+                setIsFetching(false);
             })
             .catch(err => {
                 console.error('Failed to load products:', err);
-                setIsLoading(false);
+                if (!cached) {
+                    setIsLoading(false);
+                }
+                setIsFetching(false);
             });
     }, []);
+
+    // Preload next batch of images when user scrolls
+    useEffect(() => {
+        if (products.length > displayedProducts.length) {
+            const nextBatch = products.slice(displayedProducts.length, displayedProducts.length + 20);
+            preloadImages(nextBatch, 20);
+        }
+    }, [displayedProducts.length, products]);
 
     const handleLoadMore = () => {
         setLoadMoreLoading(true);
@@ -66,8 +166,11 @@ export default function Home() {
             const newProducts = products.slice(currentLength, currentLength + 40);
             setDisplayedProducts([...displayedProducts, ...newProducts]);
             setLoadMoreLoading(false);
-        }, 500);
+        }, 300);
     };
+
+    // Generate skeleton array for loading state
+    const skeletonCount = 8;
 
     return (
         <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
@@ -110,11 +213,18 @@ export default function Home() {
                         <h2 className="text-4xl md:text-5xl font-bold tracking-tighter">NEW ARRIVALS</h2>
                         <Link href="/shop/new-arrivals" className="text-lg underline underline-offset-4 hover:text-neutral-500 transition-colors">VIEW ALL</Link>
                     </div>
+                    {/* Background refresh indicator */}
+                    {isFetching && displayedProducts.length > 0 && (
+                        <p className="text-xs text-neutral-400 mt-2">Refreshing products...</p>
+                    )}
                 </div>
 
-                {isLoading ? (
-                    <div className="text-center py-20">
-                        <p className="text-2xl">Loading products...</p>
+                {isLoading && displayedProducts.length === 0 ? (
+                    // Skeleton Loading Grid
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5">
+                        {Array.from({ length: skeletonCount }).map((_, i) => (
+                            <ProductSkeleton key={i} />
+                        ))}
                     </div>
                 ) : (
                     <>
@@ -133,6 +243,9 @@ export default function Home() {
                                                     fill
                                                     sizes="(max-width: 768px) 50vw, 25vw"
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                                    loading="lazy"
+                                                    placeholder="blur"
+                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQCEAwEPwAB//9k="
                                                 />
                                             ) : (
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />
@@ -205,6 +318,17 @@ export default function Home() {
                 onClose={setQuickViewOpen}
                 productSlug={quickViewProductSlug}
             />
+
+            {/* Shimmer animation styles */}
+            <style jsx global>{`
+                @keyframes shimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
+                }
+                .animate-shimmer {
+                    animation: shimmer 1.5s infinite linear;
+                }
+            `}</style>
         </main>
     );
 }
