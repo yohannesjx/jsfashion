@@ -22,13 +22,15 @@ func NewDashboardHandler(repo *repository.Queries, db *sql.DB) *DashboardHandler
 }
 
 type DashboardStats struct {
-	TotalRevenue   float64 `json:"total_revenue"`
-	OrdersToday    int     `json:"orders_today"`
-	TotalOrders    int     `json:"total_orders"`
-	TotalCustomers int     `json:"total_customers"`
-	ConversionRate float64 `json:"conversion_rate"`
-	AvgOrderValue  float64 `json:"avg_order_value"`
-	TotalSold      int     `json:"total_sold"`
+	TotalRevenue        float64 `json:"total_revenue"`
+	OrdersToday         int     `json:"orders_today"`
+	TotalOrders         int     `json:"total_orders"`
+	TotalCustomers      int     `json:"total_customers"`
+	ConversionRate      float64 `json:"conversion_rate"`
+	AvgOrderValue       float64 `json:"avg_order_value"`
+	TotalSold           int     `json:"total_sold"`
+	TotalInventoryValue float64 `json:"total_inventory_value"`
+	TotalInventoryCount int     `json:"total_inventory_count"`
 }
 
 type SalesDataPoint struct {
@@ -43,6 +45,13 @@ type TopProduct struct {
 	Sales    int     `json:"sales"`
 	Revenue  float64 `json:"revenue"`
 	ImageURL string  `json:"image_url"`
+}
+
+type InventoryExportItem struct {
+	ProductName string  `json:"product_name"`
+	SKU         string  `json:"sku"`
+	Price       float64 `json:"price"`
+	Stock       int     `json:"stock"`
 }
 
 // GetStats returns dashboard statistics
@@ -101,6 +110,27 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 		totalSold = 0
 	}
 
+	// Get Inventory Stats
+	var totalInventoryValue float64
+	var totalInventoryCount int
+
+	// Calculate total value (price * stock)
+	err = h.DB.QueryRowContext(ctx, `
+		SELECT COALESCE(SUM(price * stock_quantity), 0)
+		FROM product_variants
+		WHERE active = true
+	`).Scan(&totalInventoryValue)
+	if err != nil {
+		totalInventoryValue = 0
+	}
+
+	// Calculate total count (products + variants)
+	var productCount int
+	var variantCount int
+	h.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM products WHERE active = true").Scan(&productCount)
+	h.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM product_variants WHERE active = true").Scan(&variantCount)
+	totalInventoryCount = productCount + variantCount
+
 	// Calculate average order value
 	var avgOrderValue float64
 	if totalOrders > 0 {
@@ -114,16 +144,52 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 	}
 
 	stats := DashboardStats{
-		TotalRevenue:   totalRevenue,
-		OrdersToday:    ordersToday,
-		TotalOrders:    totalOrders,
-		TotalCustomers: totalCustomers,
-		ConversionRate: conversionRate,
-		AvgOrderValue:  avgOrderValue,
-		TotalSold:      totalSold,
+		TotalRevenue:        totalRevenue,
+		OrdersToday:         ordersToday,
+		TotalOrders:         totalOrders,
+		TotalCustomers:      totalCustomers,
+		ConversionRate:      conversionRate,
+		AvgOrderValue:       avgOrderValue,
+		TotalSold:           totalSold,
+		TotalInventoryValue: totalInventoryValue,
+		TotalInventoryCount: totalInventoryCount,
 	}
 
 	return c.JSON(http.StatusOK, stats)
+}
+
+// ExportInventory returns all active variants for CSV export
+func (h *DashboardHandler) ExportInventory(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	rows, err := h.DB.QueryContext(ctx, `
+		SELECT 
+			p.title as product_name,
+			v.sku,
+			v.price,
+			v.stock_quantity
+		FROM product_variants v
+		JOIN products p ON v.product_id = p.id
+		WHERE v.active = true AND p.active = true
+		ORDER BY p.title, v.sku
+	`)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "failed to fetch inventory",
+		})
+	}
+	defer rows.Close()
+
+	var items []InventoryExportItem
+	for rows.Next() {
+		var item InventoryExportItem
+		if err := rows.Scan(&item.ProductName, &item.SKU, &item.Price, &item.Stock); err != nil {
+			continue
+		}
+		items = append(items, item)
+	}
+
+	return c.JSON(http.StatusOK, items)
 }
 
 // GetSalesData returns sales data for charts (last 30 days)

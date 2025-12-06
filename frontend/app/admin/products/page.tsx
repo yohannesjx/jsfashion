@@ -34,7 +34,8 @@ import {
     Tags,
     Edit2,
     Check,
-    X
+    X,
+    Download
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -369,6 +370,49 @@ export default function ProductsPage() {
         }
     };
 
+    const handleExportCSV = async () => {
+        try {
+            const toastId = toast.loading('Generating CSV...');
+            const token = localStorage.getItem('access_token');
+            const res = await fetch(`${API_URL}/api/v1/admin/inventory/export`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch export data');
+
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                toast.dismiss(toastId);
+                toast.info('No inventory data to export');
+                return;
+            }
+
+            // Convert to CSV
+            const csvContent = "data:text/csv;charset=utf-8,"
+                + "Product Name,SKU,Price,Stock\n"
+                + data.map((item: any) => {
+                    // Escape quotes in product name
+                    const name = item.product_name.replace(/"/g, '""');
+                    return `"${name}","${item.sku}",${item.price},${item.stock}`;
+                }).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `inventory_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.dismiss(toastId);
+            toast.success('Exported successfully');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to export CSV');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -395,6 +439,10 @@ export default function ProductsPage() {
                             </Button>
                         </>
                     )}
+                    <Button variant="outline" onClick={handleExportCSV}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Export CSV
+                    </Button>
                     <Button asChild>
                         <Link href="/admin/products/new">
                             <Plus className="h-4 w-4 mr-2" />
@@ -761,6 +809,6 @@ export default function ProductsPage() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

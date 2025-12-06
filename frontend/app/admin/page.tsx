@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Loader2, TrendingUp, ShoppingCart, Users, Percent } from 'lucide-react';
+import { Loader2, TrendingUp, ShoppingCart, Users, Percent, Tags } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -18,6 +18,8 @@ interface DashboardStats {
     conversion_rate: number;
     avg_order_value: number;
     total_sold: number;
+    total_inventory_value: number;
+    total_inventory_count: number;
 }
 
 interface SalesDataPoint {
@@ -184,16 +186,18 @@ export default function AdminDashboard() {
                 <div className="bg-white p-6 rounded-lg border border-neutral-200">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-neutral-500">Conversion Rate</p>
+                            <p className="text-sm font-medium text-neutral-500">Inventory Value</p>
                             <p className="text-3xl font-bold mt-2">
-                                {stats?.conversion_rate.toFixed(1) || '0.0'}%
+                                {stats?.total_inventory_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} Birr
                             </p>
                         </div>
                         <div className="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
-                            <Percent className="h-6 w-6 text-orange-600" />
+                            <Tags className="h-6 w-6 text-orange-600" />
                         </div>
                     </div>
-                    <p className="text-xs text-neutral-500 mt-2">Orders per customer</p>
+                    <p className="text-xs text-neutral-500 mt-2">
+                        {stats?.total_inventory_count || 0} total items (products + variants)
+                    </p>
                 </div>
             </div>
 

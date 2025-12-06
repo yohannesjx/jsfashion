@@ -65,6 +65,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.GET("/dashboard/recent-orders", dashboardHandler.GetRecentOrders)
 	admin.GET("/dashboard/top-products", dashboardHandler.GetTopProducts)
 	admin.GET("/dashboard/sales", dashboardHandler.GetSalesData)
+	admin.GET("/inventory/export", dashboardHandler.ExportInventory)
 
 	// Coupon Routes
 	admin.GET("/coupons", couponHandler.ListCoupons, auth.RequireRole("super_admin", "admin", "editor"))
