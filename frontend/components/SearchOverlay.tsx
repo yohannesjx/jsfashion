@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, TrendingUp } from "lucide-react";
+import { Search, X, TrendingUp, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface Product {
     id: number;
@@ -23,6 +24,7 @@ interface SearchOverlayProps {
 }
 
 export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
+    const router = useRouter();
     const [query, setQuery] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
     const [results, setResults] = useState<Product[]>([]);
@@ -139,12 +141,15 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 setSelectedIndex(prev => Math.max(prev - 1, -1));
-            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            } else if (e.key === 'Enter') {
                 e.preventDefault();
-                const selected = results[selectedIndex];
-                if (selected) {
+                if (selectedIndex >= 0 && results[selectedIndex]) {
                     saveSearch(query);
-                    window.location.href = `/product/${selected.slug}`;
+                    window.location.href = `/product/${results[selectedIndex].slug}`;
+                } else if (query.trim()) {
+                    saveSearch(query);
+                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                    onClose();
                 }
             }
         };
@@ -188,48 +193,48 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-200">
-            <div className="bg-white w-full max-w-3xl mx-auto mt-20 rounded-lg shadow-2xl overflow-hidden animate-in slide-in-from-top duration-300">
+        <div className="fixed inset-0 bg-white/98 backdrop-blur-xl z-50 animate-in fade-in duration-200">
+            <div className="w-full max-w-5xl mx-auto mt-24 px-6 animate-in slide-in-from-top duration-300">
                 {/* Search Input */}
-                <div className="flex items-center gap-4 p-6 border-b border-neutral-200">
-                    <Search className="w-6 h-6 text-neutral-400" />
+                <div className="relative border-b-2 border-black pb-2">
+                    <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-black" />
                     <input
                         ref={inputRef}
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search for products..."
-                        className="flex-1 text-lg outline-none placeholder:text-neutral-400"
+                        placeholder="SEARCH PRODUCTS..."
+                        className="w-full bg-transparent py-4 pl-14 pr-12 text-3xl md:text-5xl font-black tracking-tighter outline-none placeholder:text-neutral-200 uppercase text-black"
                     />
-                    <button onClick={onClose} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
-                        <X className="w-5 h-5" />
+                    <button onClick={onClose} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 hover:bg-neutral-100 rounded-full transition-colors">
+                        <X className="w-8 h-8" />
                     </button>
                 </div>
 
                 {/* Results */}
-                <div className="max-h-[60vh] overflow-y-auto" ref={resultsRef}>
+                <div className="mt-12 max-h-[60vh] overflow-y-auto" ref={resultsRef}>
                     {query.trim() === '' ? (
                         // Recent searches
                         recentSearches.length > 0 && (
-                            <div className="p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-bold text-neutral-500 uppercase tracking-wide flex items-center gap-2">
+                            <div>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-2">
                                         <TrendingUp className="w-4 h-4" />
                                         Recent Searches
                                     </h3>
                                     <button
                                         onClick={clearRecentSearches}
-                                        className="text-xs text-neutral-400 hover:text-black transition-colors"
+                                        className="text-xs text-neutral-400 hover:text-black transition-colors underline underline-offset-4"
                                     >
-                                        Clear
+                                        CLEAR HISTORY
                                     </button>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="flex flex-wrap gap-3">
                                     {recentSearches.map((search, idx) => (
                                         <button
                                             key={idx}
                                             onClick={() => handleRecentSearchClick(search)}
-                                            className="w-full text-left px-4 py-2 hover:bg-neutral-50 rounded-lg transition-colors text-sm"
+                                            className="px-6 py-3 bg-neutral-100 hover:bg-black hover:text-white rounded-full transition-all text-sm font-medium tracking-wide"
                                         >
                                             {search}
                                         </button>
@@ -239,11 +244,11 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         )
                     ) : results.length > 0 ? (
                         // Search results
-                        <div className="p-4">
-                            <p className="text-xs text-neutral-500 uppercase tracking-wide mb-4 px-2">
-                                {results.length} {results.length === 1 ? 'Result' : 'Results'}
+                        <div>
+                            <p className="text-xs text-neutral-400 uppercase tracking-widest mb-6">
+                                {results.length} SUGGESTIONS
                             </p>
-                            <div className="space-y-1">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {results.map((product, idx) => {
                                     const price = product.variants[0]?.price || 0;
                                     const currency = product.variants[0]?.currency || 'Br';
@@ -254,13 +259,13 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                             href={`/product/${product.slug}`}
                                             onClick={() => handleResultClick(product)}
                                             className={cn(
-                                                "flex items-center gap-4 p-3 rounded-lg transition-all",
+                                                "flex items-center gap-4 p-4 transition-all border border-transparent hover:border-black/10 hover:bg-neutral-50",
                                                 selectedIndex === idx
-                                                    ? "bg-black text-white"
-                                                    : "hover:bg-neutral-50"
+                                                    ? "bg-neutral-50 border-black/10"
+                                                    : ""
                                             )}
                                         >
-                                            <div className="w-16 h-16 bg-neutral-100 rounded overflow-hidden flex-shrink-0">
+                                            <div className="w-20 h-24 bg-neutral-100 overflow-hidden flex-shrink-0">
                                                 {product.thumbnail ? (
                                                     <img
                                                         src={product.thumbnail}
@@ -272,48 +277,35 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-medium text-sm truncate">{product.title}</h4>
-                                                <p className={cn(
-                                                    "text-xs mt-1",
-                                                    selectedIndex === idx ? "text-white/70" : "text-neutral-500"
-                                                )}>
+                                                <h4 className="font-bold text-lg tracking-tight truncate">{product.title}</h4>
+                                                <p className="text-xs text-neutral-500 mt-1 uppercase tracking-wide">
                                                     {product.categories[0] || 'Product'}
                                                 </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-sm">{price} {currency}</p>
+                                                <p className="font-medium text-sm mt-2">{price} {currency}</p>
                                             </div>
                                         </Link>
                                     );
                                 })}
                             </div>
+                            <div className="mt-8 text-center">
+                                <button
+                                    onClick={() => {
+                                        saveSearch(query);
+                                        window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                                        onClose();
+                                    }}
+                                    className="inline-flex items-center gap-2 text-lg font-bold hover:underline underline-offset-4"
+                                >
+                                    VIEW ALL RESULTS <ArrowRight className="w-5 h-5" />
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         // No results
-                        <div className="p-12 text-center text-neutral-500">
-                            <p className="text-lg mb-2">No products found</p>
-                            <p className="text-sm">Try searching with different keywords</p>
+                        <div className="py-12 text-center text-neutral-400">
+                            <p className="text-xl font-light">No products found for "{query}"</p>
                         </div>
                     )}
-                </div>
-
-                {/* Footer hint */}
-                <div className="border-t border-neutral-200 px-6 py-3 bg-neutral-50 text-xs text-neutral-500 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                            <kbd className="px-2 py-1 bg-white border border-neutral-200 rounded text-[10px]">↑</kbd>
-                            <kbd className="px-2 py-1 bg-white border border-neutral-200 rounded text-[10px]">↓</kbd>
-                            to navigate
-                        </span>
-                        <span className="flex items-center gap-1">
-                            <kbd className="px-2 py-1 bg-white border border-neutral-200 rounded text-[10px]">Enter</kbd>
-                            to select
-                        </span>
-                        <span className="flex items-center gap-1">
-                            <kbd className="px-2 py-1 bg-white border border-neutral-200 rounded text-[10px]">Esc</kbd>
-                            to close
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
