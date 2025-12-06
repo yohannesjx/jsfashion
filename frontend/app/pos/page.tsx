@@ -56,14 +56,43 @@ export default function POSPage() {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const lastKeyTime = useRef<number>(0);
 
-    // Fetch ALL products at once for fast POS checkout
-    const { data: products = [], isLoading } = useQuery({
+    // Load cached products from localStorage
+    const getCachedProducts = useCallback(() => {
+        if (typeof window === 'undefined') return [];
+        try {
+            const cached = localStorage.getItem('pos-products-cache');
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                // Cache valid for 30 minutes
+                if (Date.now() - timestamp < 30 * 60 * 1000) {
+                    return data;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load cached products:', e);
+        }
+        return [];
+    }, []);
+
+    // Fetch ALL products at once for fast POS checkout with persistent cache
+    const { data: products = [], isLoading, isFetching } = useQuery({
         queryKey: ['pos-products'],
         queryFn: async () => {
             const res = await api.get('/products?limit=1000&offset=0');
+            // Save to localStorage for instant loading on next visit
+            try {
+                localStorage.setItem('pos-products-cache', JSON.stringify({
+                    data: res.data,
+                    timestamp: Date.now()
+                }));
+            } catch (e) {
+                console.error('Failed to cache products:', e);
+            }
             return res.data;
         },
-        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+        initialData: getCachedProducts, // Load from cache immediately
+        staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
+        gcTime: 30 * 60 * 1000, // Keep in memory for 30 minutes
     });
 
     // Mutation for Checkout
@@ -288,12 +317,18 @@ export default function POSPage() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto pb-20 pr-2">
-                    {isLoading ? (
+                    {isLoading && products.length === 0 ? (
                         <div className="col-span-full text-center py-10">Loading products...</div>
                     ) : filteredProducts.length === 0 ? (
                         <div className="col-span-full text-center py-10 text-gray-500">No products found</div>
                     ) : (
                         <>
+                            {/* Show subtle background refresh indicator */}
+                            {isFetching && products.length > 0 && (
+                                <div className="col-span-full text-center py-2 text-xs text-gray-400">
+                                    Refreshing products...
+                                </div>
+                            )}
                             {filteredProducts.map((product: Product) => (
                                 <div
                                     key={product.id}
