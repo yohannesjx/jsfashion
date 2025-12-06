@@ -88,7 +88,7 @@ export default function POSPage() {
             } catch (e) {
                 console.error('Failed to cache products:', e);
             }
-            return res.data;
+            return res.data || [];
         },
         initialData: getCachedProducts, // Load from cache immediately
         staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
@@ -97,9 +97,10 @@ export default function POSPage() {
 
     // Filtered products based on search query (shimmer while loading)
     const filteredProducts = useMemo(() => {
-        if (!searchQuery) return products;
+        const safeProducts = Array.isArray(products) ? products : [];
+        if (!searchQuery) return safeProducts;
         const q = searchQuery.toLowerCase();
-        return products.filter((p: Product) => p.name.toLowerCase().includes(q));
+        return safeProducts.filter((p: Product) => p.name.toLowerCase().includes(q));
     }, [products, searchQuery]);
 
     // Mutation for Checkout
