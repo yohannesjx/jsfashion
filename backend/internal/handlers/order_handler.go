@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -224,35 +226,53 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 
 	// Step 4: Return created order
 	// Send Telegram Notification (Async)
+	// Send Telegram Notification (Async)
 	go func() {
+		// Prepare notification data
+		notifItems := make([]notification.OrderItem, len(itemsWithPrices))
+		var firstImage string
+		for i, item := range itemsWithPrices {
+			notifItems[i] = notification.OrderItem{
+				Name:     item.ProductName,
+				Quantity: item.Quantity,
+				Price:    item.UnitPrice,
+				Variant:  item.VariantName,
+			}
+			if firstImage == "" && item.ImageURL != "" {
+				firstImage = item.ImageURL
+			}
+		}
+
+		var customerName, customerPhone, address, city string
 		if req.ShippingAddress != nil {
-			notifItems := make([]notification.OrderItem, len(itemsWithPrices))
-			var firstImage string
-			for i, item := range itemsWithPrices {
-				notifItems[i] = notification.OrderItem{
-					Name:     item.ProductName,
-					Quantity: item.Quantity,
-					Price:    item.UnitPrice,
-					Variant:  item.VariantName,
-				}
-				if firstImage == "" && item.ImageURL != "" {
-					firstImage = item.ImageURL
-				}
+			customerName = req.ShippingAddress.FullName
+			customerPhone = req.ShippingAddress.Phone
+			address = req.ShippingAddress.Address
+			city = req.ShippingAddress.City
+		} else {
+			// Fallback or fetch from DB if customer_id is present
+			customerName = "Customer (No Address Provided)"
+			if req.CustomerID != nil {
+				customerName = fmt.Sprintf("Customer ID: %s", req.CustomerID.String())
 			}
+		}
 
-			n := notification.OrderNotification{
-				OrderNumber:   order.OrderNumber,
-				CustomerName:  req.ShippingAddress.FullName,
-				CustomerPhone: req.ShippingAddress.Phone,
-				Address:       req.ShippingAddress.Address,
-				City:          req.ShippingAddress.City,
-				TotalAmount:   totalAmount,
-				Items:         notifItems,
-				ImageURL:      firstImage,
-			}
+		n := notification.OrderNotification{
+			OrderNumber:   order.OrderNumber,
+			CustomerName:  customerName,
+			CustomerPhone: customerPhone,
+			Address:       address,
+			City:          city,
+			TotalAmount:   totalAmount,
+			Items:         notifItems,
+			ImageURL:      firstImage,
+		}
 
-			// Use a hardcoded token if env var is missing for now, or rely on the package default
-			_ = notification.SendTelegramOrder(n)
+		fmt.Printf("Attempting to send Telegram notification for Order #%d to Chat ID %s\n", order.OrderNumber, os.Getenv("TELEGRAM_CHAT_ID"))
+		if err := notification.SendTelegramOrder(n); err != nil {
+			fmt.Printf("Failed to send Telegram notification: %v\n", err)
+		} else {
+			fmt.Printf("Telegram notification sent successfully for Order #%d\n", order.OrderNumber)
 		}
 	}()
 
