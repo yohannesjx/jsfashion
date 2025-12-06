@@ -6,12 +6,10 @@ import { Check, Phone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cart";
 
-export default function ThankYouPage({ params }: { params: { orderNumber?: string } }) {
+export default function ThankYouPage({ params }: { params: { orderNumber?: string[] } }) {
     const [mounted, setMounted] = useState(false);
-    const [orderNumber] = useState(() => {
-        // Generate random 5-digit order number
-        return params?.orderNumber || Math.floor(10000 + Math.random() * 90000).toString();
-    });
+    // Get order number from URL params (it's an array due to [[...orderNumber]])
+    const orderNumber = params?.orderNumber?.[0] || "—";
 
     const cartItems = useCartStore((state) => state.items);
     const getTotalPrice = useCartStore((state) => state.getTotalPrice);

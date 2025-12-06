@@ -64,7 +64,8 @@ func SendTelegramOrder(n OrderNotification) error {
 			itemTotal))
 	}
 
-	msg.WriteString(fmt.Sprintf("\n💰 TOTAL: %d ETB", n.TotalAmount))
+	msg.WriteString(fmt.Sprintf("\n💰 TOTAL: %d ETB\n\n", n.TotalAmount))
+	msg.WriteString(fmt.Sprintf("🔗 View Order: https://jsfashion.et/thank-you/%d", n.OrderNumber))
 
 	// Send as plain text message (no photo, no special formatting)
 	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)

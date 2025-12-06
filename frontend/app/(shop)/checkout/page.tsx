@@ -102,11 +102,11 @@ export default function CheckoutPage() {
             }
 
             const result = await response.json();
-            const orderId = result.order?.id || result.id;
+            const orderNumber = result.order?.order_number || result.order_number;
 
             // Clear cart and redirect to thank you page
             clearCart();
-            router.push(`/thank-you/${orderId}`);
+            router.push(`/thank-you/${orderNumber}`);
         } catch (error) {
             console.error('Order creation failed:', error);
             alert(`Failed to create order: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
