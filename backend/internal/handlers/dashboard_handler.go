@@ -30,7 +30,8 @@ type DashboardStats struct {
 	AvgOrderValue       float64 `json:"avg_order_value"`
 	TotalSold           int     `json:"total_sold"`
 	TotalInventoryValue float64 `json:"total_inventory_value"`
-	TotalInventoryCount int     `json:"total_inventory_count"`
+	ProductCount        int     `json:"product_count"`
+	VariantCount        int     `json:"variant_count"`
 }
 
 type SalesDataPoint struct {
@@ -112,24 +113,24 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 
 	// Get Inventory Stats
 	var totalInventoryValue float64
-	var totalInventoryCount int
 
 	// Calculate total value (price * stock)
+	// Ensure we cast to numeric to avoid integer overflow or type issues
 	err = h.DB.QueryRowContext(ctx, `
-		SELECT COALESCE(SUM(price * stock_quantity), 0)
+		SELECT COALESCE(SUM(CAST(price AS NUMERIC) * CAST(stock_quantity AS NUMERIC)), 0)
 		FROM product_variants
 		WHERE active = true
 	`).Scan(&totalInventoryValue)
 	if err != nil {
+		c.Logger().Errorf("Failed to calculate inventory value: %v", err)
 		totalInventoryValue = 0
 	}
 
-	// Calculate total count (products + variants)
+	// Calculate counts
 	var productCount int
 	var variantCount int
 	h.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM products WHERE active = true").Scan(&productCount)
 	h.DB.QueryRowContext(ctx, "SELECT COUNT(*) FROM product_variants WHERE active = true").Scan(&variantCount)
-	totalInventoryCount = productCount + variantCount
 
 	// Calculate average order value
 	var avgOrderValue float64
@@ -152,7 +153,8 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 		AvgOrderValue:       avgOrderValue,
 		TotalSold:           totalSold,
 		TotalInventoryValue: totalInventoryValue,
-		TotalInventoryCount: totalInventoryCount,
+		ProductCount:        productCount,
+		VariantCount:        variantCount,
 	}
 
 	return c.JSON(http.StatusOK, stats)

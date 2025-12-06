@@ -19,7 +19,8 @@ interface DashboardStats {
     avg_order_value: number;
     total_sold: number;
     total_inventory_value: number;
-    total_inventory_count: number;
+    product_count: number;
+    variant_count: number;
 }
 
 interface SalesDataPoint {
@@ -195,9 +196,10 @@ export default function AdminDashboard() {
                             <Tags className="h-6 w-6 text-orange-600" />
                         </div>
                     </div>
-                    <p className="text-xs text-neutral-500 mt-2">
-                        {stats?.total_inventory_count || 0} total items (products + variants)
-                    </p>
+                    <div className="text-xs text-neutral-500 mt-2 space-y-1">
+                        <p>{stats?.product_count || 0} Products</p>
+                        <p>{stats?.variant_count || 0} Variants</p>
+                    </div>
                 </div>
             </div>
 
