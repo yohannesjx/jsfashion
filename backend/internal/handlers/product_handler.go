@@ -279,6 +279,18 @@ func (h *ProductHandler) GetProduct(c echo.Context) error {
 			"product_id": v.ProductID,
 			"name":       v.Name,
 			"sku":        v.Sku,
+			"size": func() interface{} {
+				if v.Size.Valid {
+					return v.Size.String
+				}
+				return nil
+			}(),
+			"color": func() interface{} {
+				if v.Color.Valid {
+					return v.Color.String
+				}
+				return nil
+			}(),
 			"image": func() interface{} {
 				if v.Image.Valid {
 					return v.Image.String
@@ -796,11 +808,21 @@ func (h *ProductHandler) UpdateVariant(c echo.Context) error {
 		image = toNullString(req.Image)
 	}
 
+	size := existing.Size
+	if req.Size != nil {
+		size = toNullString(req.Size)
+	}
+
+	color := existing.Color
+	if req.Color != nil {
+		color = toNullString(req.Color)
+	}
+
 	variant, err := h.Repo.UpdateProductVariant(ctx, repository.UpdateProductVariantParams{
 		ID:            idStr,
 		Sku:           sku,
-		Size:          toNullString(req.Size),
-		Color:         toNullString(req.Color),
+		Size:          size,
+		Color:         color,
 		Image:         image,
 		StockQuantity: stockQty,
 	})
