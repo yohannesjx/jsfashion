@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, ShoppingBag, Trash2, RotateCcw } from "lucide-react";
@@ -94,6 +94,13 @@ export default function POSPage() {
         staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
         gcTime: 30 * 60 * 1000, // Keep in memory for 30 minutes
     });
+
+    // Filtered products based on search query (shimmer while loading)
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery) return products;
+        const q = searchQuery.toLowerCase();
+        return products.filter(p => p.name.toLowerCase().includes(q));
+    }, [products, searchQuery]);
 
     // Mutation for Checkout
     const checkoutMutation = useMutation({
