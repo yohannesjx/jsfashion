@@ -131,8 +131,8 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	// api.DELETE("/products/:id", productHandler.DeleteProduct)
 
 	// Product Variant Routes
+	api.GET("/products/variants/sku/:sku", productHandler.GetVariantBySku) // For barcode scanner - must be before :id
 	api.GET("/products/variants/:id", productHandler.GetVariant)
-	api.GET("/products/variants/sku/:sku", productHandler.GetVariantBySku) // For barcode scanner
 	// api.POST("/products/variants", productHandler.CreateVariant) // These are admin-only operations
 	// api.PUT("/products/:id/variants/:id", productHandler.UpdateVariant)
 	// api.DELETE("/products/variants/:id", productHandler.DeleteVariant)
