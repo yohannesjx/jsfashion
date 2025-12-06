@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ShoppingBag, Trash2, CreditCard, RotateCcw, Loader2 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { Search, ShoppingBag, Trash2, RotateCcw } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { VariantSelector } from "@/components/pos/VariantSelector";
 import { toast } from "sonner";
@@ -43,9 +43,6 @@ interface CartItem {
     price: number;
     quantity: number;
 }
-
-const PRODUCTS_PER_PAGE = 20;
-
 export default function POSPage() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -59,33 +56,15 @@ export default function POSPage() {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const lastKeyTime = useRef<number>(0);
 
-    // Fetch Products with pagination
-    const {
-        data,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-        isLoading
-    } = useInfiniteQuery({
-        queryKey: ['pos-products', searchQuery],
-        queryFn: async ({ pageParam = 0 }) => {
-            const params = new URLSearchParams({
-                limit: PRODUCTS_PER_PAGE.toString(),
-                offset: pageParam.toString(),
-                ...(searchQuery && { search: searchQuery })
-            });
-            const res = await api.get(`/products?${params}`);
+    // Fetch ALL products at once for fast POS checkout
+    const { data: products = [], isLoading } = useQuery({
+        queryKey: ['pos-products'],
+        queryFn: async () => {
+            const res = await api.get('/products?limit=1000&offset=0');
             return res.data;
         },
-        getNextPageParam: (lastPage, allPages) => {
-            // If we got fewer than PRODUCTS_PER_PAGE, there are no more pages
-            if (lastPage.length < PRODUCTS_PER_PAGE) return undefined;
-            return allPages.flat().length;
-        },
-        initialPageParam: 0,
+        staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     });
-
-    const products = data?.pages.flat() || [];
 
     // Mutation for Checkout
     const checkoutMutation = useMutation({
@@ -332,27 +311,6 @@ export default function POSPage() {
                                     <p className="text-gray-500">{parseFloat(product.base_price).toLocaleString()} ETB</p>
                                 </div>
                             ))}
-
-                            {/* Load More Button */}
-                            {hasNextPage && (
-                                <div className="col-span-full flex justify-center py-4">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => fetchNextPage()}
-                                        disabled={isFetchingNextPage}
-                                        className="w-full max-w-xs"
-                                    >
-                                        {isFetchingNextPage ? (
-                                            <>
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                Loading...
-                                            </>
-                                        ) : (
-                                            "Load More Products"
-                                        )}
-                                    </Button>
-                                </div>
-                            )}
                         </>
                     )}
                 </div>
