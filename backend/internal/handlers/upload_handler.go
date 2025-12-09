@@ -62,8 +62,12 @@ func (h *UploadHandler) UploadFile(c echo.Context) error {
 	}
 
 	// Return public URL
-	// Assuming the server serves /uploads directory at /uploads path
-	publicUrl := fmt.Sprintf("/uploads/%s", filename)
+	// Use API base URL for consistent access
+	baseURL := os.Getenv("API_BASE_URL")
+	if baseURL == "" {
+		baseURL = "https://api.jsfashion.et"
+	}
+	publicUrl := fmt.Sprintf("%s/uploads/%s", baseURL, filename)
 
 	return c.JSON(http.StatusOK, map[string]string{
 		"url": publicUrl,
