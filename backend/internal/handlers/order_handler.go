@@ -105,7 +105,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 			defer src.Close()
 
 			// Create uploads directory
-			uploadsDir := "./uploads/payment-screenshots"
+			uploadsDir := "/app/uploads/payment-screenshots"
 			if err := os.MkdirAll(uploadsDir, 0755); err != nil {
 				c.Logger().Errorf("Failed to create uploads directory: %v", err)
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
@@ -754,7 +754,7 @@ func (h *OrderHandler) UploadPaymentScreenshot(c echo.Context) error {
 	defer src.Close()
 
 	// Create uploads directory if it doesn't exist
-	uploadsDir := "./uploads/payment-screenshots"
+	uploadsDir := "/app/uploads/payment-screenshots"
 	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
 		c.Logger().Errorf("Failed to create uploads directory: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})

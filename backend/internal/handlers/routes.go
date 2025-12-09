@@ -182,6 +182,6 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	telegramHandler := NewTelegramWebhookHandler(repo)
 	api.POST("/telegram/webhook", telegramHandler.HandleWebhook)
 
-	// Static Files
-	e.Static("/uploads", "./uploads")
+	// Static Files - use absolute path since working directory is /root
+	e.Static("/uploads", "/app/uploads")
 }

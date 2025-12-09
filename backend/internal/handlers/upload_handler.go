@@ -39,8 +39,8 @@ func (h *UploadHandler) UploadFile(c echo.Context) error {
 	}
 	defer src.Close()
 
-	// Ensure uploads directory exists
-	uploadDir := "./uploads"
+	// Ensure uploads directory exists - use absolute path
+	uploadDir := "/app/uploads"
 	if err := os.MkdirAll(uploadDir, 0755); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create upload directory"})
 	}
