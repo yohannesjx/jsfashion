@@ -22,6 +22,14 @@ export default function MediaLibraryPage() {
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
+    // Get auth headers with token from localStorage
+    const getAuthHeaders = () => {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+        return {
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+        };
+    };
+
     // Fetch all uploaded images
     useEffect(() => {
         fetchMedia();
@@ -31,7 +39,7 @@ export default function MediaLibraryPage() {
         try {
             setLoading(true);
             const response = await fetch(`${API_URL}/api/v1/admin/media`, {
-                credentials: 'include',
+                headers: getAuthHeaders(),
             });
 
             if (response.ok) {
@@ -61,8 +69,8 @@ export default function MediaLibraryPage() {
 
                 const response = await fetch(`${API_URL}/api/v1/admin/upload`, {
                     method: 'POST',
+                    headers: getAuthHeaders(),
                     body: formData,
-                    credentials: 'include',
                 });
 
                 if (!response.ok) {
@@ -88,7 +96,7 @@ export default function MediaLibraryPage() {
             const filename = url.split('/').pop();
             const response = await fetch(`${API_URL}/api/v1/admin/media/${filename}`, {
                 method: 'DELETE',
-                credentials: 'include',
+                headers: getAuthHeaders(),
             });
 
             if (response.ok) {
