@@ -36,11 +36,12 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
         };
     };
 
+    // Only fetch when modal opens
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && files.length === 0) {
             fetchMedia();
         }
-    }, [isOpen]);
+    }, [isOpen]); // Remove files dependency to prevent infinite loop
 
     const fetchMedia = async () => {
         try {
@@ -51,11 +52,14 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
 
             if (response.ok) {
                 const data = await response.json();
-                setFiles(data);
+                setFiles(data || []); // Ensure it's always an array
+            } else {
+                console.error('Failed to fetch media:', response.status);
+                setFiles([]);
             }
         } catch (error) {
             console.error('Failed to fetch media:', error);
-            toast.error('Failed to load media files');
+            setFiles([]);
         } finally {
             setLoading(false);
         }

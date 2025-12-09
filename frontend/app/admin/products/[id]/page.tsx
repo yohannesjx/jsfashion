@@ -285,14 +285,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     {/* Media */}
                     <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
                         <h2 className="font-semibold text-lg">Media</h2>
-                        <input
-                            type="file"
-                            ref={productImageInputRef}
-                            className="hidden"
-                            accept="image/*"
-                            multiple
-                            onChange={handleProductImageUpload}
-                        />
                         <div className="grid grid-cols-4 gap-4">
                             {images.map((url, index) => (
                                 <div key={index} className="aspect-square bg-muted rounded-lg border border-border flex items-center justify-center relative group cursor-pointer overflow-hidden">
@@ -311,16 +303,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             ))}
                             <div
                                 className="aspect-square bg-muted/50 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:bg-muted hover:border-primary/50 transition-all cursor-pointer"
-                                onClick={() => productImageInputRef.current?.click()}
+                                onClick={() => setShowMediaPicker(true)}
                             >
-                                {isUploadingImage ? (
-                                    <Loader2 className="h-6 w-6 animate-spin" />
-                                ) : (
-                                    <>
-                                        <Upload className="h-6 w-6 mb-2" />
-                                        <span className="text-xs font-medium">Add Image</span>
-                                    </>
-                                )}
+                                <ImageIcon className="h-6 w-6 mb-2" />
+                                <span className="text-xs font-medium">Select from Media</span>
                             </div>
                         </div>
 
@@ -380,6 +366,16 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     </div>
                 </div>
             </div>
+
+            {/* Media Picker Modal */}
+            <MediaPicker
+                isOpen={showMediaPicker}
+                onClose={() => setShowMediaPicker(false)}
+                onSelect={(url) => {
+                    setImages(prev => [...prev, url]);
+                    toast.success('Image added successfully');
+                }}
+            />
         </div>
     );
 }
