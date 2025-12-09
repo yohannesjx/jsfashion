@@ -12,7 +12,8 @@ import {
     Settings,
     Percent,
     ChevronLeft,
-    Menu
+    Menu,
+    Image
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const sidebarItems = [
     { icon: LayoutDashboard, label: "Overview", href: "/admin" },
     { icon: ShoppingBag, label: "Orders", href: "/admin/orders" },
     { icon: Package, label: "Products", href: "/admin/products" },
+    { icon: Image, label: "Media", href: "/admin/media" },
     { icon: Users, label: "Customers", href: "/admin/customers" },
     { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
     { icon: Percent, label: "Discounts", href: "/admin/discounts" },

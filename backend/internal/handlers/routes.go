@@ -121,6 +121,11 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	uploadHandler := NewUploadHandler()
 	admin.POST("/upload", uploadHandler.UploadFile, auth.RequireRole("super_admin", "admin", "editor"))
 
+	// Media Library Routes (Admin/Editor only)
+	mediaHandler := NewMediaHandler()
+	admin.GET("/media", mediaHandler.ListMedia, auth.RequireRole("super_admin", "admin", "editor"))
+	admin.DELETE("/media/:filename", mediaHandler.DeleteMedia, auth.RequireRole("super_admin", "admin"))
+
 	// ============================================================================
 	// PUBLIC SHOP ROUTES (No authentication required)
 	// ============================================================================
