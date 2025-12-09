@@ -6,6 +6,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Copy, Upload, X } from "lucide-react";
 import { useCartStore } from "@/store/cart";
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -13,7 +14,9 @@ export default function CheckoutPage() {
     const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [uploadError, setUploadError] = useState<string | null>(null);
+    const [highlightUpload, setHighlightUpload] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const uploadSectionRef = useRef<HTMLDivElement>(null);
     const [formData, setFormData] = useState({
         fullName: "",
         phone: "",
@@ -73,14 +76,29 @@ export default function CheckoutPage() {
 
         // Basic validation
         if (!formData.fullName || !formData.phone || !formData.address || !formData.city) {
-            alert("Please fill in all required fields");
+            toast.error("Please fill in all required fields", {
+                description: "Name, phone, address, and city are required"
+            });
             return;
         }
 
         // Validate payment screenshot
         if (!uploadedFile) {
-            alert("Please upload your payment screenshot before placing the order");
+            toast.error("Payment screenshot required", {
+                description: "Please upload your payment confirmation screenshot",
+                duration: 5000
+            });
             setUploadError("Payment screenshot is required");
+            setHighlightUpload(true);
+
+            // Scroll to upload section
+            uploadSectionRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+            // Remove highlight after animation
+            setTimeout(() => setHighlightUpload(false), 3000);
             return;
         }
 
@@ -373,7 +391,13 @@ export default function CheckoutPage() {
                         </div>
 
                         {/* Payment Screenshot Upload */}
-                        <div className="mt-6 border-2 border-red-500 rounded-lg p-4 space-y-3">
+                        <div
+                            ref={uploadSectionRef}
+                            className={`mt-6 border-2 rounded-lg p-4 space-y-3 transition-all ${highlightUpload
+                                    ? 'border-red-500 animate-border-pulse'
+                                    : 'border-red-500'
+                                }`}
+                        >
                             <h3 className="font-bold text-base text-center">Upload Payment Screenshot *</h3>
 
                             {!uploadedFile ? (
