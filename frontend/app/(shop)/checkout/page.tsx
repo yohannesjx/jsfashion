@@ -373,14 +373,11 @@ export default function CheckoutPage() {
                         </div>
 
                         {/* Payment Screenshot Upload */}
-                        <div className="mt-6 border-2 border-red-500 rounded-lg p-6 space-y-4">
-                            <h3 className="font-bold text-lg text-center">Upload Payment Screenshot *</h3>
-                            <p className="text-sm text-neutral-600 text-center">
-                                Please upload a screenshot of your payment confirmation
-                            </p>
+                        <div className="mt-6 border-2 border-red-500 rounded-lg p-4 space-y-3">
+                            <h3 className="font-bold text-base text-center">Upload Payment Screenshot *</h3>
 
                             {!uploadedFile ? (
-                                <div className="space-y-3">
+                                <div>
                                     <input
                                         ref={fileInputRef}
                                         type="file"
@@ -391,40 +388,37 @@ export default function CheckoutPage() {
                                     />
                                     <label
                                         htmlFor="payment-screenshot"
-                                        className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg p-8 cursor-pointer hover:border-red-500 transition-colors"
+                                        className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg p-4 cursor-pointer hover:border-red-500 transition-colors"
                                     >
-                                        <Upload className="w-12 h-12 text-neutral-400 mb-3" />
+                                        <Upload className="w-8 h-8 text-neutral-400 mb-2" />
                                         <span className="text-sm font-medium text-neutral-700">Click to select image</span>
-                                        <span className="text-xs text-neutral-500 mt-1">PNG, JPG up to 10MB</span>
                                     </label>
                                 </div>
                             ) : (
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between bg-green-50 border border-green-200 p-4 rounded-lg">
-                                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <div className="w-12 h-12 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-                                                <Check className="w-6 h-6 text-green-600" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">{uploadedFile.name}</p>
-                                                <p className="text-xs text-neutral-500">
-                                                    {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                                                </p>
-                                            </div>
+                                <div className="flex items-center justify-between bg-green-50 border border-green-200 p-3 rounded-lg">
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
+                                            <Check className="w-5 h-5 text-green-600" />
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={handleRemoveFile}
-                                            className="p-2 hover:bg-green-200 rounded-full transition-colors flex-shrink-0"
-                                        >
-                                            <X className="w-5 h-5" />
-                                        </button>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium truncate">{uploadedFile.name}</p>
+                                            <p className="text-xs text-neutral-500">
+                                                {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                                            </p>
+                                        </div>
                                     </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveFile}
+                                        className="p-2 hover:bg-green-200 rounded-full transition-colors flex-shrink-0"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
                             )}
 
                             {uploadError && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm text-center">
+                                <div className="bg-red-50 border border-red-200 text-red-700 p-2 rounded-lg text-sm text-center">
                                     {uploadError}
                                 </div>
                             )}
