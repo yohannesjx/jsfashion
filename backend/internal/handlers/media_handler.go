@@ -27,7 +27,7 @@ func NewMediaHandler() *MediaHandler {
 
 // ListMedia returns all uploaded media files
 func (h *MediaHandler) ListMedia(c echo.Context) error {
-	uploadsDir := "./uploads"
+	uploadsDir := "/app/uploads" // Use absolute path
 	var mediaFiles []MediaFile
 
 	baseURL := os.Getenv("API_BASE_URL")
@@ -125,11 +125,11 @@ func (h *MediaHandler) DeleteMedia(c echo.Context) error {
 	}
 
 	// Check in main uploads directory
-	filePath := filepath.Join("./uploads", filename)
+	filePath := filepath.Join("/app/uploads", filename)
 
 	// Also check in payment-screenshots subdirectory
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		filePath = filepath.Join("./uploads/payment-screenshots", filename)
+		filePath = filepath.Join("/app/uploads/payment-screenshots", filename)
 	}
 
 	// Delete the file
