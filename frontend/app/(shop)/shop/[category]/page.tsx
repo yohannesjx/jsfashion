@@ -93,17 +93,14 @@ export default function CategoryPage({ params }: { params: { category: string } 
                                     <Link href={`/product/${product.slug || product.id}`} key={product.id} className="group cursor-pointer">
                                         <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                             {product.image_url ? (
-                                                <>
-                                                    <ImagePlaceholder className="absolute inset-0" />
-                                                    <Image
-                                                        src={product.image_url}
-                                                        alt={product.name}
-                                                        fill
-                                                        sizes="(max-width: 768px) 50vw, 25vw"
-                                                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out relative z-10"
-                                                        priority={index < 8}
-                                                    />
-                                                </>
+                                                <Image
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                                    priority={index < 8}
+                                                />
                                             ) : (
                                                 <ImagePlaceholder className="absolute inset-0" />
                                             )}

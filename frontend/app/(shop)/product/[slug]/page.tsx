@@ -401,20 +401,113 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
             {/* Lightbox */}
             {lightboxOpen && (
-                <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center animate-in fade-in duration-200">
+                <div
+                    className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center animate-in fade-in duration-200"
+                    onClick={(e) => {
+                        // Close when clicking on backdrop
+                        if (e.target === e.currentTarget) {
+                            setLightboxOpen(false);
+                        }
+                    }}
+                    onTouchStart={(e) => {
+                        const touch = e.touches[0];
+                        const startY = touch.clientY;
+                        const startX = touch.clientX;
+
+                        const handleTouchMove = (moveEvent: TouchEvent) => {
+                            const currentTouch = moveEvent.touches[0];
+                            const deltaY = currentTouch.clientY - startY;
+                            const deltaX = currentTouch.clientX - startX;
+
+                            // Swipe down to close (threshold: 100px)
+                            if (deltaY > 100 && Math.abs(deltaX) < 50) {
+                                setLightboxOpen(false);
+                                document.removeEventListener('touchmove', handleTouchMove);
+                                document.removeEventListener('touchend', handleTouchEnd);
+                            }
+
+                            // Swipe left to next image
+                            if (deltaX < -100 && Math.abs(deltaY) < 50) {
+                                if (currentImageIndex < images.length - 1) {
+                                    setCurrentImageIndex(currentImageIndex + 1);
+                                }
+                                document.removeEventListener('touchmove', handleTouchMove);
+                                document.removeEventListener('touchend', handleTouchEnd);
+                            }
+
+                            // Swipe right to previous image
+                            if (deltaX > 100 && Math.abs(deltaY) < 50) {
+                                if (currentImageIndex > 0) {
+                                    setCurrentImageIndex(currentImageIndex - 1);
+                                }
+                                document.removeEventListener('touchmove', handleTouchMove);
+                                document.removeEventListener('touchend', handleTouchEnd);
+                            }
+                        };
+
+                        const handleTouchEnd = () => {
+                            document.removeEventListener('touchmove', handleTouchMove);
+                            document.removeEventListener('touchend', handleTouchEnd);
+                        };
+
+                        document.addEventListener('touchmove', handleTouchMove);
+                        document.addEventListener('touchend', handleTouchEnd);
+                    }}
+                >
+                    {/* Close Button */}
                     <button
-                        onClick={() => setLightboxOpen(false)}
-                        className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-full"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxOpen(false);
+                        }}
+                        className="absolute top-4 right-4 text-white p-2 hover:bg-white/10 rounded-full z-50 transition-colors"
                     >
                         <X className="w-8 h-8" />
                     </button>
+
+                    {/* Navigation Arrows */}
+                    {currentImageIndex > 0 && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(currentImageIndex - 1);
+                            }}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-white p-3 hover:bg-white/10 rounded-full z-50 transition-colors"
+                        >
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    )}
+
+                    {currentImageIndex < images.length - 1 && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCurrentImageIndex(currentImageIndex + 1);
+                            }}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white p-3 hover:bg-white/10 rounded-full z-50 transition-colors"
+                        >
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    )}
+
+                    {/* Image Container */}
                     <div className="w-full h-full max-w-4xl max-h-[90vh] p-4 flex items-center justify-center relative">
                         <ImagePlaceholder className="absolute inset-0" />
                         <img
                             src={images[currentImageIndex]}
                             alt="Zoomed view"
                             className="max-w-full max-h-full object-contain relative z-10"
+                            onClick={(e) => e.stopPropagation()}
                         />
+                    </div>
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white bg-black/50 px-4 py-2 rounded-full text-sm">
+                        {currentImageIndex + 1} / {images.length}
                     </div>
                 </div>
             )}
