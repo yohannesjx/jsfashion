@@ -31,7 +31,17 @@ export default function CheckoutPage() {
     const clearCart = useCartStore((state) => state.clearCart);
 
     const subtotal = getTotalPrice();
-    const deliveryFee = selectedDelivery === "outside" ? 800 : 0;
+
+    // Calculate delivery fee based on location and order total
+    const calculateDeliveryFee = () => {
+        if (selectedDelivery === "outside") {
+            return 800; // Outside Addis Ababa
+        }
+        // Inside Addis Ababa: free if ≥5000 ETB, otherwise 300 ETB
+        return subtotal >= 5000 ? 0 : 300;
+    };
+
+    const deliveryFee = calculateDeliveryFee();
     const total = subtotal + deliveryFee;
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -268,9 +278,20 @@ export default function CheckoutPage() {
                                             <div className="w-3 h-3 bg-black rounded-full" />
                                         )}
                                     </div>
-                                    <span className="font-medium">Free Delivery</span>
+                                    <div className="flex flex-col items-start">
+                                        <span className="font-medium">Inside Addis Ababa</span>
+                                        {subtotal < 5000 && (
+                                            <span className="text-xs text-neutral-500">Free for orders ≥5000 ETB</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <span className="font-bold">0 ETB</span>
+                                <span className="font-bold">
+                                    {subtotal >= 5000 ? (
+                                        <span className="text-green-600">Free</span>
+                                    ) : (
+                                        "300 ETB"
+                                    )}
+                                </span>
                             </button>
 
                             <button
@@ -394,8 +415,8 @@ export default function CheckoutPage() {
                         <div
                             ref={uploadSectionRef}
                             className={`mt-6 border-2 rounded-lg p-4 space-y-3 transition-all ${highlightUpload
-                                    ? 'border-red-500 animate-border-pulse'
-                                    : 'border-red-500'
+                                ? 'border-red-500 animate-border-pulse'
+                                : 'border-red-500'
                                 }`}
                         >
                             <h3 className="font-bold text-base text-center">Upload Payment Screenshot *</h3>
