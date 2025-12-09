@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -616,4 +617,94 @@ func (h *OrderHandler) GetOrderPublic(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+// UploadPaymentScreenshot handles payment screenshot upload for an order
+func (h *OrderHandler) UploadPaymentScreenshot(c echo.Context) error {
+	orderNumber := c.Param("orderNumber")
+	if orderNumber == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Order number is required"})
+	}
+
+	// Parse the multipart form
+	file, err := c.FormFile("screenshot")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Screenshot file is required"})
+	}
+
+	// Validate file size (max 10MB)
+	if file.Size > 10*1024*1024 {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "File size must be less than 10MB"})
+	}
+
+	// Validate file type
+	contentType := file.Header.Get("Content-Type")
+	if !strings.HasPrefix(contentType, "image/") {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "File must be an image"})
+	}
+
+	// Open the uploaded file
+	src, err := file.Open()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to open file"})
+	}
+	defer src.Close()
+
+	// Create uploads directory if it doesn't exist
+	uploadsDir := "./uploads/payment-screenshots"
+	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
+		c.Logger().Errorf("Failed to create uploads directory: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+	}
+
+	// Generate unique filename
+	ext := strings.ToLower(file.Filename[strings.LastIndex(file.Filename, "."):])
+	filename := fmt.Sprintf("order_%s_%d%s", orderNumber, time.Now().Unix(), ext)
+	filepath := fmt.Sprintf("%s/%s", uploadsDir, filename)
+
+	// Save file to disk
+	dst, err := os.Create(filepath)
+	if err != nil {
+		c.Logger().Errorf("Failed to create file: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		c.Logger().Errorf("Failed to copy file: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+	}
+
+	// Generate public URL
+	baseURL := os.Getenv("API_BASE_URL")
+	if baseURL == "" {
+		baseURL = "https://api.jsfashion.et"
+	}
+	publicURL := fmt.Sprintf("%s/uploads/payment-screenshots/%s", baseURL, filename)
+
+	// Update order in database
+	ctx := c.Request().Context()
+	_, err = h.DB.ExecContext(ctx, `
+		UPDATE orders 
+		SET payment_screenshot = $1, updated_at = CURRENT_TIMESTAMP 
+		WHERE order_number = $2
+	`, publicURL, orderNumber)
+	if err != nil {
+		c.Logger().Errorf("Failed to update order: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update order"})
+	}
+
+	// Send notification to Telegram
+	caption := fmt.Sprintf("💳 Payment Screenshot for Order #%s\n\n🔗 View Order: https://jsfashion.et/admin/orders", orderNumber)
+	go func() {
+		if err := notification.SendTelegramPhoto(publicURL, caption); err != nil {
+			fmt.Printf("Failed to send Telegram notification: %v\n", err)
+		}
+	}()
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"success": true,
+		"url":     publicURL,
+		"message": "Payment screenshot uploaded successfully",
+	})
 }

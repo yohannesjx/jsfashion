@@ -219,3 +219,52 @@ func EditMessageText(chatID int64, messageID int, newText string) error {
 
 	return nil
 }
+
+// SendTelegramPhoto sends a photo with caption to all configured chat IDs
+func SendTelegramPhoto(photoURL, caption string) error {
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if token == "" {
+		token = "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
+	}
+
+	chatIDsStr := os.Getenv("TELEGRAM_CHAT_IDS")
+	var chatIDs []string
+	if chatIDsStr != "" {
+		chatIDs = strings.Split(chatIDsStr, ",")
+	} else {
+		chatIDs = defaultChatIDs
+	}
+
+	var lastErr error
+	for _, chatID := range chatIDs {
+		chatID = strings.TrimSpace(chatID)
+		if chatID == "" {
+			continue
+		}
+
+		apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendPhoto", token)
+		payload := map[string]interface{}{
+			"chat_id": chatID,
+			"photo":   photoURL,
+			"caption": caption,
+		}
+		reqBody, _ := json.Marshal(payload)
+
+		resp, err := http.Post(apiURL, "application/json", bytes.NewBuffer(reqBody))
+		if err != nil {
+			lastErr = fmt.Errorf("http error for chat %s: %v", chatID, err)
+			continue
+		}
+
+		body, _ := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			lastErr = fmt.Errorf("telegram api returned status %d for chat %s: %s", resp.StatusCode, chatID, string(body))
+		} else {
+			fmt.Printf("Telegram photo sent to chat %s\n", chatID)
+		}
+	}
+
+	return lastErr
+}
