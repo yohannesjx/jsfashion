@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Search, X, Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,6 +28,7 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
     const [deleting, setDeleting] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
+    const [sortBy, setSortBy] = useState<string>("newest");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -161,9 +163,59 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
         onClose();
     };
 
-    const filteredFiles = files.filter(file =>
-        file.filename.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Helper function to get date category
+    const getDateCategory = (date: Date) => {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const thisWeek = new Date(today);
+        thisWeek.setDate(thisWeek.getDate() - 7);
+        const thisMonth = new Date(today);
+        thisMonth.setDate(thisMonth.getDate() - 30);
+
+        const uploadDate = new Date(date);
+
+        if (uploadDate >= today) return 'today';
+        if (uploadDate >= yesterday) return 'yesterday';
+        if (uploadDate >= thisWeek) return 'thisWeek';
+        if (uploadDate >= thisMonth) return 'thisMonth';
+        return 'older';
+    };
+
+    // Filter and sort files
+    const getFilteredAndSortedFiles = () => {
+        let filtered = files.filter(file =>
+            file.filename.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        // Apply date filter
+        if (sortBy !== 'newest' && sortBy !== 'oldest' && sortBy !== 'nameAZ' && sortBy !== 'nameZA') {
+            filtered = filtered.filter(file => {
+                const category = getDateCategory(new Date(file.uploadedAt));
+                return category === sortBy;
+            });
+        }
+
+        // Sort
+        const sorted = [...filtered].sort((a, b) => {
+            switch (sortBy) {
+                case 'oldest':
+                    return new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime();
+                case 'nameAZ':
+                    return a.filename.localeCompare(b.filename);
+                case 'nameZA':
+                    return b.filename.localeCompare(a.filename);
+                case 'newest':
+                default:
+                    return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
+            }
+        });
+
+        return sorted;
+    };
+
+    const filteredFiles = getFilteredAndSortedFiles();
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -183,6 +235,23 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
                             className="pl-10"
                         />
                     </div>
+
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Sort by..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="newest">Newest First</SelectItem>
+                            <SelectItem value="oldest">Oldest First</SelectItem>
+                            <SelectItem value="today">Today</SelectItem>
+                            <SelectItem value="yesterday">Yesterday</SelectItem>
+                            <SelectItem value="thisWeek">This Week</SelectItem>
+                            <SelectItem value="thisMonth">This Month</SelectItem>
+                            <SelectItem value="older">Older</SelectItem>
+                            <SelectItem value="nameAZ">Name A-Z</SelectItem>
+                            <SelectItem value="nameZA">Name Z-A</SelectItem>
+                        </SelectContent>
+                    </Select>
 
                     <Button
                         variant="outline"
@@ -253,8 +322,8 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
                                             className="w-full h-full object-cover"
                                         />
                                         <div className={`absolute top-2 right-2 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${isSelected
-                                                ? 'bg-blue-600 border-blue-600'
-                                                : 'bg-white border-neutral-300'
+                                            ? 'bg-blue-600 border-blue-600'
+                                            : 'bg-white border-neutral-300'
                                             }`}>
                                             {isSelected && <Check className="w-4 h-4 text-white" />}
                                         </div>
