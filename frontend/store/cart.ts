@@ -36,8 +36,8 @@ export const useCartStore = create<CartStore>()(
                     const quantityToAdd = item.quantity || 1;
 
                     if (existingItem) {
-                        // Check stock limit
-                        if (existingItem.quantity + quantityToAdd > existingItem.maxStock) {
+                        // Only check stock limit if maxStock is defined and > 0
+                        if (existingItem.maxStock && existingItem.maxStock > 0 && existingItem.quantity + quantityToAdd > existingItem.maxStock) {
                             toast.error(`Only ${existingItem.maxStock} items available in stock`);
                             return { items: state.items };
                         }
@@ -51,8 +51,8 @@ export const useCartStore = create<CartStore>()(
                             ),
                         };
                     } else {
-                        // Check stock limit for new item
-                        if (quantityToAdd > item.maxStock) {
+                        // Only check stock limit if maxStock is defined and > 0
+                        if (item.maxStock && item.maxStock > 0 && quantityToAdd > item.maxStock) {
                             toast.error(`Only ${item.maxStock} items available in stock`);
                             return { items: state.items };
                         }
@@ -80,8 +80,8 @@ export const useCartStore = create<CartStore>()(
                 set((state) => ({
                     items: state.items.map(i => {
                         if (i.variantId === variantId) {
-                            // Check stock limit
-                            if (quantity > i.maxStock) {
+                            // Only check stock limit if maxStock is defined and > 0
+                            if (i.maxStock && i.maxStock > 0 && quantity > i.maxStock) {
                                 toast.error(`Only ${i.maxStock} items available in stock`);
                                 return i; // Don't update if exceeds stock
                             }
