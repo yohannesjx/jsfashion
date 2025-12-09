@@ -19,7 +19,11 @@ echo ""
 # Step 2: Run database migration to fix existing image URLs
 echo "Step 2: Running database migration..."
 echo "This will update all existing image URLs to use full API domain"
-docker-compose -f docker-compose.prod.yml exec -T backend sh -c "psql \$DATABASE_URL -f /app/sql/migrations/009_fix_image_urls.sql"
+
+# Copy migration file to postgres container and execute
+docker cp backend/sql/migrations/009_fix_image_urls.sql jsfashion_postgres:/tmp/009_fix_image_urls.sql
+docker-compose -f docker-compose.prod.yml exec -T postgres psql -U jsfashion -d jsfashion -f /tmp/009_fix_image_urls.sql
+
 echo "✓ Database migration completed"
 echo ""
 
