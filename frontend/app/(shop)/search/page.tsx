@@ -85,7 +85,7 @@ function SearchContent() {
                 ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5 -mx-4 md:mx-0">
-                            {displayedProducts.map((product) => {
+                            {displayedProducts.map((product, index) => {
                                 const price = parseInt(product.base_price) || 0;
                                 const currency = 'Br';
 
@@ -99,6 +99,7 @@ function SearchContent() {
                                                     fill
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                                                     sizes="(max-width: 768px) 50vw, 25vw"
+                                                    priority={index < 8}
                                                 />
                                             ) : (
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />

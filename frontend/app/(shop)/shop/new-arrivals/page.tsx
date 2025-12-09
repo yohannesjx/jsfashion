@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api/client";
 
@@ -68,7 +69,7 @@ export default function NewArrivalsPage() {
                 ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5 -mx-4 md:mx-0">
-                            {displayedProducts.map((product) => {
+                            {displayedProducts.map((product, index) => {
                                 const price = parseFloat(product.base_price) / 100;
                                 const currency = 'Br';
 
@@ -76,10 +77,13 @@ export default function NewArrivalsPage() {
                                     <Link href={`/product/${product.slug || product.id}`} key={product.id} className="group cursor-pointer">
                                         <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                             {product.image_url ? (
-                                                <img
+                                                <Image
                                                     src={product.image_url}
                                                     alt={product.name}
-                                                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                                    fill
+                                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                                    priority={index < 8}
                                                 />
                                             ) : (
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />

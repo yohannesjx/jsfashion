@@ -229,7 +229,7 @@ export default function Home() {
                 ) : (
                     <>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-0.5">
-                            {displayedProducts.map((product) => {
+                            {displayedProducts.map((product, index) => {
                                 const price = parseInt(product.base_price) || 0;
                                 const currency = 'Br';
 
@@ -243,9 +243,7 @@ export default function Home() {
                                                     fill
                                                     sizes="(max-width: 768px) 50vw, 25vw"
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                                                    loading="lazy"
-                                                    placeholder="blur"
-                                                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAj/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBEQCEAwEPwAB//9k="
+                                                    priority={index < 8}
                                                 />
                                             ) : (
                                                 <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />
