@@ -2,15 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Upload, X } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 
 export default function CheckoutPage() {
     const router = useRouter();
     const [selectedDelivery, setSelectedDelivery] = useState("free");
     const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [formData, setFormData] = useState({
         fullName: "",
         phone: "",
@@ -39,12 +42,45 @@ export default function CheckoutPage() {
         setTimeout(() => setCopiedAccount(null), 2000);
     };
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setUploadError('Please select an image file');
+                return;
+            }
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                setUploadError('File size must be less than 10MB');
+                return;
+            }
+            setUploadedFile(file);
+            setUploadError(null);
+        }
+    };
+
+    const handleRemoveFile = () => {
+        setUploadedFile(null);
+        setUploadError(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Basic validation
         if (!formData.fullName || !formData.phone || !formData.address || !formData.city) {
             alert("Please fill in all required fields");
+            return;
+        }
+
+        // Validate payment screenshot
+        if (!uploadedFile) {
+            alert("Please upload your payment screenshot before placing the order");
+            setUploadError("Payment screenshot is required");
             return;
         }
 
@@ -83,17 +119,32 @@ export default function CheckoutPage() {
                     address: formData.address,
                     city: formData.city,
                     delivery_method: selectedDelivery
-                }
+                },
+                payment_screenshot: uploadedFile // Include the file for backend processing
             };
 
             console.log('Sending order data:', JSON.stringify(orderData, null, 2));
 
+            // Create FormData to send both JSON and file
+            const formDataToSend = new FormData();
+            formDataToSend.append('data', JSON.stringify({
+                customer_id: null,
+                items: items,
+                payment_method: "bank_transfer",
+                shipping_address: {
+                    full_name: formData.fullName,
+                    phone: cleanPhone,
+                    email: formData.email || null,
+                    address: formData.address,
+                    city: formData.city,
+                    delivery_method: selectedDelivery
+                }
+            }));
+            formDataToSend.append('payment_screenshot', uploadedFile);
+
             const response = await fetch(`${API_URL}/api/v1/orders`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
+                body: formDataToSend,
             });
 
             if (!response.ok) {
@@ -319,6 +370,64 @@ export default function CheckoutPage() {
                         {/* Warning */}
                         <div className="mt-4 bg-black text-white text-center py-3 rounded-lg">
                             <p className="text-sm">Unpaid orders will be canceled after 30min</p>
+                        </div>
+
+                        {/* Payment Screenshot Upload */}
+                        <div className="mt-6 border-2 border-red-500 rounded-lg p-6 space-y-4">
+                            <h3 className="font-bold text-lg text-center">Upload Payment Screenshot *</h3>
+                            <p className="text-sm text-neutral-600 text-center">
+                                Please upload a screenshot of your payment confirmation
+                            </p>
+
+                            {!uploadedFile ? (
+                                <div className="space-y-3">
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                        id="payment-screenshot"
+                                    />
+                                    <label
+                                        htmlFor="payment-screenshot"
+                                        className="flex flex-col items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg p-8 cursor-pointer hover:border-red-500 transition-colors"
+                                    >
+                                        <Upload className="w-12 h-12 text-neutral-400 mb-3" />
+                                        <span className="text-sm font-medium text-neutral-700">Click to select image</span>
+                                        <span className="text-xs text-neutral-500 mt-1">PNG, JPG up to 10MB</span>
+                                    </label>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between bg-green-50 border border-green-200 p-4 rounded-lg">
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            <div className="w-12 h-12 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
+                                                <Check className="w-6 h-6 text-green-600" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">{uploadedFile.name}</p>
+                                                <p className="text-xs text-neutral-500">
+                                                    {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveFile}
+                                            className="p-2 hover:bg-green-200 rounded-full transition-colors flex-shrink-0"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {uploadError && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm text-center">
+                                    {uploadError}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </form>

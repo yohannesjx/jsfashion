@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -61,17 +62,91 @@ func splitName(fullName string) []string {
 
 // CreateOrder creates a new order with stock deduction
 func (h *OrderHandler) CreateOrder(c echo.Context) error {
+	ctx := c.Request().Context()
+
 	var req CreateOrderRequest
-	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	var paymentScreenshotURL string
+
+	// Check if this is a multipart form (with payment screenshot)
+	contentType := c.Request().Header.Get("Content-Type")
+	if strings.HasPrefix(contentType, "multipart/form-data") {
+		// Parse multipart form
+		if err := c.Request().ParseMultipartForm(10 << 20); err != nil { // 10MB max
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to parse form"})
+		}
+
+		// Get JSON data from form
+		dataStr := c.FormValue("data")
+		if dataStr == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Missing order data"})
+		}
+
+		if err := json.Unmarshal([]byte(dataStr), &req); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid order data"})
+		}
+
+		// Handle payment screenshot upload
+		file, err := c.FormFile("payment_screenshot")
+		if err == nil && file != nil {
+			// Validate file
+			if file.Size > 10*1024*1024 {
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": "File size must be less than 10MB"})
+			}
+
+			if !strings.HasPrefix(file.Header.Get("Content-Type"), "image/") {
+				return c.JSON(http.StatusBadRequest, map[string]string{"error": "File must be an image"})
+			}
+
+			// Open uploaded file
+			src, err := file.Open()
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to open file"})
+			}
+			defer src.Close()
+
+			// Create uploads directory
+			uploadsDir := "./uploads/payment-screenshots"
+			if err := os.MkdirAll(uploadsDir, 0755); err != nil {
+				c.Logger().Errorf("Failed to create uploads directory: %v", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+			}
+
+			// Generate unique filename with timestamp
+			ext := strings.ToLower(file.Filename[strings.LastIndex(file.Filename, "."):])
+			filename := fmt.Sprintf("order_%d%s", time.Now().Unix(), ext)
+			filepath := fmt.Sprintf("%s/%s", uploadsDir, filename)
+
+			// Save file
+			dst, err := os.Create(filepath)
+			if err != nil {
+				c.Logger().Errorf("Failed to create file: %v", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+			}
+			defer dst.Close()
+
+			if _, err = io.Copy(dst, src); err != nil {
+				c.Logger().Errorf("Failed to copy file: %v", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to save file"})
+			}
+
+			// Generate public URL
+			baseURL := os.Getenv("API_BASE_URL")
+			if baseURL == "" {
+				baseURL = "https://api.jsfashion.et"
+			}
+			paymentScreenshotURL = fmt.Sprintf("%s/uploads/payment-screenshots/%s", baseURL, filename)
+		}
+	} else {
+		// Regular JSON request
+		if err := c.Bind(&req); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+		}
 	}
 
 	// CustomerID is optional for guest checkout
 	if len(req.Items) == 0 {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Order must contain at least one item"})
 	}
-
-	ctx := c.Request().Context()
 
 	// Step 1: Validate stock availability and calculate total
 	type ItemWithPrice struct {
@@ -283,6 +358,34 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 			fmt.Printf("Telegram notification sent successfully for Order #%d\n", order.OrderNumber)
 		}
 	}()
+
+	// Update order with payment screenshot if provided
+	if paymentScreenshotURL != "" {
+		_, err = h.DB.ExecContext(ctx, `
+			UPDATE orders 
+			SET payment_screenshot = $1, updated_at = CURRENT_TIMESTAMP 
+			WHERE id = $2
+		`, paymentScreenshotURL, order.ID)
+		if err != nil {
+			c.Logger().Errorf("Failed to update order with payment screenshot: %v", err)
+			// Don't fail the order creation, just log the error
+		}
+
+		// Send payment screenshot to Telegram
+		go func() {
+			caption := fmt.Sprintf("💳 Payment Screenshot for Order #%d\n\n👤 Customer: %s\n📞 Phone: %s\n💰 Total: %d ETB\n\n🔗 View Order: https://jsfashion.et/admin/orders",
+				order.OrderNumber,
+				req.ShippingAddress.FullName,
+				req.ShippingAddress.Phone,
+				totalAmount)
+
+			if err := notification.SendTelegramPhoto(paymentScreenshotURL, caption); err != nil {
+				fmt.Printf("Failed to send payment screenshot to Telegram: %v\n", err)
+			} else {
+				fmt.Printf("Payment screenshot sent to Telegram for Order #%d\n", order.OrderNumber)
+			}
+		}()
+	}
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
 		"order":   order,
