@@ -17,6 +17,7 @@ import {
     ChevronLeft,
     ChevronRight,
     FolderTree,
+    Image,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -49,6 +50,12 @@ const navItems: NavItem[] = [
         title: 'Categories',
         href: '/admin/categories',
         icon: FolderTree,
+        roles: ['super_admin', 'admin', 'editor'],
+    },
+    {
+        title: 'Media',
+        href: '/admin/media',
+        icon: Image,
         roles: ['super_admin', 'admin', 'editor'],
     },
     {
