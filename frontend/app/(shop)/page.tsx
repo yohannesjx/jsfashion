@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import QuickViewModal from "@/components/shop/QuickViewModal";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 interface Product {
     id: string;
@@ -237,16 +238,19 @@ export default function Home() {
                                     <Link href={`/product/${product.slug}`} key={product.id} className="group cursor-pointer">
                                         <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                             {product.image_url ? (
-                                                <Image
-                                                    src={product.image_url}
-                                                    alt={product.name}
-                                                    fill
-                                                    sizes="(max-width: 768px) 50vw, 25vw"
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                                                    priority={index < 8}
-                                                />
+                                                <>
+                                                    <ImagePlaceholder className="absolute inset-0" />
+                                                    <Image
+                                                        src={product.image_url}
+                                                        alt={product.name}
+                                                        fill
+                                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out relative z-10"
+                                                        priority={index < 8}
+                                                    />
+                                                </>
                                             ) : (
-                                                <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />
+                                                <ImagePlaceholder className="absolute inset-0" />
                                             )}
                                             <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
                                                 <Button

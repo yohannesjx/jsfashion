@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api/client";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 interface Product {
     id: string;
@@ -77,16 +78,19 @@ export default function NewArrivalsPage() {
                                     <Link href={`/product/${product.slug || product.id}`} key={product.id} className="group cursor-pointer">
                                         <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                             {product.image_url ? (
-                                                <Image
-                                                    src={product.image_url}
-                                                    alt={product.name}
-                                                    fill
-                                                    sizes="(max-width: 768px) 50vw, 25vw"
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                                                    priority={index < 8}
-                                                />
+                                                <>
+                                                    <ImagePlaceholder className="absolute inset-0" />
+                                                    <Image
+                                                        src={product.image_url}
+                                                        alt={product.name}
+                                                        fill
+                                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out relative z-10"
+                                                        priority={index < 8}
+                                                    />
+                                                </>
                                             ) : (
-                                                <div className="absolute inset-0 bg-neutral-200 group-hover:scale-105 transition-transform duration-500 ease-out" />
+                                                <ImagePlaceholder className="absolute inset-0" />
                                             )}
                                             <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
                                                 <Button className="w-full bg-white/90 backdrop-blur-md text-black hover:bg-black hover:text-white border border-black/10 rounded-none shadow-sm">QUICK ADD</Button>

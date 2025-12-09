@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
 import RelatedProducts from "@/components/shop/RelatedProducts";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
 
 interface ProductVariant {
     id: string; // UUID
@@ -170,10 +171,11 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                     setLightboxOpen(true);
                                 }}
                             >
+                                <ImagePlaceholder className="absolute inset-0" />
                                 <img
                                     src={src}
                                     alt={`${product.name} - ${idx + 1}`}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover relative z-10"
                                     onError={(e) => {
                                         // Fallback to placeholder if image fails to load
                                         (e.target as HTMLImageElement).src = '/placeholder-1.jpg';
@@ -406,11 +408,12 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                     >
                         <X className="w-8 h-8" />
                     </button>
-                    <div className="w-full h-full max-w-4xl max-h-[90vh] p-4 flex items-center justify-center">
+                    <div className="w-full h-full max-w-4xl max-h-[90vh] p-4 flex items-center justify-center relative">
+                        <ImagePlaceholder className="absolute inset-0" />
                         <img
                             src={images[currentImageIndex]}
                             alt="Zoomed view"
-                            className="max-w-full max-h-full object-contain"
+                            className="max-w-full max-h-full object-contain relative z-10"
                         />
                     </div>
                 </div>
