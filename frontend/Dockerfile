@@ -33,6 +33,11 @@ ENV NODE_ENV production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Install sharp for image optimization in standalone mode
+RUN apk add --no-cache libc6-compat
+COPY package.json package-lock.json* ./
+RUN npm install sharp
+
 COPY --from=builder /app/public ./public
 
 # Automatically leverage output traces to reduce image size
