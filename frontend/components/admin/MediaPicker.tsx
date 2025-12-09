@@ -24,8 +24,9 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
     const [files, setFiles] = useState<MediaFile[]>([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
+    const [selectedUrls, setSelectedUrls] = useState<string[]>([]);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -99,12 +100,65 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
         }
     };
 
-    const handleSelect = () => {
-        if (selectedUrl) {
-            onSelect(selectedUrl);
-            onClose();
-            setSelectedUrl(null);
+    const handleDelete = async () => {
+        if (selectedUrls.length === 0) return;
+
+        if (!confirm(`Delete ${selectedUrls.length} image(s)?`)) return;
+
+        setDeleting(true);
+        try {
+            let successCount = 0;
+            for (const url of selectedUrls) {
+                const filename = url.split('/').pop();
+                if (!filename) continue;
+
+                const response = await fetch(`${API_URL}/api/v1/admin/media/${filename}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders(),
+                });
+
+                if (response.ok) {
+                    successCount++;
+                }
+            }
+
+            toast.success(`${successCount} image(s) deleted successfully`);
+            setSelectedUrls([]);
+            fetchMedia();
+        } catch (error) {
+            console.error('Delete error:', error);
+            toast.error('Failed to delete images');
+        } finally {
+            setDeleting(false);
         }
+    };
+
+    const toggleSelection = (url: string) => {
+        setSelectedUrls(prev =>
+            prev.includes(url)
+                ? prev.filter(u => u !== url)
+                : [...prev, url]
+        );
+    };
+
+    const handleSelectAll = () => {
+        if (selectedUrls.length === filteredFiles.length) {
+            setSelectedUrls([]);
+        } else {
+            setSelectedUrls(filteredFiles.map(f => f.url));
+        }
+    };
+
+    const handleAddSelected = () => {
+        if (selectedUrls.length === 0) {
+            toast.error('No images selected');
+            return;
+        }
+
+        selectedUrls.forEach(url => onSelect(url));
+        toast.success(`${selectedUrls.length} image(s) added`);
+        setSelectedUrls([]);
+        onClose();
     };
 
     const filteredFiles = files.filter(file =>
@@ -115,10 +169,10 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-5xl max-h-[80vh] overflow-hidden flex flex-col">
                 <DialogHeader>
-                    <DialogTitle>Select Image from Media Library</DialogTitle>
+                    <DialogTitle>Select Images from Media Library</DialogTitle>
                 </DialogHeader>
 
-                {/* Search and Upload */}
+                {/* Search and Actions */}
                 <div className="flex gap-3 mb-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -129,6 +183,27 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
                             className="pl-10"
                         />
                     </div>
+
+                    <Button
+                        variant="outline"
+                        onClick={handleSelectAll}
+                        disabled={loading || filteredFiles.length === 0}
+                    >
+                        {selectedUrls.length === filteredFiles.length && filteredFiles.length > 0
+                            ? 'Deselect All'
+                            : 'Select All'}
+                    </Button>
+
+                    {selectedUrls.length > 0 && (
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={deleting}
+                        >
+                            <X className="w-4 h-4 mr-2" />
+                            Delete ({selectedUrls.length})
+                        </Button>
+                    )}
 
                     <label htmlFor="media-picker-upload">
                         <Button disabled={uploading} className="cursor-pointer" asChild>
@@ -163,27 +238,29 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            {filteredFiles.map((file) => (
-                                <div
-                                    key={file.url}
-                                    onClick={() => setSelectedUrl(file.url)}
-                                    className={`relative aspect-square bg-neutral-100 rounded-lg overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500 ${selectedUrl === file.url ? 'ring-2 ring-blue-600' : ''
-                                        }`}
-                                >
-                                    <img
-                                        src={file.url}
-                                        alt={file.filename}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    {selectedUrl === file.url && (
-                                        <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center">
-                                            <div className="bg-blue-600 rounded-full p-2">
-                                                <Check className="w-6 h-6 text-white" />
-                                            </div>
+                            {filteredFiles.map((file) => {
+                                const isSelected = selectedUrls.includes(file.url);
+                                return (
+                                    <div
+                                        key={file.url}
+                                        onClick={() => toggleSelection(file.url)}
+                                        className={`relative aspect-square bg-neutral-100 rounded-lg overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-blue-500 ${isSelected ? 'ring-2 ring-blue-600' : ''
+                                            }`}
+                                    >
+                                        <img
+                                            src={file.url}
+                                            alt={file.filename}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className={`absolute top-2 right-2 w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${isSelected
+                                                ? 'bg-blue-600 border-blue-600'
+                                                : 'bg-white border-neutral-300'
+                                            }`}>
+                                            {isSelected && <Check className="w-4 h-4 text-white" />}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -191,17 +268,19 @@ export function MediaPicker({ isOpen, onClose, onSelect }: MediaPickerProps) {
                 {/* Actions */}
                 <div className="flex justify-between items-center pt-4 border-t">
                     <p className="text-sm text-neutral-500">
-                        {selectedUrl ? 'Image selected' : 'Click an image to select'}
+                        {selectedUrls.length > 0
+                            ? `${selectedUrls.length} image(s) selected`
+                            : 'Click images to select'}
                     </p>
                     <div className="flex gap-2">
                         <Button variant="outline" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button
-                            onClick={handleSelect}
-                            disabled={!selectedUrl}
+                            onClick={handleAddSelected}
+                            disabled={selectedUrls.length === 0}
                         >
-                            Select Image
+                            Add Selected ({selectedUrls.length})
                         </Button>
                     </div>
                 </div>
