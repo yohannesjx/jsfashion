@@ -35,9 +35,16 @@ func (h *MediaHandler) ListMedia(c echo.Context) error {
 		baseURL = "https://api.jsfashion.et"
 	}
 
+	// Check if uploads directory exists
+	if _, err := os.Stat(uploadsDir); os.IsNotExist(err) {
+		c.Logger().Errorf("Uploads directory does not exist: %s", uploadsDir)
+		return c.JSON(http.StatusOK, []MediaFile{}) // Return empty array
+	}
+
 	// Walk through uploads directory
 	err := filepath.WalkDir(uploadsDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
+			c.Logger().Errorf("Error walking path %s: %v", path, err)
 			return err
 		}
 
@@ -54,12 +61,14 @@ func (h *MediaHandler) ListMedia(c echo.Context) error {
 		// Get file info
 		info, err := d.Info()
 		if err != nil {
+			c.Logger().Warnf("Cannot get info for %s: %v", path, err)
 			return nil // Skip files we can't read
 		}
 
 		// Get relative path from uploads directory
 		relPath, err := filepath.Rel(uploadsDir, path)
 		if err != nil {
+			c.Logger().Warnf("Cannot get relative path for %s: %v", path, err)
 			return nil
 		}
 
@@ -77,10 +86,13 @@ func (h *MediaHandler) ListMedia(c echo.Context) error {
 	})
 
 	if err != nil {
+		c.Logger().Errorf("Failed to walk uploads directory: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Failed to list media files",
 		})
 	}
+
+	c.Logger().Infof("Found %d media files", len(mediaFiles))
 
 	// Sort by upload date (newest first)
 	// Simple bubble sort since we don't expect thousands of files
