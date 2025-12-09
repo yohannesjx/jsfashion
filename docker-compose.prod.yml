@@ -37,11 +37,14 @@ services:
       DB_USER: jsfashion
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: jsfashion
+      API_BASE_URL: https://api.jsfashion.et
       # Telegram Bot Configuration
       TELEGRAM_BOT_TOKEN: "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
       TELEGRAM_CHAT_IDS: "358753046,6734086506,7399604556,2097854740"
     ports:
       - "8080:8080"
+    volumes:
+      - jsfashion_uploads:/app/uploads
     depends_on:
       - postgres
       - redis
@@ -72,3 +75,4 @@ networks:
 
 volumes:
   jsfashion_postgres_data:
+  jsfashion_uploads:
