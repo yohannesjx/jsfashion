@@ -46,7 +46,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useCategories, useSetProductCategories, useProductCategories } from '@/lib/api/admin/categories';
-import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct } from '@/lib/api/admin/products';
+import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct, useUpdateProduct } from '@/lib/api/admin/products';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
