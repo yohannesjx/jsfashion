@@ -19,6 +19,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -40,7 +45,7 @@ import {
 import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
-import { useCategories, useSetProductCategories } from '@/lib/api/admin/categories';
+import { useCategories, useSetProductCategories, useProductCategories } from '@/lib/api/admin/categories';
 import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct } from '@/lib/api/admin/products';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 
@@ -94,6 +99,10 @@ export default function ProductsPage() {
 
     // Media Picker state
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
+
+    // Category assignment state
+    const [categoryEditingProductId, setCategoryEditingProductId] = useState<string | null>(null);
+    const [productCategoriesCache, setProductCategoriesCache] = useState<Record<string, string[]>>({});
 
     const limit = 100;
 
@@ -449,6 +458,58 @@ export default function ProductsPage() {
         }
     };
 
+    const handleOpenCategoryPopover = async (productId: string) => {
+        setCategoryEditingProductId(productId);
+
+        // Fetch current categories for this product if not cached
+        if (!productCategoriesCache[productId]) {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`${API_URL}/api/v1/admin/products/${productId}/categories`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const categoryIds = data.map((cat: any) => cat.id);
+                    setProductCategoriesCache(prev => ({ ...prev, [productId]: categoryIds }));
+                }
+            } catch (error) {
+                console.error('Failed to fetch product categories:', error);
+            }
+        }
+    };
+
+    const toggleProductCategory = (productId: string, categoryId: string) => {
+        setProductCategoriesCache(prev => {
+            const current = prev[productId] || [];
+            const updated = current.includes(categoryId)
+                ? current.filter(id => id !== categoryId)
+                : [...current, categoryId];
+            return { ...prev, [productId]: updated };
+        });
+    };
+
+    const handleSaveCategories = async (productId: string) => {
+        const categoryIds = productCategoriesCache[productId] || [];
+
+        if (categoryIds.length === 0) {
+            toast.error('Please select at least one category');
+            return;
+        }
+
+        try {
+            await setProductCategories.mutateAsync({
+                productId,
+                categoryIds,
+            });
+            toast.success('Categories updated');
+            setCategoryEditingProductId(null);
+        } catch (error) {
+            toast.error('Failed to update categories');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -590,12 +651,80 @@ export default function ProductsPage() {
                                                             </div>
                                                         </div>
                                                     )}
-                                                    <Link
-                                                        href={`/admin/products/${product.id}`}
-                                                        className="font-medium hover:text-blue-600 hover:underline"
-                                                    >
-                                                        {product.name}
-                                                    </Link>
+                                                    <div className="flex items-center gap-2">
+                                                        <Link
+                                                            href={`/admin/products/${product.id}`}
+                                                            className="font-medium hover:text-blue-600 hover:underline"
+                                                        >
+                                                            {product.name}
+                                                        </Link>
+
+                                                        {/* Quick Category Assignment */}
+                                                        <Popover
+                                                            open={categoryEditingProductId === product.id}
+                                                            onOpenChange={(open) => {
+                                                                if (open) {
+                                                                    handleOpenCategoryPopover(product.id);
+                                                                } else {
+                                                                    setCategoryEditingProductId(null);
+                                                                }
+                                                            }}
+                                                        >
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                    title="Assign categories"
+                                                                >
+                                                                    <Tags className="h-3 w-3" />
+                                                                </Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent className="w-64" align="start">
+                                                                <div className="space-y-3">
+                                                                    <div className="space-y-2">
+                                                                        <h4 className="font-medium text-sm">Categories</h4>
+                                                                        <p className="text-xs text-muted-foreground">
+                                                                            Select categories for this product
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-2">
+                                                                        {categories.map((cat) => (
+                                                                            <div key={cat.id} className="flex items-center space-x-2">
+                                                                                <Checkbox
+                                                                                    id={`quick-cat-${product.id}-${cat.id}`}
+                                                                                    checked={productCategoriesCache[product.id]?.includes(cat.id) || false}
+                                                                                    onCheckedChange={() => toggleProductCategory(product.id, cat.id)}
+                                                                                />
+                                                                                <Label
+                                                                                    htmlFor={`quick-cat-${product.id}-${cat.id}`}
+                                                                                    className="text-sm cursor-pointer"
+                                                                                >
+                                                                                    {cat.name}
+                                                                                </Label>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                    <div className="flex gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            onClick={() => handleSaveCategories(product.id)}
+                                                                            className="flex-1"
+                                                                        >
+                                                                            Save
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() => setCategoryEditingProductId(null)}
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-medium">
