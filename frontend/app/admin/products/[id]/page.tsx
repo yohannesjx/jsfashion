@@ -121,6 +121,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             return; // Prevent double-click
         }
 
+        // Validate categories
+        if (selectedCategoryIds.length === 0) {
+            toast.error('Please select at least one category to save the product.');
+            return;
+        }
+
         try {
             console.log('Saving product...', { name, description, basePrice, status, selectedCategoryIds, images });
 
@@ -135,12 +141,10 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             });
 
             // Update product categories
-            if (selectedCategoryIds.length > 0) {
-                await setProductCategories.mutateAsync({
-                    productId: params.id,
-                    categoryIds: selectedCategoryIds,
-                });
-            }
+            await setProductCategories.mutateAsync({
+                productId: params.id,
+                categoryIds: selectedCategoryIds,
+            });
 
             toast.success('Product updated successfully');
         } catch (error: any) {
@@ -249,85 +253,55 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                                     placeholder="0.00"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label>Categories</Label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
-                                    {categories.length === 0 ? (
-                                        <div className="text-sm text-muted-foreground">No categories available</div>
-                                    ) : (
-                                        categories.map((cat) => (
-                                            <div key={cat.id} className="flex items-center space-x-2">
-                                                <Checkbox
-                                                    id={`cat-${cat.id}`}
-                                                    checked={selectedCategoryIds.includes(cat.id)}
-                                                    onCheckedChange={(checked) => {
-                                                        if (checked) {
-                                                            setSelectedCategoryIds([...selectedCategoryIds, cat.id]);
-                                                        } else {
-                                                            setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== cat.id));
-                                                        }
-                                                    }}
-                                                />
-                                                <label
-                                                    htmlFor={`cat-${cat.id}`}
-                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                                >
-                                                    {cat.name}
-                                                </label>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Media */}
-                    <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
-                        <h2 className="font-semibold text-lg">Media</h2>
-                        <div className="grid grid-cols-4 gap-4">
-                            {images.map((url, index) => (
-                                <div key={index} className="aspect-square bg-muted rounded-lg border border-border flex items-center justify-center relative group cursor-pointer overflow-hidden">
-                                    <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
-                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Button
-                                            variant="destructive"
-                                            size="icon"
-                                            onClick={() => removeImage(index)}
-                                            className="h-8 w-8"
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                            <div
-                                className="aspect-square bg-muted/50 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:bg-muted hover:border-primary/50 transition-all cursor-pointer"
-                                onClick={() => setShowMediaPicker(true)}
-                            >
-                                <ImageIcon className="h-6 w-6 mb-2" />
-                                <span className="text-xs font-medium">Select from Media</span>
-                            </div>
                         </div>
 
-                        {/* Upload Progress */}
-                        {uploadProgress.length > 0 && (
-                            <div className="space-y-2 mt-4">
-                                <p className="text-sm font-medium text-muted-foreground">Uploading...</p>
-                                {uploadProgress.map((file, idx) => (
-                                    <div key={idx} className="space-y-1">
-                                        <div className="flex justify-between text-xs text-muted-foreground">
-                                            <span className="truncate max-w-[200px]">{file.fileName}</span>
-                                            <span>{file.progress}%</span>
-                                        </div>
-                                        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                                            <div
-                                                className="bg-primary h-full transition-all duration-300 ease-out"
-                                                style={{ width: `${file.progress}%` }}
-                                            />
+                        {/* Media */}
+                        <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
+                            <h2 className="font-semibold text-lg">Media</h2>
+                            <div className="grid grid-cols-4 gap-4">
+                                {images.map((url, index) => (
+                                    <div key={index} className="aspect-square bg-muted rounded-lg border border-border flex items-center justify-center relative group cursor-pointer overflow-hidden">
+                                        <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Button
+                                                variant="destructive"
+                                                size="icon"
+                                                onClick={() => removeImage(index)}
+                                                className="h-8 w-8"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
+                                <div
+                                    className="aspect-square bg-muted/50 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:bg-muted hover:border-primary/50 transition-all cursor-pointer"
+                                    onClick={() => setShowMediaPicker(true)}
+                                >
+                                    <ImageIcon className="h-6 w-6 mb-2" />
+                                    <span className="text-xs font-medium">Select from Media</span>
+                                </div>
+                            </div>
+
+                            {/* Upload Progress */}
+                            {uploadProgress.length > 0 && (
+                                <div className="space-y-2 mt-4">
+                                    <p className="text-sm font-medium text-muted-foreground">Uploading...</p>
+                                    {uploadProgress.map((file, idx) => (
+                                        <div key={idx} className="space-y-1">
+                                            <div className="flex justify-between text-xs text-muted-foreground">
+                                                <span className="truncate max-w-[200px]">{file.fileName}</span>
+                                                <span>{file.progress}%</span>
+                                            </div>
+                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                                                <div
+                                                    className="bg-primary h-full transition-all duration-300 ease-out"
+                                                    style={{ width: `${file.progress}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -351,6 +325,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 <div className="space-y-8">
                     <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
                         <h2 className="font-semibold text-lg">Organization</h2>
+
+                        {/* Status */}
                         <div className="space-y-2">
                             <Label>Status</Label>
                             <Select value={status} onValueChange={(v: "active" | "draft") => setStatus(v)}>
@@ -362,6 +338,41 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                                     <SelectItem value="draft">Draft</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        {/* Categories */}
+                        <div className="space-y-2 pt-2 border-t">
+                            <Label>Categories *</Label>
+                            <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                                {categories.length === 0 ? (
+                                    <div className="text-sm text-muted-foreground">No categories available</div>
+                                ) : (
+                                    categories.map((cat) => (
+                                        <div key={cat.id} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`cat-${cat.id}`}
+                                                checked={selectedCategoryIds.includes(cat.id)}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        setSelectedCategoryIds([...selectedCategoryIds, cat.id]);
+                                                    } else {
+                                                        setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== cat.id));
+                                                    }
+                                                }}
+                                            />
+                                            <label
+                                                htmlFor={`cat-${cat.id}`}
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                            >
+                                                {cat.name}
+                                            </label>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <p className="text-xs text-neutral-500">
+                                Product MUST belong to at least one category to appear in the shop.
+                            </p>
                         </div>
                     </div>
                 </div>
