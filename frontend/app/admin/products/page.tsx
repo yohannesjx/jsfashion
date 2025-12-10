@@ -123,6 +123,41 @@ export default function ProductsPage() {
         fetchProducts(1, false);
     }, [debouncedSearch]);
 
+    const fetchVariantsInBackground = async (productsToFetch: Product[], isAppend: boolean) => {
+        const token = localStorage.getItem('access_token');
+        const BATCH_SIZE = 5;
+
+        for (let i = 0; i < productsToFetch.length; i += BATCH_SIZE) {
+            const batch = productsToFetch.slice(i, i + BATCH_SIZE);
+            const batchResults = await Promise.all(
+                batch.map(async (product) => {
+                    try {
+                        const variantRes = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        });
+                        if (variantRes.ok) {
+                            const variantData = await variantRes.json();
+                            return { ...product, variants: variantData.variants || [] };
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                    return { ...product, variants: [] };
+                })
+            );
+
+            // Update state incrementally
+            setProducts(prev => {
+                const updatedBatchMap = new Map(batchResults.map(p => [p.id, p]));
+                return prev.map(p => {
+                    const updated = updatedBatchMap.get(p.id);
+                    if (updated) return { ...p, variants: updated.variants };
+                    return p;
+                });
+            });
+        }
+    };
+
     const fetchProducts = async (pageNum: number, append: boolean = false) => {
         setIsLoading(!append);
 
@@ -148,36 +183,23 @@ export default function ProductsPage() {
                 const data = await response.json();
                 const newProducts = data.products || data || [];
 
-                // Fetch variants for each product
-                const productsWithVariants = await Promise.all(
-                    newProducts.map(async (product: Product) => {
-                        try {
-                            const variantRes = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
-                                headers: { 'Authorization': `Bearer ${token}` },
-                            });
-                            if (variantRes.ok) {
-                                const variantData = await variantRes.json();
-                                return {
-                                    ...product,
-                                    variants: variantData.variants || []
-                                };
-                            }
-                        } catch (e) {
-                            console.error('Failed to fetch variants for', product.id);
-                        }
-                        return { ...product, variants: [] };
-                    })
-                );
+                // 1. Set products immediately to unblock UI
+                const productsInit = newProducts.map((p: any) => ({ ...p, variants: [] }));
 
                 if (append) {
-                    setProducts(prev => [...prev, ...productsWithVariants]);
+                    setProducts(prev => [...prev, ...productsInit]);
                 } else {
-                    setProducts(productsWithVariants);
+                    setProducts(productsInit);
                 }
-
                 setHasMore(newProducts.length === limit);
+                setIsLoading(false); // Unblock UI here!
+
+                // 2. Fetch variants in background
+                // Use a defined function to avoid clutter
+                fetchVariantsInBackground(newProducts, append);
             } else {
                 toast.error('Failed to load products');
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -665,13 +687,14 @@ export default function ProductsPage() {
                                                             />
                                                             {/* Hover zoom preview */}
                                                             <div className="absolute left-12 top-0 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-                                                                <div className="relative h-64 w-64 rounded-lg overflow-hidden shadow-2xl border-2 border-white">
+                                                                <div className="relative h-[500px] w-[500px] rounded-lg overflow-hidden shadow-2xl border-2 border-white bg-white">
                                                                     <Image
                                                                         src={product.image_url}
                                                                         alt={product.name}
                                                                         fill
                                                                         className="object-cover"
-                                                                        sizes="256px"
+                                                                        sizes="500px"
+                                                                        priority
                                                                     />
                                                                 </div>
                                                             </div>

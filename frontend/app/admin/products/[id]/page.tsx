@@ -135,7 +135,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                 description,
                 base_price: basePrice,
                 is_active: status === "active",
-                image_url: images[0] || undefined,
+                image_url: images.length > 0 ? images[0] : "",
                 images: images,
             });
 
