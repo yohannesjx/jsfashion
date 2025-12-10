@@ -42,6 +42,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useCategories, useSetProductCategories } from '@/lib/api/admin/categories';
 import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct } from '@/lib/api/admin/products';
+import { MediaPicker } from '@/components/admin/MediaPicker';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -90,6 +91,9 @@ export default function ProductsPage() {
     const createVariant = useCreateVariant();
     const deleteVariant = useDeleteVariant();
     const deleteProduct = useDeleteProduct();
+
+    // Media Picker state
+    const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
     const limit = 100;
 
@@ -413,6 +417,38 @@ export default function ProductsPage() {
         }
     };
 
+    const handleImageSelect = async (imageUrl: string) => {
+        if (!editingProductId) return;
+
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`${API_URL}/api/v1/admin/products/${editingProductId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    image_url: imageUrl,
+                }),
+            });
+
+            if (response.ok) {
+                // Update local state
+                setProducts(prev => prev.map(p =>
+                    p.id === editingProductId ? { ...p, image_url: imageUrl } : p
+                ));
+                toast.success('Product image updated');
+                setEditingProductId(null);
+            } else {
+                toast.error('Failed to update image');
+            }
+        } catch (error) {
+            console.error('Failed to update image:', error);
+            toast.error('Failed to update image');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -528,7 +564,11 @@ export default function ProductsPage() {
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     {product.image_url && (
-                                                        <div className="relative h-10 w-10 rounded overflow-hidden bg-neutral-100 group">
+                                                        <div
+                                                            className="relative h-10 w-10 rounded overflow-hidden bg-neutral-100 group cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                                                            onClick={() => setEditingProductId(product.id)}
+                                                            title="Click to change image"
+                                                        >
                                                             <Image
                                                                 src={product.image_url}
                                                                 alt={product.name}
@@ -809,6 +849,13 @@ export default function ProductsPage() {
                     </Button>
                 </div>
             </div>
+
+            {/* Media Picker Modal */}
+            <MediaPicker
+                isOpen={editingProductId !== null}
+                onClose={() => setEditingProductId(null)}
+                onSelect={handleImageSelect}
+            />
         </div >
     );
 }
