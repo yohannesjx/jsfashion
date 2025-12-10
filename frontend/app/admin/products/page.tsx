@@ -135,8 +135,12 @@ export default function ProductsPage() {
             });
 
             const response = await fetch(`${API_URL}/api/v1/admin/products?${params}`, {
+                method: 'GET',
+                cache: 'no-store',
                 headers: {
                     'Authorization': `Bearer ${token}`,
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
                 },
             });
 
