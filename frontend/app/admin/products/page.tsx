@@ -96,6 +96,7 @@ export default function ProductsPage() {
     const createVariant = useCreateVariant();
     const deleteVariant = useDeleteVariant();
     const deleteProduct = useDeleteProduct();
+    const updateProduct = useUpdateProduct();
 
     // Media Picker state
     const [editingProductId, setEditingProductId] = useState<string | null>(null);
@@ -430,45 +431,21 @@ export default function ProductsPage() {
         if (!editingProductId) return;
 
         try {
-            const token = localStorage.getItem('access_token');
-
-            // Find the product to get its current data
-            const product = products.find(p => p.id === editingProductId);
-            if (!product) {
-                toast.error('Product not found');
-                return;
-            }
-
-            const response = await fetch(`${API_URL}/api/v1/admin/products/${editingProductId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    name: product.name,
-                    description: product.description || '',
-                    base_price: product.base_price,
-                    is_active: product.is_active ?? true,
-                    image_url: imageUrl,
-                }),
+            await updateProduct.mutateAsync({
+                id: editingProductId,
+                image_url: imageUrl,
             });
 
-            if (response.ok) {
-                // Update local state
-                setProducts(prev => prev.map(p =>
-                    p.id === editingProductId ? { ...p, image_url: imageUrl } : p
-                ));
-                toast.success('Product image updated');
-                setEditingProductId(null);
-            } else {
-                const errorData = await response.json();
-                console.error('Update failed:', errorData);
-                toast.error('Failed to update image');
-            }
-        } catch (error) {
+            // Update local state
+            setProducts(prev => prev.map(p =>
+                p.id === editingProductId ? { ...p, image_url: imageUrl } : p
+            ));
+
+            toast.success('Product image updated');
+            setEditingProductId(null);
+        } catch (error: any) {
             console.error('Failed to update image:', error);
-            toast.error('Failed to update image');
+            toast.error(error?.message || 'Failed to update image');
         }
     };
 
