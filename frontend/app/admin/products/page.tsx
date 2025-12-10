@@ -167,15 +167,17 @@ export default function ProductsPage() {
                 page: pageNum.toString(),
                 limit: limit.toString(),
                 ...(debouncedSearch && { search: debouncedSearch }),
+                _t: new Date().getTime().toString(), // Cache busting without headers
             });
 
             const response = await fetch(`${API_URL}/api/v1/admin/products?${params}`, {
                 method: 'GET',
+                // cache: 'no-store', // This might still trigger headers in some browsers/nextjs versions so be careful, but standard fetch API it's usually fine. 
+                // However, Next.js extensions might add headers. 
+                // Safe bet: remove custom headers that caused CORS and rely on query param + no-store signal
                 cache: 'no-store',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
                 },
             });
 
