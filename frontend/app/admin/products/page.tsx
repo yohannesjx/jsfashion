@@ -431,6 +431,14 @@ export default function ProductsPage() {
 
         try {
             const token = localStorage.getItem('access_token');
+
+            // Find the product to get its current data
+            const product = products.find(p => p.id === editingProductId);
+            if (!product) {
+                toast.error('Product not found');
+                return;
+            }
+
             const response = await fetch(`${API_URL}/api/v1/admin/products/${editingProductId}`, {
                 method: 'PUT',
                 headers: {
@@ -438,6 +446,10 @@ export default function ProductsPage() {
                     'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
+                    name: product.name,
+                    description: product.description || '',
+                    base_price: product.base_price,
+                    is_active: product.is_active ?? true,
                     image_url: imageUrl,
                 }),
             });
@@ -450,6 +462,8 @@ export default function ProductsPage() {
                 toast.success('Product image updated');
                 setEditingProductId(null);
             } else {
+                const errorData = await response.json();
+                console.error('Update failed:', errorData);
                 toast.error('Failed to update image');
             }
         } catch (error) {
