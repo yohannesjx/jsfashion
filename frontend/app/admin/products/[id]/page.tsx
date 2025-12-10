@@ -47,7 +47,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             setDescription(productData.product.description || "");
             setBasePrice(productData.product.base_price);
             setStatus(productData.product.is_active ? "active" : "draft");
-            setStatus(productData.product.is_active ? "active" : "draft");
             if (productData.images && productData.images.length > 0) {
                 setImages(productData.images.map((img: any) => img.url));
             } else if (productData.product.image_url) {
@@ -254,54 +253,54 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                                 />
                             </div>
                         </div>
+                    </div>
 
-                        {/* Media */}
-                        <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
-                            <h2 className="font-semibold text-lg">Media</h2>
-                            <div className="grid grid-cols-4 gap-4">
-                                {images.map((url, index) => (
-                                    <div key={index} className="aspect-square bg-muted rounded-lg border border-border flex items-center justify-center relative group cursor-pointer overflow-hidden">
-                                        <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
-                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Button
-                                                variant="destructive"
-                                                size="icon"
-                                                onClick={() => removeImage(index)}
-                                                className="h-8 w-8"
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
+                    {/* Media */}
+                    <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-4">
+                        <h2 className="font-semibold text-lg">Media</h2>
+                        <div className="grid grid-cols-4 gap-4">
+                            {images.map((url, index) => (
+                                <div key={index} className="aspect-square bg-muted rounded-lg border border-border flex items-center justify-center relative group cursor-pointer overflow-hidden">
+                                    <img src={url} alt={`Product ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Button
+                                            variant="destructive"
+                                            size="icon"
+                                            onClick={() => removeImage(index)}
+                                            className="h-8 w-8"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                            <div
+                                className="aspect-square bg-muted/50 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:bg-muted hover:border-primary/50 transition-all cursor-pointer"
+                                onClick={() => setShowMediaPicker(true)}
+                            >
+                                <ImageIcon className="h-6 w-6 mb-2" />
+                                <span className="text-xs font-medium">Select from Media</span>
+                            </div>
+                        </div>
+
+                        {/* Upload Progress */}
+                        {uploadProgress.length > 0 && (
+                            <div className="space-y-2 mt-4">
+                                <p className="text-sm font-medium text-muted-foreground">Uploading...</p>
+                                {uploadProgress.map((file, idx) => (
+                                    <div key={idx} className="space-y-1">
+                                        <div className="flex justify-between text-xs text-muted-foreground">
+                                            <span className="truncate max-w-[200px]">{file.fileName}</span>
+                                            <span>{file.progress}%</span>
+                                        </div>
+                                        <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                                            <div
+                                                className="bg-primary h-full transition-all duration-300 ease-out"
+                                                style={{ width: `${file.progress}%` }}
+                                            />
                                         </div>
                                     </div>
                                 ))}
-                                <div
-                                    className="aspect-square bg-muted/50 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:bg-muted hover:border-primary/50 transition-all cursor-pointer"
-                                    onClick={() => setShowMediaPicker(true)}
-                                >
-                                    <ImageIcon className="h-6 w-6 mb-2" />
-                                    <span className="text-xs font-medium">Select from Media</span>
-                                </div>
-                            </div>
-
-                            {/* Upload Progress */}
-                            {uploadProgress.length > 0 && (
-                                <div className="space-y-2 mt-4">
-                                    <p className="text-sm font-medium text-muted-foreground">Uploading...</p>
-                                    {uploadProgress.map((file, idx) => (
-                                        <div key={idx} className="space-y-1">
-                                            <div className="flex justify-between text-xs text-muted-foreground">
-                                                <span className="truncate max-w-[200px]">{file.fileName}</span>
-                                                <span>{file.progress}%</span>
-                                            </div>
-                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                                                <div
-                                                    className="bg-primary h-full transition-all duration-300 ease-out"
-                                                    style={{ width: `${file.progress}%` }}
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
                             </div>
                         )}
                     </div>
