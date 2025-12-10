@@ -431,12 +431,43 @@ export default function ProductsPage() {
         if (!editingProductId) return;
 
         try {
-            await updateProduct.mutateAsync({
-                id: editingProductId,
-                image_url: imageUrl,
+            const token = localStorage.getItem('access_token');
+
+            // 1. Fetch fresh, complete product details
+            // We need this because the update endpoint expects a full payload or specific pointers,
+            // and mixing partial state from the list view with the update might be causing issues.
+            const res = await fetch(`${API_URL}/api/v1/admin/products/${editingProductId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            // Update local state
+            if (!res.ok) throw new Error('Failed to fetch product details');
+
+            const data = await res.json();
+            const product = data.product;
+            const existingImages = data.images || [];
+
+            // 2. Prepare updated images list 
+            // Put the selected image first (as primary), followed by other existing images
+            // Filter out the selected image from existing ones to avoid duplicates
+            const otherImageUrls = existingImages
+                .map((img: any) => img.url)
+                .filter((url: string) => url !== imageUrl);
+
+            const updatedImages = [imageUrl, ...otherImageUrls];
+
+            // 3. Send COMPLETE update via mutation
+            // This mimics exactly how the Edit Product page works
+            await updateProduct.mutateAsync({
+                id: editingProductId,
+                name: product.name,
+                description: product.description || '',
+                base_price: product.base_price,
+                is_active: product.is_active,
+                image_url: imageUrl,      // Set primary image URL
+                images: updatedImages     // Set all images array
+            });
+
+            // Update local state to reflect change immediately
             setProducts(prev => prev.map(p =>
                 p.id === editingProductId ? { ...p, image_url: imageUrl } : p
             ));
