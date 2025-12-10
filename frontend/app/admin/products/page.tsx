@@ -676,19 +676,23 @@ export default function ProductsPage() {
                                                 <div className="flex items-center gap-3">
                                                     {product.image_url && (
                                                         <div
-                                                            className="relative h-10 w-10 rounded overflow-hidden bg-neutral-100 group cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                                                            className="relative group cursor-pointer"
                                                             onClick={() => setEditingProductId(product.id)}
                                                             title="Click to change image"
                                                         >
-                                                            <Image
-                                                                src={product.image_url}
-                                                                alt={product.name}
-                                                                fill
-                                                                className="object-cover"
-                                                                sizes="40px"
-                                                            />
+                                                            {/* Thumbnail Image */}
+                                                            <div className="h-10 w-10 rounded overflow-hidden bg-neutral-100 group-hover:ring-2 group-hover:ring-primary transition-all">
+                                                                <Image
+                                                                    src={product.image_url}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                    sizes="40px"
+                                                                />
+                                                            </div>
+
                                                             {/* Hover zoom preview */}
-                                                            <div className="absolute left-12 top-0 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                                            <div className="absolute left-12 top-0 z-[100] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none min-w-[500px]">
                                                                 <div className="relative h-[500px] w-[500px] rounded-lg overflow-hidden shadow-2xl border-2 border-white bg-white">
                                                                     <Image
                                                                         src={product.image_url}
