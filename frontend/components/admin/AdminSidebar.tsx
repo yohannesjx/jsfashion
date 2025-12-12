@@ -112,34 +112,34 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
     return (
         <aside
             className={cn(
-                'bg-white border-r border-neutral-200 transition-all duration-300 flex flex-col',
-                isOpen ? 'w-64' : 'w-20'
+                'bg-white m-4 rounded-3xl shadow-2xl transition-all duration-300 flex flex-col h-[calc(100vh-2rem)]',
+                isOpen ? 'w-72' : 'w-24 items-center'
             )}
         >
             {/* Logo */}
-            <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-200">
+            <div className={cn("h-20 flex items-center px-6", isOpen ? "justify-between" : "justify-center")}>
                 {isOpen && (
-                    <Link href="/admin" className="text-xl font-bold tracking-tight">
-                        JsFashion ADMIN
-                    </Link>
+                    <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+                        JsFashion
+                    </span>
                 )}
                 <Button
                     variant="ghost"
                     size="icon"
                     onClick={onToggle}
-                    className="ml-auto"
+                    className={cn("rounded-full hover:bg-neutral-100 text-neutral-500", !isOpen && "mt-2")}
                 >
                     {isOpen ? (
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-5 w-5" />
                     ) : (
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-5 w-5" />
                     )}
                 </Button>
             </div>
 
             {/* Navigation */}
-            <ScrollArea className="flex-1 py-4">
-                <nav className="space-y-1 px-2">
+            <ScrollArea className="flex-1 py-4 px-3 w-full">
+                <nav className="space-y-2">
                     {visibleNavItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -149,14 +149,15 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                                    'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200',
                                     isActive
-                                        ? 'bg-neutral-900 text-white'
-                                        : 'text-neutral-700 hover:bg-neutral-100',
-                                    !isOpen && 'justify-center'
+                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'
+                                        : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
+                                    !isOpen && 'justify-center w-12 h-12 px-0 mx-auto'
                                 )}
+                                title={!isOpen ? item.title : undefined}
                             >
-                                <Icon className="h-5 w-5 flex-shrink-0" />
+                                <Icon className={cn("flex-shrink-0 transition-transform", isOpen ? "h-5 w-5" : "h-6 w-6", isActive && !isOpen && "scale-110")} />
                                 {isOpen && <span>{item.title}</span>}
                             </Link>
                         );
@@ -165,20 +166,25 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
             </ScrollArea>
 
             {/* User Info */}
-            {isOpen && user && (
-                <div className="p-4 border-t border-neutral-200">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-neutral-900 text-white flex items-center justify-center font-semibold">
+            {user && (
+                <div className="p-4 mt-auto">
+                    <div className={cn(
+                        "flex items-center gap-3 p-3 rounded-2xl bg-neutral-50 border border-neutral-100",
+                        !isOpen && "justify-center bg-transparent border-none p-0"
+                    )}>
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-md">
                             {user.first_name?.[0] || user.email[0].toUpperCase()}
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                                {user.first_name} {user.last_name}
-                            </p>
-                            <p className="text-xs text-neutral-500 truncate capitalize">
-                                {user.role.replace('_', ' ')}
-                            </p>
-                        </div>
+                        {isOpen && (
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold truncate leading-none mb-1">
+                                    {user.first_name} {user.last_name}
+                                </p>
+                                <p className="text-xs text-neutral-500 truncate capitalize">
+                                    {user.role}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
