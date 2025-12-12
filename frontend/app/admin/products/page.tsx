@@ -611,7 +611,7 @@ export default function ProductsPage() {
             </div>
 
             {/* Products Table with Collapsible Variants */}
-            <div className="border rounded-lg">
+            <div className="bg-white rounded-2xl border-none shadow-lg overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>

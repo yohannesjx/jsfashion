@@ -43,7 +43,7 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
     };
 
     return (
-        <header className="h-16 bg-white border-b border-neutral-200 flex items-center justify-between px-6">
+        <header className="h-20 m-4 mb-0 rounded-3xl bg-white shadow-xl flex items-center justify-between px-8 z-10 relative">
             {/* Left: Menu + Search */}
             <div className="flex items-center gap-4 flex-1">
                 <Button
@@ -56,11 +56,11 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
                 </Button>
 
                 <div className="relative w-full max-w-md hidden md:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
                     <Input
                         type="search"
                         placeholder="Search products, orders, customers..."
-                        className="pl-10 bg-neutral-50 border-neutral-200"
+                        className="pl-12 bg-neutral-100 border-transparent rounded-2xl h-11 focus-visible:ring-offset-0 focus-visible:ring-neutral-200"
                     />
                 </div>
             </div>
@@ -107,8 +107,8 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
                 {/* User Menu */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <div className="h-8 w-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-semibold text-sm">
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                            <div className="h-10 w-10 rounded-full bg-neutral-900 text-white flex items-center justify-center font-semibold text-sm shadow-md">
                                 {user?.first_name?.[0] || user?.email[0].toUpperCase()}
                             </div>
                         </Button>
