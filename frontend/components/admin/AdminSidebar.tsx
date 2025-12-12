@@ -113,7 +113,7 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
         <aside
             className={cn(
                 'bg-white m-4 rounded-3xl shadow-sm border border-neutral-200 transition-all duration-300 flex flex-col h-[calc(100vh-2rem)]',
-                isOpen ? 'w-72' : 'w-24 items-center'
+                isOpen ? 'w-72' : 'w-20 items-center'
             )}
         >
             {/* Logo */}
@@ -155,11 +155,11 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
                                     isActive
                                         ? 'bg-neutral-900 text-white shadow-md'
                                         : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
-                                    !isOpen && 'justify-center w-12 h-12 px-0 mx-auto'
+                                    !isOpen && 'justify-center w-10 h-10 px-0 mx-auto'
                                 )}
                                 title={!isOpen ? item.title : undefined}
                             >
-                                <Icon className={cn("flex-shrink-0 transition-transform", isOpen ? "h-5 w-5" : "h-6 w-6", isActive && !isOpen && "scale-110")} />
+                                <Icon className={cn("flex-shrink-0 transition-transform", isOpen ? "h-5 w-5" : "h-5 w-5", isActive && !isOpen && "scale-110")} />
                                 {isOpen && <span>{item.title}</span>}
                             </Link>
                         );
