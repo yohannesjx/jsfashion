@@ -165,11 +165,12 @@ SELECT
   v.stock_quantity as stock, 
   v.stock_quantity, 
   v.active, 
-  COALESCE(p.amount, 0) as price, 
+  COALESCE(p.amount, (pr.base_price::numeric + COALESCE(v.price_adjustment, 0))::bigint) as price, 
   v.display_order, 
   v.created_at, 
   v.updated_at
 FROM product_variants v
+JOIN products pr ON v.product_id = pr.id
 LEFT JOIN prices p ON p.variant_id = v.id
 WHERE v.product_id = $1::bigint
 ORDER BY v.display_order ASC, v.created_at ASC;
