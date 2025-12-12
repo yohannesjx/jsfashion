@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { RefundDialog } from '@/components/admin/orders/RefundDialog';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -196,6 +197,12 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                    <RefundDialog
+                        orderId={order.id}
+                        items={items}
+                        onSuccess={() => fetchOrderDetails()}
+                    />
+                    <div className="w-px h-6 bg-border mx-2 hidden md:block" />
                     {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => {
                         const isActive = order.status === status;
                         return (

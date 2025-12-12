@@ -543,3 +543,22 @@ AND EXISTS (
 )
 ORDER BY p.created_at DESC
 LIMIT $2 OFFSET $3;
+
+-- Refunds
+-- name: CreateRefund :one
+INSERT INTO refunds (order_id, amount, reason, restock)
+VALUES ($1, $2, $3, $4)
+RETURNING *;
+
+-- name: CreateRefundItem :one
+INSERT INTO refund_items (refund_id, order_item_id, quantity, amount)
+VALUES ($1, $2, $3, $4)
+RETURNING *;
+
+-- name: ListOrderRefunds :many
+SELECT r.*, 
+  (SELECT json_agg(ri.*) FROM refund_items ri WHERE ri.refund_id = r.id) as items
+FROM refunds r
+WHERE r.order_id = $1
+ORDER BY r.created_at DESC;
+
