@@ -145,12 +145,12 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
+                <Button variant="outline" className="gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl">
                     <RefreshCcw className="h-4 w-4" />
                     Refund Items
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl sm:rounded-2xl rounded-xl">
                 <DialogHeader>
                     <DialogTitle>Process Refund</DialogTitle>
                     <DialogDescription>
@@ -160,7 +160,7 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
 
                 <div className="space-y-6 py-4">
                     {/* Items Table */}
-                    <div className="border rounded-md overflow-hidden max-h-[300px] overflow-y-auto">
+                    <div className="border rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -203,7 +203,7 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
                                                     value={isSelected ? quantity : ''}
                                                     disabled={!isSelected}
                                                     onChange={(e) => handleQuantityChange(itemId, parseInt(e.target.value) || 0, item.quantity)}
-                                                    className="h-8 text-center"
+                                                    className="h-8 text-center rounded-lg"
                                                 />
                                                 <div className="text-[10px] text-muted-foreground text-center mt-1">
                                                     Max: {item.quantity}
@@ -227,11 +227,11 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
                                 placeholder="Damaged, Returned, Mistake..."
                                 value={reason}
                                 onChange={(e) => setReason(e.target.value)}
-                                className="resize-none"
+                                className="resize-none rounded-xl"
                             />
                         </div>
                         <div className="space-y-4">
-                            <div className="bg-muted p-4 rounded-lg space-y-2">
+                            <div className="bg-muted p-4 rounded-xl space-y-2">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-muted-foreground">Items Selected:</span>
                                     <span className="font-medium">{Object.keys(refundQuantities).length}</span>
@@ -242,7 +242,7 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
                                 </div>
                             </div>
 
-                            <div className="flex items-center space-x-2 border p-3 rounded-md">
+                            <div className="flex items-center space-x-2 border p-3 rounded-xl">
                                 <Checkbox
                                     id="restock"
                                     checked={restock}
@@ -262,11 +262,12 @@ export function RefundDialog({ orderId, items, currency = 'Birr', onSuccess }: R
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setOpen(false)} className="rounded-xl">Cancel</Button>
                     <Button
                         onClick={handleRefund}
                         disabled={isLoading || totalRefundAmount <= 0}
                         variant="destructive"
+                        className="rounded-xl"
                     >
                         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Confirm Refund
