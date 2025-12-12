@@ -167,9 +167,9 @@ export default function MediaLibraryPage() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-8">
-                    <div className="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div className="bg-white border border-neutral-200 rounded-2xl p-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <div className="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center">
                                 <ImageIcon className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
@@ -178,9 +178,9 @@ export default function MediaLibraryPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div className="bg-white border border-neutral-200 rounded-2xl p-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <div className="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center">
                                 <Upload className="w-5 h-5 text-green-600" />
                             </div>
                             <div>
@@ -189,9 +189,9 @@ export default function MediaLibraryPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div className="bg-white border border-neutral-200 rounded-2xl p-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <div className="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center">
                                 <ImageIcon className="w-5 h-5 text-purple-600" />
                             </div>
                             <div>
@@ -211,7 +211,7 @@ export default function MediaLibraryPage() {
                         <p className="text-neutral-500 mt-4">Loading images...</p>
                     </div>
                 ) : filteredFiles.length === 0 ? (
-                    <div className="text-center py-12 bg-neutral-50 rounded-lg border-2 border-dashed border-neutral-200">
+                    <div className="text-center py-12 bg-neutral-50 rounded-2xl border-2 border-dashed border-neutral-200">
                         <ImageIcon className="w-16 h-16 text-neutral-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium mb-2">No images found</h3>
                         <p className="text-neutral-500 mb-4">
@@ -241,7 +241,7 @@ export default function MediaLibraryPage() {
                         {filteredFiles.map((file) => (
                             <div
                                 key={file.url}
-                                className="group relative bg-white border border-neutral-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                                className="group relative bg-white border border-neutral-200 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
                             >
                                 {/* Image */}
                                 <div className="aspect-square bg-neutral-100 relative">
