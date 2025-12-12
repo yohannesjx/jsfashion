@@ -119,7 +119,7 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
             {/* Logo */}
             <div className={cn("h-20 flex items-center px-6", isOpen ? "justify-between" : "justify-center")}>
                 {isOpen && (
-                    <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+                    <span className="text-xl font-extrabold tracking-tight text-neutral-900">
                         JsFashion
                     </span>
                 )}
@@ -149,9 +149,9 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
-                                    'flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200',
+                                    'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200',
                                     isActive
-                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20'
+                                        ? 'bg-neutral-900 text-white shadow-md'
                                         : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900',
                                     !isOpen && 'justify-center w-12 h-12 px-0 mx-auto'
                                 )}
@@ -172,7 +172,7 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
                         "flex items-center gap-3 p-3 rounded-2xl bg-neutral-50 border border-neutral-100",
                         !isOpen && "justify-center bg-transparent border-none p-0"
                     )}>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 text-white flex items-center justify-center font-bold shadow-md">
+                        <div className="h-9 w-9 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold shadow-md">
                             {user.first_name?.[0] || user.email[0].toUpperCase()}
                         </div>
                         {isOpen && (
