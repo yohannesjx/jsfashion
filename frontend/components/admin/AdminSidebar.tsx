@@ -112,7 +112,7 @@ export function AdminSidebar({ isOpen, onToggle }: SidebarProps) {
     return (
         <aside
             className={cn(
-                'bg-white m-4 rounded-3xl shadow-2xl transition-all duration-300 flex flex-col h-[calc(100vh-2rem)]',
+                'bg-white m-4 rounded-3xl shadow-sm border border-neutral-200 transition-all duration-300 flex flex-col h-[calc(100vh-2rem)]',
                 isOpen ? 'w-72' : 'w-24 items-center'
             )}
         >

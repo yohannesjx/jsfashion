@@ -43,7 +43,7 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
     };
 
     return (
-        <header className="h-20 m-4 mb-0 rounded-3xl bg-white shadow-xl flex items-center justify-between px-8 z-10 relative">
+        <header className="h-20 m-4 mb-0 flex items-center justify-between z-10 relative bg-transparent">
             {/* Left: Menu + Search */}
             <div className="flex items-center gap-4 flex-1">
                 <Button
@@ -59,14 +59,14 @@ export function AdminTopbar({ onMenuClick }: TopbarProps) {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
                     <Input
                         type="search"
-                        placeholder="Search products, orders, customers..."
-                        className="pl-12 bg-neutral-100 border-transparent rounded-2xl h-11 focus-visible:ring-offset-0 focus-visible:ring-neutral-200"
+                        placeholder="Search..."
+                        className="pl-12 bg-white border-neutral-200 shadow-sm rounded-full h-11 focus-visible:ring-offset-0 focus-visible:ring-neutral-200 w-full"
                     />
                 </div>
             </div>
 
             {/* Right: Notifications + Dark Mode + User Menu */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white border border-neutral-200 shadow-sm rounded-full px-4 py-1 h-12">
                 {/* Notifications */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>

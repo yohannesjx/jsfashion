@@ -109,7 +109,7 @@ export default function CustomersPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl border-none shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>

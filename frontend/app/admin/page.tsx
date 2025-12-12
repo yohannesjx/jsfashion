@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium text-neutral-500">Total Revenue</p>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <Link href="/admin/orders" className="block transition-transform hover:scale-[1.02]">
-                    <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden h-full cursor-pointer">
+                    <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden h-full cursor-pointer">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-neutral-500">Orders Today</p>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     </div>
                 </Link>
 
-                <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium text-neutral-500">Total Customers</p>
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-neutral-500 mt-2">Active users</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium text-neutral-500">Inventory Value</p>
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Revenue Chart */}
-                <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <h2 className="text-lg font-semibold mb-4">Revenue Overview (Last 30 Days)</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={salesData}>
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Top Products Chart */}
-                <div className="bg-white p-6 rounded-2xl border-none shadow-lg overflow-hidden">
+                <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <h2 className="text-lg font-semibold mb-4">Top Products (Last 30 Days)</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={topProducts.slice(0, 5)}>
@@ -243,7 +243,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Top Products Table */}
-            <div className="bg-white rounded-2xl border-none shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-neutral-200">
                     <h2 className="text-lg font-semibold">Top Selling Products</h2>
                 </div>
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent Orders */}
-            <div className="bg-white rounded-2xl border-none shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-neutral-200 flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Recent Orders</h2>
                     <Button variant="ghost" size="sm" asChild>
