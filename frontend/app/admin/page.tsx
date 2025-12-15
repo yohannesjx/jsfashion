@@ -141,7 +141,7 @@ export default function AdminDashboard() {
                 <div className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-neutral-500">Total Revenue</p>
+                            <p className="text-sm font-medium text-neutral-500">Today's Revenue</p>
                             <p className="text-3xl font-bold mt-2">
                                 {stats?.total_revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} Birr
                             </p>

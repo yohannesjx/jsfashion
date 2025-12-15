@@ -60,12 +60,13 @@ type InventoryExportItem struct {
 func (h *DashboardHandler) GetStats(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	// Get total revenue
+	// Get total revenue (today only)
 	var totalRevenue float64
 	err := h.DB.QueryRowContext(ctx, `
 		SELECT COALESCE(SUM(total_amount), 0)
 		FROM orders
 		WHERE status NOT IN ('cancelled', 'refunded')
+		  AND DATE(created_at) = CURRENT_DATE
 	`).Scan(&totalRevenue)
 	if err != nil {
 		totalRevenue = 0
@@ -100,13 +101,14 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 		totalCustomers = 0
 	}
 
-	// Get total items sold
+	// Get total items sold (today only)
 	var totalSold int
 	err = h.DB.QueryRowContext(ctx, `
 		SELECT COALESCE(SUM(quantity), 0)
 		FROM order_items oi
 		JOIN orders o ON o.id = oi.order_id
 		WHERE o.status NOT IN ('cancelled', 'refunded')
+		  AND DATE(o.created_at) = CURRENT_DATE
 	`).Scan(&totalSold)
 	if err != nil {
 		totalSold = 0
