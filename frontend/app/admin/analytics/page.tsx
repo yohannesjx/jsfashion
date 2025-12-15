@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Loader2, TrendingUp, DollarSign, Users, ShoppingCart, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
