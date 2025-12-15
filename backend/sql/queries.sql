@@ -450,7 +450,7 @@ SELECT
   COUNT(DISTINCT o.customer_id) as unique_customers
 FROM orders o
 WHERE o.created_at >= $1 AND o.created_at <= $2
-  AND o.status = 'completed';
+  AND o.status = 'delivered';
 
 -- name: GetTopSellingProducts :many
 SELECT 
@@ -465,7 +465,7 @@ JOIN variants v ON p.id = v.product_id
 JOIN order_items oi ON v.id = oi.variant_id
 JOIN orders o ON oi.order_id = o.id
 WHERE o.created_at >= $1 AND o.created_at <= $2
-  AND o.status = 'completed'
+  AND o.status = 'delivered'
 GROUP BY p.id, p.title, p.thumbnail
 ORDER BY total_quantity_sold DESC
 LIMIT $3 OFFSET $4;
@@ -479,7 +479,7 @@ FROM (
   SELECT customer_id, COUNT(*) as order_count
   FROM orders
   WHERE created_at >= $1 AND created_at <= $2
-    AND status = 'completed'
+    AND status = 'delivered'
   GROUP BY customer_id
 ) customer_orders;
 
@@ -490,7 +490,7 @@ SELECT
   COALESCE(SUM(total_amount), 0)::bigint as revenue
 FROM orders
 WHERE created_at >= $1 AND created_at <= $2
-  AND status = 'completed'
+  AND status = 'delivered'
 GROUP BY DATE(created_at)
 ORDER BY date ASC;
 
