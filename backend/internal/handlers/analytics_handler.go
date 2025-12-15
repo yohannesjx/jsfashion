@@ -55,10 +55,12 @@ func (h *AnalyticsHandler) GetTopProducts(c echo.Context) error {
 	startDate := c.QueryParam("start_date")
 	endDate := c.QueryParam("end_date")
 	limitStr := c.QueryParam("limit")
+	pageStr := c.QueryParam("page")
 
 	end := time.Now()
 	start := end.AddDate(0, 0, -30)
-	limit := int32(10)
+	limit := int32(20) // Default 20 per page
+	page := int32(1)
 
 	if startDate != "" {
 		if parsed, err := time.Parse("2006-01-02", startDate); err == nil {
@@ -75,11 +77,19 @@ func (h *AnalyticsHandler) GetTopProducts(c echo.Context) error {
 			limit = int32(val)
 		}
 	}
+	if pageStr != "" {
+		if val, err := strconv.Atoi(pageStr); err == nil && val > 0 {
+			page = int32(val)
+		}
+	}
+
+	offset := (page - 1) * limit
 
 	params := repository.GetTopSellingProductsParams{
 		CreatedAt:   start,
 		CreatedAt_2: end,
 		Limit:       limit,
+		Offset:      offset,
 	}
 
 	products, err := h.Repo.GetTopSellingProducts(c.Request().Context(), params)

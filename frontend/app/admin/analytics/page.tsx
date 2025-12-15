@@ -53,10 +53,13 @@ export default function AnalyticsPage() {
     const [customerMetrics, setCustomerMetrics] = useState<CustomerMetrics | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [dateRange, setDateRange] = useState('30'); // days
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const itemsPerPage = 20;
 
     useEffect(() => {
         fetchAnalytics();
-    }, [dateRange]);
+    }, [dateRange, currentPage]);
 
     const fetchAnalytics = async () => {
         setIsLoading(true);
@@ -81,12 +84,14 @@ export default function AnalyticsPage() {
             }
 
             // Fetch top products
-            const productsResponse = await fetch(`${API_URL}/api/v1/admin/analytics/top-products?${params}&limit=5`, {
+            const productsResponse = await fetch(`${API_URL}/api/v1/admin/analytics/top-products?${params}&limit=${itemsPerPage}&page=${currentPage}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
             });
             if (productsResponse.ok) {
                 const data = await productsResponse.json();
                 setTopProducts(data || []);
+                // Estimate total pages (you might want to add a count endpoint)
+                setTotalPages(data && data.length === itemsPerPage ? currentPage + 1 : currentPage);
             }
 
             // Fetch customer metrics
@@ -250,7 +255,7 @@ export default function AnalyticsPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Package className="h-5 w-5" />
-                        Top Selling Products
+                        Sold Products
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -301,6 +306,33 @@ export default function AnalyticsPage() {
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* Pagination */}
+                    {topProducts.length > 0 && (
+                        <div className="flex items-center justify-between px-6 py-4 border-t">
+                            <p className="text-sm text-neutral-500">
+                                Page {currentPage}
+                            </p>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage(p => p + 1)}
+                                    disabled={topProducts.length < itemsPerPage}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

@@ -2133,7 +2133,7 @@ const getTopSellingProducts = `-- name: GetTopSellingProducts :many
 SELECT 
   p.id,
   p.title as product_name,
-  p.image_url,
+  p.thumbnail as image_url,
   COUNT(oi.id) as order_count,
   COALESCE(SUM(oi.quantity), 0)::bigint as total_quantity_sold,
   COALESCE(SUM(oi.price * oi.quantity), 0)::bigint as total_revenue
@@ -2142,15 +2142,17 @@ JOIN variants v ON p.id = v.product_id
 JOIN order_items oi ON v.id = oi.variant_id
 JOIN orders o ON oi.order_id = o.id
 WHERE o.created_at >= $1 AND o.created_at <= $2
-GROUP BY p.id, p.title, p.image_url
-ORDER BY total_revenue DESC
-LIMIT $3
+  AND o.status = 'completed'
+GROUP BY p.id, p.title, p.thumbnail
+ORDER BY total_quantity_sold DESC
+LIMIT $3 OFFSET $4
 `
 
 type GetTopSellingProductsParams struct {
 	CreatedAt   time.Time `json:"created_at"`
 	CreatedAt_2 time.Time `json:"created_at_2"`
 	Limit       int32     `json:"limit"`
+	Offset      int32     `json:"offset"`
 }
 
 type GetTopSellingProductsRow struct {
@@ -2163,7 +2165,7 @@ type GetTopSellingProductsRow struct {
 }
 
 func (q *Queries) GetTopSellingProducts(ctx context.Context, arg GetTopSellingProductsParams) ([]GetTopSellingProductsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTopSellingProducts, arg.CreatedAt, arg.CreatedAt_2, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getTopSellingProducts, arg.CreatedAt, arg.CreatedAt_2, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

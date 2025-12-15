@@ -449,13 +449,14 @@ SELECT
   COALESCE(AVG(o.total_amount), 0)::bigint as average_order_value,
   COUNT(DISTINCT o.customer_id) as unique_customers
 FROM orders o
-WHERE o.created_at >= $1 AND o.created_at <= $2;
+WHERE o.created_at >= $1 AND o.created_at <= $2
+  AND o.status = 'completed';
 
 -- name: GetTopSellingProducts :many
 SELECT 
   p.id,
   p.title as product_name,
-  p.image_url,
+  p.thumbnail as image_url,
   COUNT(oi.id) as order_count,
   COALESCE(SUM(oi.quantity), 0)::bigint as total_quantity_sold,
   COALESCE(SUM(oi.price * oi.quantity), 0)::bigint as total_revenue
@@ -464,9 +465,10 @@ JOIN variants v ON p.id = v.product_id
 JOIN order_items oi ON v.id = oi.variant_id
 JOIN orders o ON oi.order_id = o.id
 WHERE o.created_at >= $1 AND o.created_at <= $2
-GROUP BY p.id, p.title, p.image_url
-ORDER BY total_revenue DESC
-LIMIT $3;
+  AND o.status = 'completed'
+GROUP BY p.id, p.title, p.thumbnail
+ORDER BY total_quantity_sold DESC
+LIMIT $3 OFFSET $4;
 
 -- name: GetCustomerMetrics :one
 SELECT 
@@ -477,6 +479,7 @@ FROM (
   SELECT customer_id, COUNT(*) as order_count
   FROM orders
   WHERE created_at >= $1 AND created_at <= $2
+    AND status = 'completed'
   GROUP BY customer_id
 ) customer_orders;
 
@@ -487,6 +490,7 @@ SELECT
   COALESCE(SUM(total_amount), 0)::bigint as revenue
 FROM orders
 WHERE created_at >= $1 AND created_at <= $2
+  AND status = 'completed'
 GROUP BY DATE(created_at)
 ORDER BY date ASC;
 
