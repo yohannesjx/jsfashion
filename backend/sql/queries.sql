@@ -461,7 +461,7 @@ SELECT
   COALESCE(SUM(oi.quantity), 0)::bigint as total_quantity_sold,
   COALESCE(SUM(oi.price * oi.quantity), 0)::bigint as total_revenue
 FROM products p
-JOIN variants v ON p.id = v.product_id
+JOIN product_variants v ON p.id = v.product_id
 JOIN order_items oi ON v.id = oi.variant_id
 JOIN orders o ON oi.order_id = o.id
 WHERE o.created_at >= $1 AND o.created_at <= $2

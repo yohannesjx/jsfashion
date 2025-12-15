@@ -251,7 +251,7 @@ func (h *DashboardHandler) GetTopProducts(c echo.Context) error {
 			COUNT(oi.id) as sales,
 			COALESCE(SUM(oi.subtotal), 0) as revenue
 		FROM products p
-		JOIN variants v ON v.product_id = p.id
+		JOIN product_variants v ON v.product_id = p.id
 		JOIN order_items oi ON oi.variant_id = v.id
 		JOIN orders o ON o.id = oi.order_id
 		WHERE o.status NOT IN ('cancelled', 'refunded')
