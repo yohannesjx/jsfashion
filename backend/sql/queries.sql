@@ -459,7 +459,7 @@ SELECT
   p.thumbnail as image_url,
   COUNT(oi.id) as order_count,
   COALESCE(SUM(oi.quantity), 0)::bigint as total_quantity_sold,
-  COALESCE(SUM(oi.price * oi.quantity), 0)::bigint as total_revenue
+  COALESCE(SUM(oi.unit_price * oi.quantity), 0)::bigint as total_revenue
 FROM products p
 JOIN product_variants v ON p.id = v.product_id
 JOIN order_items oi ON v.id = oi.variant_id
