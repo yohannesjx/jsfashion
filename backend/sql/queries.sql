@@ -427,17 +427,20 @@ ORDER BY im.created_at DESC
 LIMIT $1 OFFSET $2;
 
 -- name: GetLowStockVariants :many
-SELECT v.id, v.sku, v.stock_quantity, p.title as product_name, p.image_url
-FROM variants v
+SELECT v.id, v.sku, v.stock_quantity, p.title as product_name, p.thumbnail as image_url
+FROM product_variants v
 JOIN products p ON v.product_id = p.id
 WHERE v.stock_quantity < $1
 ORDER BY v.stock_quantity ASC;
 
 -- name: GetInventoryStats :one
 SELECT 
-  COUNT(*) FILTER (WHERE stock_quantity < 1) as low_stock_count,
-  COALESCE(SUM(stock_quantity), 0)::bigint as total_stock_items
-FROM variants;
+  COUNT(*) FILTER (WHERE pv.stock_quantity < 1) as low_stock_count,
+  COALESCE(SUM(pv.stock_quantity), 0)::bigint as total_stock_items,
+  COUNT(pv.id)::bigint as variant_count,
+  COALESCE(SUM(pv.stock_quantity * COALESCE(p.amount, 0)), 0)::bigint as total_inventory_value
+FROM product_variants pv
+LEFT JOIN prices p ON p.variant_id = pv.id;
 -- Analytics
 -- name: GetSalesAnalytics :one
 SELECT 

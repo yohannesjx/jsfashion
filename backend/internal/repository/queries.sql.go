@@ -2027,15 +2027,15 @@ func (q *Queries) ListInventoryMovements(ctx context.Context, arg ListInventoryM
 }
 
 const getLowStockVariants = `-- name: GetLowStockVariants :many
-SELECT v.id, v.sku, v.stock_quantity, p.title as product_name, p.image_url
-FROM variants v
+SELECT v.id, v.sku, v.stock_quantity, p.title as product_name, p.thumbnail as image_url
+FROM product_variants v
 JOIN products p ON v.product_id = p.id
 WHERE v.stock_quantity < $1
 ORDER BY v.stock_quantity ASC
 `
 
 type GetLowStockVariantsRow struct {
-	ID            int64          `json:"id"`
+	ID            uuid.UUID      `json:"id"`
 	Sku           string         `json:"sku"`
 	StockQuantity int32          `json:"stock_quantity"`
 	ProductName   string         `json:"product_name"`
@@ -2073,20 +2073,25 @@ func (q *Queries) GetLowStockVariants(ctx context.Context, stockQuantity int32) 
 
 const getInventoryStats = `-- name: GetInventoryStats :one
 SELECT 
-  COUNT(*) FILTER (WHERE stock_quantity < 1) as low_stock_count,
-  COALESCE(SUM(stock_quantity), 0)::bigint as total_stock_items
-FROM variants
+  COUNT(*) FILTER (WHERE pv.stock_quantity < 1) as low_stock_count,
+  COALESCE(SUM(pv.stock_quantity), 0)::bigint as total_stock_items,
+  COUNT(pv.id)::bigint as variant_count,
+  COALESCE(SUM(pv.stock_quantity * COALESCE(p.amount, 0)), 0)::bigint as total_inventory_value
+FROM product_variants pv
+LEFT JOIN prices p ON p.variant_id = pv.id
 `
 
 type GetInventoryStatsRow struct {
-	LowStockCount   int64 `json:"low_stock_count"`
-	TotalStockItems int64 `json:"total_stock_items"`
+	LowStockCount       int64 `json:"low_stock_count"`
+	TotalStockItems     int64 `json:"total_stock_items"`
+	VariantCount        int64 `json:"variant_count"`
+	TotalInventoryValue int64 `json:"total_inventory_value"`
 }
 
 func (q *Queries) GetInventoryStats(ctx context.Context) (GetInventoryStatsRow, error) {
 	row := q.db.QueryRowContext(ctx, getInventoryStats)
 	var i GetInventoryStatsRow
-	err := row.Scan(&i.LowStockCount, &i.TotalStockItems)
+	err := row.Scan(&i.LowStockCount, &i.TotalStockItems, &i.VariantCount, &i.TotalInventoryValue)
 	return i, err
 }
 

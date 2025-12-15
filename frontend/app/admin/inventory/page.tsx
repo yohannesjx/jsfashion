@@ -21,10 +21,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 interface InventoryStats {
     low_stock_count: number;
     total_stock_items: number;
+    variant_count: number;
+    total_inventory_value: number;
 }
 
 interface LowStockVariant {
-    id: number;
+    id: string;
     sku: string;
     stock_quantity: number;
     product_name: string;
@@ -116,13 +118,13 @@ export default function InventoryPage() {
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Stock Items</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Stock Quantity</CardTitle>
                         <Package className="h-4 w-4 text-neutral-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats?.total_stock_items?.toLocaleString() || 0}</div>
                         <p className="text-xs text-neutral-500 mt-1">
-                            Across all variants
+                            Across {stats?.variant_count || 0} variants
                         </p>
                     </CardContent>
                 </Card>
@@ -140,18 +142,17 @@ export default function InventoryPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-green-200 bg-green-50">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Stock Health</CardTitle>
+                        <CardTitle className="text-sm font-medium text-green-900">Total Stock Value</CardTitle>
+                        <Package className="h-4 w-4 text-green-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
-                            {stats?.total_stock_items && stats?.low_stock_count !== undefined
-                                ? Math.round(((stats.total_stock_items - stats.low_stock_count) / stats.total_stock_items) * 100)
-                                : 0}%
+                        <div className="text-2xl font-bold text-green-900">
+                            {stats?.total_inventory_value?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'} Birr
                         </div>
-                        <p className="text-xs text-neutral-500 mt-1">
-                            Items in stock
+                        <p className="text-xs text-green-700 mt-1">
+                            Total inventory value
                         </p>
                     </CardContent>
                 </Card>
