@@ -101,7 +101,7 @@ WHERE p.active = true
 AND EXISTS (
     SELECT 1 FROM product_variants pv 
     WHERE pv.product_id = p.id 
-    AND pv.stock_quantity > 0
+    AND COALESCE(pv.stock_quantity, 0) > 0
 )
 ORDER BY p.created_at DESC NULLS LAST, p.id DESC
 LIMIT $1 OFFSET $2;
