@@ -346,7 +346,7 @@ export default function POSPage() {
                                         )}
                                     </div>
                                     <h3 className="font-medium mb-1 line-clamp-1">{product.name}</h3>
-                                    <p className="text-gray-500">{parseFloat(product.base_price).toLocaleString()} ETB</p>
+                                    <p className="text-gray-500">{parseFloat(product.base_price).toLocaleString()} Br</p>
                                 </div>
                             ))}
                         </>
@@ -384,10 +384,10 @@ export default function POSPage() {
                                             {item.color && <span>{item.color}</span>}
                                             {!item.size && !item.color && <span>Default</span>}
                                         </p>
-                                        <p className="text-sm text-gray-500">{item.quantity} x {item.price.toLocaleString()} ETB</p>
+                                        <p className="text-sm text-gray-500">{item.quantity} x {item.price.toLocaleString()} Br</p>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <p className="font-medium">{(item.price * item.quantity).toLocaleString()} ETB</p>
+                                        <p className="font-medium">{(item.price * item.quantity).toLocaleString()} Br</p>
                                         <Button
                                             variant="ghost"
                                             size="icon"
@@ -406,7 +406,7 @@ export default function POSPage() {
                 <div className="p-6 bg-gray-50 border-t border-gray-200">
                     <div className="flex justify-between mb-4 text-lg font-semibold">
                         <span>Total</span>
-                        <span>{total.toLocaleString()} ETB</span>
+                        <span>{total.toLocaleString()} Br</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

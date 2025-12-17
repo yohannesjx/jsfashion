@@ -68,7 +68,7 @@ export function VariantSelector({ product, open, onOpenChange, onAddToCart }: Va
                     {hasVariants ? (
                         <div className="grid grid-cols-1 gap-4">
                             {variants.map((variant) => {
-                                const price = variant.price / 100.0;
+                                const price = variant.price;
                                 const isSelected = selectedVariant?.id === variant.id;
                                 const outOfStock = variant.stock <= 0;
 
@@ -89,7 +89,7 @@ export function VariantSelector({ product, open, onOpenChange, onAddToCart }: Va
                                             <div className="text-sm text-gray-500">SKU: {variant.sku}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-semibold">${price.toFixed(2)}</div>
+                                            <div className="font-semibold">{price.toLocaleString()} Br</div>
                                             <div className={cn("text-xs", outOfStock ? "text-red-500" : "text-green-600")}>
                                                 {outOfStock ? "Out of Stock" : `${variant.stock} in stock`}
                                             </div>
