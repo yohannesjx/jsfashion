@@ -214,9 +214,10 @@ RETURNING *;
 -- name: GetProductVariant :one
 SELECT 
     pv.*,
-    COALESCE(p.amount, 0) as price
+    COALESCE(pr.amount, prod.base_price, 0) as price
 FROM product_variants pv
-LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'Br'
+LEFT JOIN prices pr ON pr.variant_id = pv.id AND pr.currency = 'Br'
+LEFT JOIN products prod ON prod.id = pv.product_id
 WHERE pv.id = $1 
 LIMIT 1;
 
