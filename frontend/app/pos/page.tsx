@@ -319,7 +319,7 @@ export default function POSPage() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-y-auto pb-20 pr-2">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-0.5 overflow-y-auto pb-20">
                     {(isLoading || (isFetching && products.length === 0)) ? (
                         <div className="col-span-full text-center py-10">Loading products...</div>
                     ) : filteredProducts.length === 0 ? (
@@ -335,18 +335,26 @@ export default function POSPage() {
                             {filteredProducts.map((product: Product) => (
                                 <div
                                     key={product.id}
-                                    className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-center text-center group"
+                                    className="group cursor-pointer bg-white"
                                     onClick={() => handleProductClick(product)}
                                 >
-                                    <div className="w-full aspect-square bg-gray-100 mb-4 rounded-lg flex items-center justify-center text-gray-300 overflow-hidden relative">
+                                    <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
                                         {product.image_url ? (
-                                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                            <img
+                                                src={product.image_url}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                            />
                                         ) : (
-                                            <ShoppingBag className="w-8 h-8 opacity-20" />
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <ShoppingBag className="w-12 h-12 text-neutral-300" />
+                                            </div>
                                         )}
                                     </div>
-                                    <h3 className="font-medium mb-1 line-clamp-1">{product.name}</h3>
-                                    <p className="text-gray-500">{parseFloat(product.base_price).toLocaleString()} Br</p>
+                                    <div className="p-3">
+                                        <h3 className="text-sm font-medium tracking-tight mb-1 line-clamp-2">{product.name}</h3>
+                                        <p className="text-sm font-bold">{parseFloat(product.base_price).toLocaleString()} Br</p>
+                                    </div>
                                 </div>
                             ))}
                         </>
