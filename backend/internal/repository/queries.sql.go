@@ -585,7 +585,7 @@ SELECT
     pv.created_at,
     pv.updated_at
 FROM product_variants pv
-LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'ETB'
+LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'Br'
 WHERE pv.id = $1::uuid 
 LIMIT 1
 `

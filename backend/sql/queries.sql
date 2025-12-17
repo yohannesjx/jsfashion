@@ -216,7 +216,7 @@ SELECT
     pv.*,
     COALESCE(p.amount, 0) as price
 FROM product_variants pv
-LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'ETB'
+LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'Br'
 WHERE pv.id = $1 
 LIMIT 1;
 
