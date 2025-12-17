@@ -212,7 +212,13 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING *;
 
 -- name: GetProductVariant :one
-SELECT * FROM product_variants WHERE id = $1 LIMIT 1;
+SELECT 
+    pv.*,
+    COALESCE(p.amount, 0) as price
+FROM product_variants pv
+LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'ETB'
+WHERE pv.id = $1 
+LIMIT 1;
 
 -- name: UpdateProductVariant :one
 UPDATE product_variants

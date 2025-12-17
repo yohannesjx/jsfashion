@@ -570,23 +570,24 @@ func (q *Queries) GetProductBySlug(ctx context.Context, slug string) (Product, e
 
 const getProductVariant = `-- name: GetProductVariant :one
 SELECT 
-  v.id, 
-  v.product_id, 
-  CONCAT_WS(' / ', v.size, v.color)::text as name, 
-  v.sku, 
-  v.size, 
-  v.color, 
-  v.image, 
-  v.stock_quantity as stock, 
-  v.stock_quantity, 
-  NULL::boolean as active, 
-  COALESCE(p.amount, 0) as price, 
-  0 as display_order, 
-  v.created_at, 
-  v.updated_at
-FROM product_variants v
-LEFT JOIN prices p ON p.variant_id = v.id
-WHERE v.id = $1::uuid LIMIT 1
+    pv.id,
+    pv.product_id,
+    CONCAT_WS(' / ', pv.size, pv.color)::text as name,
+    pv.sku,
+    pv.size,
+    pv.color,
+    pv.image,
+    pv.stock_quantity as stock,
+    pv.stock_quantity,
+    pv.active,
+    COALESCE(p.amount, 0) as price,
+    pv.display_order,
+    pv.created_at,
+    pv.updated_at
+FROM product_variants pv
+LEFT JOIN prices p ON p.variant_id = pv.id AND p.currency = 'ETB'
+WHERE pv.id = $1::uuid 
+LIMIT 1
 `
 
 func (q *Queries) GetProductVariant(ctx context.Context, id string) (ProductVariant, error) {
