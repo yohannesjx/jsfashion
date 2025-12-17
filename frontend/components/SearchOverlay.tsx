@@ -56,14 +56,24 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         }
     }, [isOpen]);
 
-    // Fuzzy search function
+    // Fuzzy search function with better exact match prioritization
     const fuzzyMatch = (text: string, search: string): number => {
         const textLower = text.toLowerCase();
         const searchLower = search.toLowerCase();
 
-        // Exact match gets highest score
+        // Exact full match gets highest score
+        if (textLower === searchLower) {
+            return 1000;
+        }
+
+        // Starts with search term gets very high score
+        if (textLower.startsWith(searchLower)) {
+            return 500;
+        }
+
+        // Contains exact search term gets high score
         if (textLower.includes(searchLower)) {
-            return 100;
+            return 300;
         }
 
         // Check if all search characters appear in order
@@ -93,10 +103,13 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         const scored = products.map(product => {
             let score = 0;
 
-            // Search in title
+            // Search in title with very high weight
             searchTerms.forEach(term => {
-                score += fuzzyMatch(product.title, term) * 3; // Title weighted higher
+                score += fuzzyMatch(product.title, term) * 5; // Title weighted much higher
             });
+
+            // Bonus for matching the full query in title
+            score += fuzzyMatch(product.title, searchQuery) * 10;
 
             // Search in categories
             product.categories.forEach(cat => {
@@ -108,7 +121,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             return { product, score };
         });
 
-        // Filter and sort by score
+        // Filter and sort by score (highest first)
         const filtered = scored
             .filter(item => item.score > 0)
             .sort((a, b) => b.score - a.score)
@@ -248,7 +261,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             <p className="text-xs text-neutral-400 uppercase tracking-widest mb-6">
                                 {results.length} SUGGESTIONS
                             </p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-3">
                                 {results.map((product, idx) => {
                                     const price = product.variants[0]?.price || 0;
                                     const currency = product.variants[0]?.currency || 'Br';
@@ -259,30 +272,45 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                             href={`/product/${product.slug}`}
                                             onClick={() => handleResultClick(product)}
                                             className={cn(
-                                                "flex items-center gap-4 p-4 transition-all border border-transparent hover:border-black/10 hover:bg-neutral-50",
+                                                "group flex items-center gap-6 p-5 transition-all duration-200 border-2 rounded-xl",
                                                 selectedIndex === idx
-                                                    ? "bg-neutral-50 border-black/10"
-                                                    : ""
+                                                    ? "bg-black text-white border-black shadow-lg scale-[1.02]"
+                                                    : "bg-white border-neutral-200 hover:border-black hover:shadow-md"
                                             )}
                                         >
-                                            <div className="w-20 h-24 bg-neutral-100 overflow-hidden flex-shrink-0">
+                                            <div className="w-24 h-28 bg-neutral-100 overflow-hidden flex-shrink-0 rounded-lg">
                                                 {product.thumbnail ? (
                                                     <img
                                                         src={product.thumbnail}
                                                         alt={product.title}
-                                                        className="w-full h-full object-cover"
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                                     />
                                                 ) : (
-                                                    <div className="w-full h-full bg-neutral-200" />
+                                                    <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
+                                                        <Search className="w-8 h-8 text-neutral-400" />
+                                                    </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-lg tracking-tight truncate">{product.title}</h4>
-                                                <p className="text-xs text-neutral-500 mt-1 uppercase tracking-wide">
+                                                <h4 className={cn(
+                                                    "font-bold text-xl tracking-tight line-clamp-2 mb-1",
+                                                    selectedIndex === idx ? "text-white" : "text-black"
+                                                )}>{product.title}</h4>
+                                                <p className={cn(
+                                                    "text-xs uppercase tracking-wider font-medium mb-2",
+                                                    selectedIndex === idx ? "text-white/70" : "text-neutral-500"
+                                                )}>
                                                     {product.categories[0] || 'Product'}
                                                 </p>
-                                                <p className="font-medium text-sm mt-2">{price} {currency}</p>
+                                                <p className={cn(
+                                                    "font-bold text-lg",
+                                                    selectedIndex === idx ? "text-white" : "text-black"
+                                                )}>{price} {currency}</p>
                                             </div>
+                                            <ArrowRight className={cn(
+                                                "w-6 h-6 flex-shrink-0 transition-transform group-hover:translate-x-1",
+                                                selectedIndex === idx ? "text-white" : "text-neutral-400"
+                                            )} />
                                         </Link>
                                     );
                                 })}
