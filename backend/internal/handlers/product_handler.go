@@ -40,8 +40,11 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 	// Get search query
 	searchQuery := c.QueryParam("search")
 
+	// Check if this is an admin request (admin routes have /admin/ prefix)
+	isAdmin := strings.HasPrefix(c.Request().URL.Path, "/api/v1/admin/")
+
 	// Cache Key
-	cacheKey := fmt.Sprintf("products:list:%d:%d:%s", limit, offset, searchQuery)
+	cacheKey := fmt.Sprintf("products:list:%d:%d:%s:%v", limit, offset, searchQuery, isAdmin)
 
 	// Check Cache
 	if h.Redis != nil {
@@ -58,8 +61,18 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 	var err error
 
 	if searchQuery != "" {
+		// Build stock filter conditionally
+		stockFilter := ""
+		if !isAdmin {
+			stockFilter = `AND EXISTS (
+                SELECT 1 FROM product_variants pv 
+                WHERE pv.product_id = p.id 
+                AND COALESCE(pv.stock_quantity, 0) > 0
+            )`
+		}
+
 		// Search products by name
-		query := `
+		query := fmt.Sprintf(`
 			SELECT 
 				p.id::text,
 				p.title as name,
@@ -80,14 +93,10 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 			FROM products p
 			WHERE p.title ILIKE $1
             AND p.active = true
-            AND EXISTS (
-                SELECT 1 FROM product_variants pv 
-                WHERE pv.product_id = p.id 
-                AND COALESCE(pv.stock_quantity, 0) > 0
-            )
+            %s
 			ORDER BY p.created_at DESC
 			LIMIT $2 OFFSET $3
-		`
+		`, stockFilter)
 		rows, err := h.Repo.DB().QueryContext(ctx, query, "%"+searchQuery+"%", limit, offset)
 		if err != nil {
 			c.Logger().Errorf("Failed to search products: %v", err)
@@ -121,7 +130,11 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 			Offset: int32(offset),
 		}
 
-		products, err = h.Repo.ListProducts(ctx, params)
+		if isAdmin {
+			products, err = h.Repo.ListProductsAdmin(ctx, params)
+		} else {
+			products, err = h.Repo.ListProducts(ctx, params)
+		}
 		if err != nil {
 			c.Logger().Errorf("Failed to fetch products: %v", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch products"})

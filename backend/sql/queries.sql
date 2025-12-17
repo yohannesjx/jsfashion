@@ -106,6 +106,30 @@ AND EXISTS (
 ORDER BY p.created_at DESC NULLS LAST, p.id DESC
 LIMIT $1 OFFSET $2;
 
+-- name: ListProductsAdmin :many
+SELECT 
+    p.id::text as id,
+    p.title as name,
+    p.slug,
+    p.description,
+    COALESCE(p.base_price, 0)::text as base_price,
+    ''::text as category,
+    COALESCE(pi.url, p.thumbnail) as image_url,
+    p.active as is_active,
+    p.created_at,
+    p.updated_at
+FROM products p
+LEFT JOIN LATERAL (
+    SELECT url 
+    FROM product_images 
+    WHERE product_id = p.id 
+    ORDER BY position ASC
+    LIMIT 1
+) pi ON true
+WHERE p.active = true
+ORDER BY p.created_at DESC NULLS LAST, p.id DESC
+LIMIT $1 OFFSET $2;
+
 -- name: GetRelatedProducts :many
 SELECT DISTINCT
     p.id::text as id,
