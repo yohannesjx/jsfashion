@@ -36,9 +36,26 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     // Load products and recent searches
     useEffect(() => {
         if (isOpen) {
-            fetch('/products.json')
+            // Fetch from API instead of static JSON
+            fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/api/v1/products?limit=100`)
                 .then(res => res.json())
-                .then(data => setProducts(data))
+                .then(data => {
+                    // Handle both array and object responses
+                    const productList = Array.isArray(data) ? data : data.products || [];
+                    // Map to expected format
+                    const mapped = productList.map((p: any) => ({
+                        id: parseInt(p.id) || 0,
+                        title: p.name || p.title || '',
+                        slug: p.slug || '',
+                        thumbnail: p.image_url || p.thumbnail || null,
+                        categories: p.category ? [p.category] : [],
+                        variants: [{
+                            price: parseInt(p.base_price) || 0,
+                            currency: 'Br'
+                        }]
+                    }));
+                    setProducts(mapped);
+                })
                 .catch(err => console.error('Failed to load products:', err));
 
             // Load recent searches from localStorage
