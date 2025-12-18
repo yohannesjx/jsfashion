@@ -95,11 +95,10 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                   child: Transform.scale(
                     scale: _scaleAnimation.value,
                     child: Padding(
-                      padding: const EdgeInsets.all(20), // Padding on all sides
+                      padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
                       child: Image.asset(
                         'assets/logo.png',
-                        width: 150, // Smaller logo - 150px
-                        height: 150,
+                        width: MediaQuery.of(context).size.width - 40, // Full width minus padding
                         fit: BoxFit.contain,
                       ),
                     ),
