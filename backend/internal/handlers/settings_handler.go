@@ -42,6 +42,8 @@ type UpdateSettingsRequest struct {
 	StorePhone    *string `json:"store_phone"`
 	Currency      *string `json:"currency"`
 	HeroBannerUrl *string `json:"hero_banner_url"`
+	HeroTitle     *string `json:"hero_title"`
+	HeroSubtitle  *string `json:"hero_subtitle"`
 }
 
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
@@ -103,6 +105,24 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 				return ""
 			}(),
 			Valid: req.HeroBannerUrl != nil,
+		},
+		HeroTitle: sql.NullString{
+			String: func() string {
+				if req.HeroTitle != nil {
+					return *req.HeroTitle
+				}
+				return ""
+			}(),
+			Valid: req.HeroTitle != nil,
+		},
+		HeroSubtitle: sql.NullString{
+			String: func() string {
+				if req.HeroSubtitle != nil {
+					return *req.HeroSubtitle
+				}
+				return ""
+			}(),
+			Valid: req.HeroSubtitle != nil,
 		},
 	}
 

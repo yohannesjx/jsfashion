@@ -613,6 +613,8 @@ SET
   store_phone = $3,
   currency = $4,
   hero_banner_url = $5,
+  hero_title = $6,
+  hero_subtitle = $7,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = (SELECT id FROM store_settings LIMIT 1)
 RETURNING *;

@@ -27,7 +27,9 @@ export default function SettingsPage() {
         store_email: '',
         store_phone: '',
         currency: 'ETB',
-        hero_banner_url: ''
+        hero_banner_url: '',
+        hero_title: '',
+        hero_subtitle: ''
     });
 
     useEffect(() => {
@@ -50,7 +52,9 @@ export default function SettingsPage() {
                     store_email: data.store_email?.String || '',
                     store_phone: data.store_phone?.String || '',
                     currency: data.currency?.String || 'ETB',
-                    hero_banner_url: data.hero_banner_url?.String || ''
+                    hero_banner_url: data.hero_banner_url?.String || '',
+                    hero_title: data.hero_title?.String || '',
+                    hero_subtitle: data.hero_subtitle?.String || ''
                 });
             } else {
                 toast.error('Failed to load settings');
@@ -80,7 +84,9 @@ export default function SettingsPage() {
                     store_email: formData.store_email || null,
                     store_phone: formData.store_phone || null,
                     currency: formData.currency || null,
-                    hero_banner_url: formData.hero_banner_url || null
+                    hero_banner_url: formData.hero_banner_url || null,
+                    hero_title: formData.hero_title || null,
+                    hero_subtitle: formData.hero_subtitle || null
                 }),
             });
 
@@ -175,6 +181,29 @@ export default function SettingsPage() {
                                 />
                             </div>
                         )}
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="hero_title">Hero Title</Label>
+                        <Input
+                            id="hero_title"
+                            value={formData.hero_title}
+                            onChange={(e) => setFormData({ ...formData, hero_title: e.target.value })}
+                            placeholder="e.g., FUTURE\nCLASSICS (use \n for line break)"
+                        />
+                        <p className="text-sm text-neutral-500">
+                            Use \n for line breaks (e.g., "FUTURE\nCLASSICS")
+                        </p>
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="hero_subtitle">Hero Subtitle (Optional)</Label>
+                        <Input
+                            id="hero_subtitle"
+                            value={formData.hero_subtitle}
+                            onChange={(e) => setFormData({ ...formData, hero_subtitle: e.target.value })}
+                            placeholder="e.g., Discover our latest collection"
+                        />
                     </div>
 
                     <div className="grid gap-2">

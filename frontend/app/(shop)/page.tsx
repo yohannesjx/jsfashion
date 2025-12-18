@@ -95,16 +95,24 @@ export default function Home() {
     const [quickViewOpen, setQuickViewOpen] = useState(false);
     const [quickViewProductSlug, setQuickViewProductSlug] = useState<string | null>(null);
     const [heroBannerUrl, setHeroBannerUrl] = useState<string>('/hero-bg.jpg');
+    const [heroTitle, setHeroTitle] = useState<string>('FUTURE\nCLASSICS');
+    const [heroSubtitle, setHeroSubtitle] = useState<string>('');
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
     useEffect(() => {
-        // Fetch hero banner from settings
+        // Fetch hero settings
         fetch(`${API_URL}/api/v1/settings`)
             .then(res => res.json())
             .then(data => {
                 if (data.hero_banner_url?.String) {
                     setHeroBannerUrl(data.hero_banner_url.String);
+                }
+                if (data.hero_title?.String) {
+                    setHeroTitle(data.hero_title.String);
+                }
+                if (data.hero_subtitle?.String) {
+                    setHeroSubtitle(data.hero_subtitle.String);
                 }
             })
             .catch(err => console.error('Failed to load settings:', err));
@@ -194,8 +202,18 @@ export default function Home() {
 
                 <div className="relative z-10 text-center space-y-6 max-w-5xl px-4">
                     <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter text-black mix-blend-overlay">
-                        FUTURE<br />CLASSICS
+                        {heroTitle.split('\n').map((line, i) => (
+                            <span key={i}>
+                                {line}
+                                {i < heroTitle.split('\n').length - 1 && <br />}
+                            </span>
+                        ))}
                     </h1>
+                    {heroSubtitle && (
+                        <p className="text-xl md:text-2xl font-medium text-black mix-blend-overlay">
+                            {heroSubtitle}
+                        </p>
+                    )}
                     <div className="flex flex-col md:flex-row gap-6 justify-center items-center mt-12">
                         <Button asChild size="lg" className="bg-black text-white hover:bg-white hover:text-black border-2 border-black rounded-none h-14 px-10 text-lg tracking-widest transition-all duration-300">
                             <Link href="/shop/new-arrivals">SHOP NEW ARRIVALS</Link>

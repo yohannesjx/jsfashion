@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isLoadingMore = false;
   String? _error;
   String _heroBannerUrl = 'https://jsfashion.et/hero-bg.jpg'; // Default hero banner
+  String _heroTitle = 'FUTURE\nCLASSICS'; // Default hero title
+  String _heroSubtitle = ''; // Default hero subtitle
   
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
@@ -70,6 +72,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         
         // Check both possible response formats
         String? bannerUrl;
+        String? title;
+        String? subtitle;
+        
         if (data['hero_banner_url'] != null) {
           if (data['hero_banner_url'] is String) {
             bannerUrl = data['hero_banner_url'];
@@ -78,22 +83,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           }
         }
         
-        print('🖼️ Extracted banner URL: $bannerUrl');
-        
-        if (bannerUrl != null && bannerUrl.isNotEmpty) {
-          if (mounted) {
-            setState(() {
-              _heroBannerUrl = bannerUrl!;
-            });
-            print('✅ Hero banner updated to: $_heroBannerUrl');
+        if (data['hero_title'] != null) {
+          if (data['hero_title'] is String) {
+            title = data['hero_title'];
+          } else if (data['hero_title']['String'] != null) {
+            title = data['hero_title']['String'];
           }
-        } else {
-          print('⚠️ No hero banner URL found in response');
+        }
+        
+        if (data['hero_subtitle'] != null) {
+          if (data['hero_subtitle'] is String) {
+            subtitle = data['hero_subtitle'];
+          } else if (data['hero_subtitle']['String'] != null) {
+            subtitle = data['hero_subtitle']['String'];
+          }
+        }
+        
+        print('🖼️ Extracted banner URL: $bannerUrl');
+        print('📝 Extracted title: $title');
+        print('📝 Extracted subtitle: $subtitle');
+        
+        if (mounted) {
+          setState(() {
+            if (bannerUrl != null && bannerUrl.isNotEmpty) {
+              _heroBannerUrl = bannerUrl;
+            }
+            if (title != null && title.isNotEmpty) {
+              _heroTitle = title;
+            }
+            if (subtitle != null && subtitle.isNotEmpty) {
+              _heroSubtitle = subtitle;
+            }
+          });
+          print('✅ Hero settings updated');
         }
       }
     } catch (e) {
       print('❌ Error fetching hero banner: $e');
-      // Keep default banner on error
+      // Keep default values on error
     }
   }
 
@@ -625,20 +652,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ],
                                           ),
                                         ),
-                                      ),
                                     ),
                                     // Text Overlay
                                     Center(
-                                      child: Text(
-                                        'FUTURE\nCLASSICS',
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 64,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: -2.0,
-                                          height: 0.9,
-                                          color: Colors.white,
-                                        ),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            _heroTitle,
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 64,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: -2.0,
+                                              height: 0.9,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          if (_heroSubtitle.isNotEmpty) ...[
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              _heroSubtitle,
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     ),
                                   ],

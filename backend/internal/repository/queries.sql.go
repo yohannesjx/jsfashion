@@ -1731,11 +1731,14 @@ type StoreSetting struct {
 	StorePhone    sql.NullString `json:"store_phone"`
 	Currency      sql.NullString `json:"currency"`
 	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
+	HeroTitle     sql.NullString `json:"hero_title"`
+	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
+	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
 }
 
 const getStoreSettings = `-- name: GetStoreSettings :one
-SELECT id, store_name, store_email, store_phone, currency, hero_banner_url, updated_at FROM store_settings LIMIT 1
+SELECT * FROM store_settings LIMIT 1
 `
 
 func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
@@ -1748,6 +1751,9 @@ func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
 		&i.StorePhone,
 		&i.Currency,
 		&i.HeroBannerUrl,
+		&i.HeroTitle,
+		&i.HeroSubtitle,
+		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
@@ -1761,9 +1767,11 @@ SET
   store_phone = $3,
   currency = $4,
   hero_banner_url = $5,
+  hero_title = $6,
+  hero_subtitle = $7,
   updated_at = CURRENT_TIMESTAMP
 WHERE id = (SELECT id FROM store_settings LIMIT 1)
-RETURNING id, store_name, store_email, store_phone, currency, hero_banner_url, updated_at
+RETURNING *
 `
 
 type UpdateStoreSettingsParams struct {
@@ -1772,6 +1780,8 @@ type UpdateStoreSettingsParams struct {
 	StorePhone    sql.NullString `json:"store_phone"`
 	Currency      sql.NullString `json:"currency"`
 	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
+	HeroTitle     sql.NullString `json:"hero_title"`
+	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
 }
 
 func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettingsParams) (StoreSetting, error) {
@@ -1781,6 +1791,8 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		arg.StorePhone,
 		arg.Currency,
 		arg.HeroBannerUrl,
+		arg.HeroTitle,
+		arg.HeroSubtitle,
 	)
 	var i StoreSetting
 	err := row.Scan(
@@ -1790,6 +1802,9 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		&i.StorePhone,
 		&i.Currency,
 		&i.HeroBannerUrl,
+		&i.HeroTitle,
+		&i.HeroSubtitle,
+		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
