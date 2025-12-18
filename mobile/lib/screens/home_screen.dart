@@ -438,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   color: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Text(
-                    'FREE SHIPPING ON ORDERS OVER 5000 Br',
+                    'FREE DELIVERY ON ORDERS OVER 5000 Br',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 13,
