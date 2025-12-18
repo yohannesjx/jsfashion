@@ -392,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onRefresh: _fetchCategories,
                 color: Colors.black,
                 child: ListView(
-                  padding: EdgeInsets.zero,
+                  padding: const EdgeInsets.only(top: 4),
                   children: [
                     // Categories
                     if (_isCategoriesLoading)
@@ -429,31 +429,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                          ),
                        )
                     else
-                    ..._categories.map((cat) => Container(
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        title: Text(
-                          (cat['name'] as String? ?? '').toUpperCase(),
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.5,
-                            color: _selectedCategoryName == cat['name'] 
-                               ? Colors.black 
-                               : Colors.grey[700],
+                    ..._categories.map((cat) => InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _selectedCategoryName = cat['name'];
+                          _searchController.clear();
+                        });
+                        _fetchProducts(categoryId: cat['id'].toString());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _selectedCategoryName == cat['name'] 
+                              ? Colors.black.withOpacity(0.03)
+                              : Colors.transparent,
+                          border: Border(
+                            left: BorderSide(
+                              color: _selectedCategoryName == cat['name']
+                                  ? Colors.black
+                                  : Colors.transparent,
+                              width: 3,
+                            ),
                           ),
                         ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            _selectedCategoryName = cat['name'];
-                            _searchController.clear();
-                          });
-                          _fetchProducts(categoryId: cat['id'].toString());
-                        },
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                (cat['name'] as String? ?? '').toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  fontWeight: _selectedCategoryName == cat['name']
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  letterSpacing: 0.8,
+                                  color: _selectedCategoryName == cat['name'] 
+                                      ? Colors.black 
+                                      : Colors.grey[700],
+                                ),
+                              ),
+                            ),
+                            if (_selectedCategoryName == cat['name'])
+                              const Icon(Icons.check, size: 16, color: Colors.black),
+                          ],
+                        ),
                       ),
                     )),
 
