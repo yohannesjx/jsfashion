@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isLoadingMore = false;
   String? _error;
   String _heroBannerUrl = 'https://jsfashion.et/hero-bg.jpg'; // Default hero banner
-  String _heroTitle = 'FUTURE\nCLASSICS'; // Default hero title
+  String _heroTitle = ''; // Will be loaded from API
   String _heroSubtitle = ''; // Default hero subtitle
   
   final TextEditingController _searchController = TextEditingController();
