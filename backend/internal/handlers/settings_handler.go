@@ -37,10 +37,11 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 }
 
 type UpdateSettingsRequest struct {
-	StoreName  string  `json:"store_name"`
-	StoreEmail *string `json:"store_email"`
-	StorePhone *string `json:"store_phone"`
-	Currency   *string `json:"currency"`
+	StoreName     string  `json:"store_name"`
+	StoreEmail    *string `json:"store_email"`
+	StorePhone    *string `json:"store_phone"`
+	Currency      *string `json:"currency"`
+	HeroBannerUrl *string `json:"hero_banner_url"`
 }
 
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
@@ -93,6 +94,15 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 				return ""
 			}(),
 			Valid: req.Currency != nil,
+		},
+		HeroBannerUrl: sql.NullString{
+			String: func() string {
+				if req.HeroBannerUrl != nil {
+					return *req.HeroBannerUrl
+				}
+				return ""
+			}(),
+			Valid: req.HeroBannerUrl != nil,
 		},
 	}
 

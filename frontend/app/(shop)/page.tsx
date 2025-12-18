@@ -94,8 +94,21 @@ export default function Home() {
     const [loadMoreLoading, setLoadMoreLoading] = useState(false);
     const [quickViewOpen, setQuickViewOpen] = useState(false);
     const [quickViewProductSlug, setQuickViewProductSlug] = useState<string | null>(null);
+    const [heroBannerUrl, setHeroBannerUrl] = useState<string>('/hero-bg.jpg');
+
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
     useEffect(() => {
+        // Fetch hero banner from settings
+        fetch(`${API_URL}/api/v1/settings`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.hero_banner_url?.String) {
+                    setHeroBannerUrl(data.hero_banner_url.String);
+                }
+            })
+            .catch(err => console.error('Failed to load settings:', err));
+
         // Try to load from cache first for instant display
         const cached = getCachedProducts();
         if (cached && cached.length > 0) {
@@ -111,7 +124,6 @@ export default function Home() {
         }
 
         // Fetch fresh products from API
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
         fetch(`${API_URL}/api/v1/products?limit=1000&offset=0`)
             .then(res => res.json())
             .then((data: Product[]) => {
@@ -178,7 +190,7 @@ export default function Home() {
 
             {/* Hero Section */}
             <section className="relative h-[90vh] w-full flex flex-col justify-center items-center overflow-hidden bg-neutral-100">
-                <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center opacity-90 grayscale contrast-125" />
+                <div className="absolute inset-0 bg-cover bg-center opacity-90 grayscale contrast-125" style={{ backgroundImage: `url('${heroBannerUrl}')` }} />
 
                 <div className="relative z-10 text-center space-y-6 max-w-5xl px-4">
                     <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter text-black mix-blend-overlay">

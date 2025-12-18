@@ -1725,16 +1725,17 @@ func (q *Queries) DeleteCoupon(ctx context.Context, id int64) error {
 }
 
 type StoreSetting struct {
-	ID         int32          `json:"id"`
-	StoreName  string         `json:"store_name"`
-	StoreEmail sql.NullString `json:"store_email"`
-	StorePhone sql.NullString `json:"store_phone"`
-	Currency   sql.NullString `json:"currency"`
-	UpdatedAt  sql.NullTime   `json:"updated_at"`
+	ID            int32          `json:"id"`
+	StoreName     string         `json:"store_name"`
+	StoreEmail    sql.NullString `json:"store_email"`
+	StorePhone    sql.NullString `json:"store_phone"`
+	Currency      sql.NullString `json:"currency"`
+	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
+	UpdatedAt     sql.NullTime   `json:"updated_at"`
 }
 
 const getStoreSettings = `-- name: GetStoreSettings :one
-SELECT id, store_name, store_email, store_phone, currency, updated_at FROM store_settings LIMIT 1
+SELECT id, store_name, store_email, store_phone, currency, hero_banner_url, updated_at FROM store_settings LIMIT 1
 `
 
 func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
@@ -1746,6 +1747,7 @@ func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
 		&i.StoreEmail,
 		&i.StorePhone,
 		&i.Currency,
+		&i.HeroBannerUrl,
 		&i.UpdatedAt,
 	)
 	return i, err
@@ -1758,15 +1760,18 @@ SET
   store_email = $2,
   store_phone = $3,
   currency = $4,
+  hero_banner_url = $5,
   updated_at = CURRENT_TIMESTAMP
-RETURNING id, store_name, store_email, store_phone, currency, updated_at
+WHERE id = (SELECT id FROM store_settings LIMIT 1)
+RETURNING id, store_name, store_email, store_phone, currency, hero_banner_url, updated_at
 `
 
 type UpdateStoreSettingsParams struct {
-	StoreName  string         `json:"store_name"`
-	StoreEmail sql.NullString `json:"store_email"`
-	StorePhone sql.NullString `json:"store_phone"`
-	Currency   sql.NullString `json:"currency"`
+	StoreName     string         `json:"store_name"`
+	StoreEmail    sql.NullString `json:"store_email"`
+	StorePhone    sql.NullString `json:"store_phone"`
+	Currency      sql.NullString `json:"currency"`
+	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
 }
 
 func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettingsParams) (StoreSetting, error) {
@@ -1775,6 +1780,7 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		arg.StoreEmail,
 		arg.StorePhone,
 		arg.Currency,
+		arg.HeroBannerUrl,
 	)
 	var i StoreSetting
 	err := row.Scan(
@@ -1783,6 +1789,7 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		&i.StoreEmail,
 		&i.StorePhone,
 		&i.Currency,
+		&i.HeroBannerUrl,
 		&i.UpdatedAt,
 	)
 	return i, err

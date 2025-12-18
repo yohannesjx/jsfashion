@@ -601,3 +601,19 @@ FROM refunds r
 WHERE r.order_id = $1
 ORDER BY r.created_at DESC;
 
+-- Store Settings
+-- name: GetStoreSettings :one
+SELECT * FROM store_settings LIMIT 1;
+
+-- name: UpdateStoreSettings :one
+UPDATE store_settings
+SET 
+  store_name = $1,
+  store_email = $2,
+  store_phone = $3,
+  currency = $4,
+  hero_banner_url = $5,
+  updated_at = CURRENT_TIMESTAMP
+WHERE id = (SELECT id FROM store_settings LIMIT 1)
+RETURNING *;
+

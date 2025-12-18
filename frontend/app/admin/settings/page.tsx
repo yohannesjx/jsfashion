@@ -12,19 +12,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Image } from 'lucide-react';
 import { toast } from 'sonner';
+import { MediaPicker } from '@/components/admin/MediaPicker';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
 export default function SettingsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
     const [formData, setFormData] = useState({
         store_name: '',
         store_email: '',
         store_phone: '',
-        currency: 'ETB'
+        currency: 'ETB',
+        hero_banner_url: ''
     });
 
     useEffect(() => {
@@ -46,7 +49,8 @@ export default function SettingsPage() {
                     store_name: data.store_name || '',
                     store_email: data.store_email?.String || '',
                     store_phone: data.store_phone?.String || '',
-                    currency: data.currency?.String || 'ETB'
+                    currency: data.currency?.String || 'ETB',
+                    hero_banner_url: data.hero_banner_url?.String || ''
                 });
             } else {
                 toast.error('Failed to load settings');
@@ -75,7 +79,8 @@ export default function SettingsPage() {
                     store_name: formData.store_name,
                     store_email: formData.store_email || null,
                     store_phone: formData.store_phone || null,
-                    currency: formData.currency || null
+                    currency: formData.currency || null,
+                    hero_banner_url: formData.hero_banner_url || null
                 }),
             });
 
@@ -144,6 +149,35 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="grid gap-2">
+                        <Label htmlFor="hero_banner_url">Hero Banner Image</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                id="hero_banner_url"
+                                value={formData.hero_banner_url}
+                                onChange={(e) => setFormData({ ...formData, hero_banner_url: e.target.value })}
+                                placeholder="Enter image URL or select from media library"
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setMediaPickerOpen(true)}
+                            >
+                                <Image className="w-4 h-4 mr-2" />
+                                Select Image
+                            </Button>
+                        </div>
+                        {formData.hero_banner_url && (
+                            <div className="mt-2">
+                                <img
+                                    src={formData.hero_banner_url}
+                                    alt="Hero Banner Preview"
+                                    className="w-full max-w-md h-48 object-cover rounded border"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="grid gap-2">
                         <Label htmlFor="currency">Currency</Label>
                         <Select
                             value={formData.currency}
@@ -169,6 +203,15 @@ export default function SettingsPage() {
                     </Button>
                 </div>
             </form>
+
+            <MediaPicker
+                isOpen={mediaPickerOpen}
+                onClose={() => setMediaPickerOpen(false)}
+                onSelect={(url) => {
+                    setFormData({ ...formData, hero_banner_url: url });
+                    setMediaPickerOpen(false);
+                }}
+            />
         </div>
     );
 }

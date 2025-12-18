@@ -209,35 +209,44 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                         </div>
 
                         {/* Variant Selector */}
-                        {product.variants.length > 1 && (
-                            <div>
-                                <div className="flex justify-between text-sm mb-2">
-                                    <span className="font-bold">Size</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {product.variants.filter(v => v.stock > 0).map((variant, idx) => {
-                                        const cleanName = cleanVariantName(variant.name, product.name);
-                                        // Find the original index of this variant in the full list to keep selection logic consistent
-                                        const originalIdx = product.variants.findIndex(v => v.id === variant.id);
+                        {(() => {
+                            const availableVariants = product.variants.filter(v => v.stock > 0);
+                            const shouldShow = availableVariants.length > 0 &&
+                                (availableVariants.length > 1 || !availableVariants[0].name.toLowerCase().includes('default'));
 
-                                        return (
-                                            <button
-                                                key={variant.id}
-                                                onClick={() => setSelectedVariant(originalIdx)}
-                                                className={cn(
-                                                    "h-10 min-w-[60px] px-3 rounded border text-sm font-medium transition-all",
-                                                    selectedVariant === originalIdx
-                                                        ? "bg-black text-white border-black"
-                                                        : "bg-white text-black border-neutral-200 hover:border-black"
-                                                )}
-                                            >
-                                                {cleanName}
-                                            </button>
-                                        );
-                                    })}
+                            if (!shouldShow) return null;
+
+                            return (
+                                <div>
+                                    <div className="flex justify-between text-sm mb-2">
+                                        <span className="font-bold">Size</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {availableVariants.map((variant, idx) => {
+                                            const cleanName = cleanVariantName(variant.name, product.name);
+                                            const originalIdx = product.variants.findIndex(v => v.id === variant.id);
+                                            const isLong = cleanName.length > 3;
+
+                                            return (
+                                                <button
+                                                    key={variant.id}
+                                                    onClick={() => setSelectedVariant(originalIdx)}
+                                                    className={cn(
+                                                        "h-10 text-sm font-medium transition-all rounded border w-fit",
+                                                        isLong ? "px-4 min-w-[40px]" : "w-10 flex items-center justify-center",
+                                                        selectedVariant === originalIdx
+                                                            ? "bg-black text-white border-black"
+                                                            : "bg-white text-black border-neutral-200 hover:border-black"
+                                                    )}
+                                                >
+                                                    {cleanName}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Quantity */}
                         <div>
