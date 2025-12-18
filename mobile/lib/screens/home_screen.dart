@@ -48,14 +48,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(seconds: 25), // Slowed down from 15 to 25 seconds
       vsync: this,
     )..repeat();
+    
+    // Remove splash screen immediately after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
+    
+    // Fetch data in background
     _fetchHeroBanner();
     _fetchCategories();
     _fetchProducts();
-    
-    // Remove splash screen after delay to show the nice image
-    Future.delayed(const Duration(seconds: 2), () {
-      FlutterNativeSplash.remove();
-    });
   }
 
   Future<void> _fetchHeroBanner() async {
