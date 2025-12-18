@@ -98,7 +98,8 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                       padding: const EdgeInsets.all(20), // Padding on all sides
                       child: Image.asset(
                         'assets/logo.png',
-                        width: 200, // Fixed max width of 200px
+                        width: 150, // Smaller logo - 150px
+                        height: 150,
                         fit: BoxFit.contain,
                       ),
                     ),
