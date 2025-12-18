@@ -246,6 +246,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchProducts({String searchQuery = '', String? categoryId}) async {
+    print('🔍 [DEBUG] _fetchProducts called with searchQuery="$searchQuery", categoryId="$categoryId"');
     setState(() {
       _isLoading = true;
       _currentPage = 0;
@@ -258,8 +259,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (categoryId != null) query += '&category_id=$categoryId';
 
       final url = Uri.parse('${ApiConstants.baseUrl}/products$query');
+      print('🌐 [DEBUG] Fetching from: $url');
       
       final response = await http.get(url);
+      print('📡 [DEBUG] Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
@@ -269,6 +272,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         } else {
           productList = data['products'] ?? [];
         }
+
+        print('📦 [DEBUG] Received ${productList.length} products');
 
         if (mounted) {
           // Shuffle products for randomization
