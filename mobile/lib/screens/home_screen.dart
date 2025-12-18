@@ -45,23 +45,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    print('🚀 [TIMING] initState started');
+    final startTime = DateTime.now();
+    
+    // Remove splash screen IMMEDIATELY - don't wait for anything
+    FlutterNativeSplash.remove();
+    print('🚀 [TIMING] Splash removed: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+    
     _marqueeController = AnimationController(
       duration: const Duration(seconds: 25),
       vsync: this,
     )..repeat();
-    
-    // Remove splash screen immediately after first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FlutterNativeSplash.remove();
-    });
+    print('🚀 [TIMING] Animation controller created: ${DateTime.now().difference(startTime).inMilliseconds}ms');
     
     // Load cached data first for instant display
-    _loadCachedData();
+    _loadCachedData().then((_) {
+      print('🚀 [TIMING] Cache loaded: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+    });
     
     // Then fetch fresh data in background
     _fetchHeroBanner();
     _fetchCategories();
     _fetchProducts();
+    print('🚀 [TIMING] initState completed: ${DateTime.now().difference(startTime).inMilliseconds}ms');
   }
 
   Future<void> _loadCachedData() async {

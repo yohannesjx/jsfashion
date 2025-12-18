@@ -7,8 +7,14 @@ import 'models/cart_model.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() {
+  print('🚀 [TIMING] main() started');
+  final startTime = DateTime.now();
+  
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  print('🚀 [TIMING] WidgetsBinding initialized: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+  
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  print('🚀 [TIMING] Splash preserved: ${DateTime.now().difference(startTime).inMilliseconds}ms');
   
   runApp(
     MultiProvider(
@@ -18,6 +24,7 @@ void main() {
       child: const MyApp(),
     ),
   );
+  print('🚀 [TIMING] runApp called: ${DateTime.now().difference(startTime).inMilliseconds}ms');
 }
 
 class MyApp extends StatelessWidget {
