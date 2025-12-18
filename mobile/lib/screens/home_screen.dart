@@ -58,20 +58,41 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> _fetchHeroBanner() async {
     try {
       final url = Uri.parse('${ApiConstants.baseUrl}/settings');
+      print('🎨 Fetching hero banner from: $url');
       final response = await http.get(url);
+      
+      print('📡 Hero Banner Response Status: ${response.statusCode}');
+      print('📦 Hero Banner Response Body: ${response.body}');
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['hero_banner_url'] != null && data['hero_banner_url']['String'] != null) {
+        print('🔧 Decoded hero banner data: $data');
+        
+        // Check both possible response formats
+        String? bannerUrl;
+        if (data['hero_banner_url'] != null) {
+          if (data['hero_banner_url'] is String) {
+            bannerUrl = data['hero_banner_url'];
+          } else if (data['hero_banner_url']['String'] != null) {
+            bannerUrl = data['hero_banner_url']['String'];
+          }
+        }
+        
+        print('🖼️ Extracted banner URL: $bannerUrl');
+        
+        if (bannerUrl != null && bannerUrl.isNotEmpty) {
           if (mounted) {
             setState(() {
-              _heroBannerUrl = data['hero_banner_url']['String'];
+              _heroBannerUrl = bannerUrl!;
             });
+            print('✅ Hero banner updated to: $_heroBannerUrl');
           }
+        } else {
+          print('⚠️ No hero banner URL found in response');
         }
       }
     } catch (e) {
-      print('Error fetching hero banner: $e');
+      print('❌ Error fetching hero banner: $e');
       // Keep default banner on error
     }
   }
