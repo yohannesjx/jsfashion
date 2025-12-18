@@ -9,7 +9,7 @@ void main() {
   print('🚀 [TIMING] main() started');
   final startTime = DateTime.now();
   
-  WidgetsBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   print('🚀 [TIMING] WidgetsBinding initialized: ${DateTime.now().difference(startTime).inMilliseconds}ms');
   
   runApp(
