@@ -12,6 +12,7 @@ import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../widgets/floating_contact_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _marqueeController = AnimationController(
-      duration: const Duration(seconds: 25), // Slowed down from 15 to 25 seconds
+      duration: const Duration(seconds: 25),
       vsync: this,
     )..repeat();
     
@@ -54,10 +55,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       FlutterNativeSplash.remove();
     });
     
-    // Fetch data in background
+    // Load cached data first for instant display
+    _loadCachedData();
+    
+    // Then fetch fresh data in background
     _fetchHeroBanner();
     _fetchCategories();
     _fetchProducts();
+  }
+
+  Future<void> _loadCachedData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Load cached products
+      final cachedProductsJson = prefs.getString('cached_products');
+      if (cachedProductsJson != null) {
+        final List<dynamic> productsData = json.decode(cachedProductsJson);
+        final products = productsData.map((p) => Product.fromJson(p)).toList();
+        
+        if (mounted && products.isNotEmpty) {
+          setState(() {
+            _allProducts = products;
+            _displayedProducts = products.take(_productsPerPage).toList();
+            _isLoading = false;
+          });
+          print('✅ Loaded ${products.length} products from cache');
+        }
+      }
+      
+      // Load cached categories
+      final cachedCategoriesJson = prefs.getString('cached_categories');
+      if (cachedCategoriesJson != null) {
+        final List<dynamic> categoriesData = json.decode(cachedCategoriesJson);
+        
+        if (mounted && categoriesData.isNotEmpty) {
+          setState(() {
+            _categories = categoriesData;
+          });
+          print('✅ Loaded ${categoriesData.length} categories from cache');
+        }
+      }
+    } catch (e) {
+      print('⚠️ Error loading cache: $e');
+    }
   }
 
   Future<void> _fetchHeroBanner() async {
@@ -171,6 +212,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         print('📊 Final categoryList length: ${categoryList.length}');
         if (categoryList.isNotEmpty) {
           print('📝 First category: ${categoryList[0]}');
+          
+          // Save to cache
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('cached_categories', json.encode(categoryList));
+            print('💾 Categories saved to cache');
+          } catch (e) {
+            print('⚠️ Failed to cache categories: $e');
+          }
         }
         
         if (mounted) {
@@ -231,6 +281,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _isLoading = false;
             _error = null;
           });
+          
+          // Save to cache (only if not searching/filtering)
+          if (searchQuery.isEmpty && categoryId == null) {
+            try {
+              final prefs = await SharedPreferences.getInstance();
+              final productsJson = products.map((p) => p.toJson()).toList();
+              await prefs.setString('cached_products', json.encode(productsJson));
+              print('💾 Saved ${products.length} products to cache');
+            } catch (e) {
+              print('⚠️ Failed to cache products: $e');
+            }
+          }
         }
       } else {
         throw Exception('Failed to load products: ${response.statusCode}');

@@ -252,11 +252,14 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                                   color: Colors.grey.shade100,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: item.imageUrl != null
+                                child: item.imageUrl != null &&
+                                        item.imageUrl!.isNotEmpty
                                     ? ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: CachedNetworkImage(
-                                          imageUrl: item.imageUrl!,
+                                          imageUrl: item.imageUrl!.startsWith('http')
+                                              ? item.imageUrl!
+                                              : 'https://api.jsfashion.et${item.imageUrl}',
                                           fit: BoxFit.cover,
                                           placeholder: (context, url) =>
                                               Container(

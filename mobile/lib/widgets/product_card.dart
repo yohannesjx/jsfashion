@@ -47,6 +47,16 @@ class Product {
       slug: json['slug'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'base_price': basePrice,
+      'image_url': imageUrl,
+      'slug': slug,
+    };
+  }
 }
 
 class ProductCard extends StatelessWidget {
