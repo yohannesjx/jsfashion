@@ -37,14 +37,15 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 	}
 	offset := (page - 1) * limit
 
-	// Get search query
+	// Get search query and category filter
 	searchQuery := c.QueryParam("search")
+	categoryID := c.QueryParam("category_id")
 
 	// Check if this is an admin request (admin routes have /admin/ prefix)
 	isAdmin := strings.HasPrefix(c.Request().URL.Path, "/api/v1/admin/")
 
 	// Cache Key
-	cacheKey := fmt.Sprintf("products:list:%d:%d:%s:%v", limit, offset, searchQuery, isAdmin)
+	cacheKey := fmt.Sprintf("products:list:%d:%d:%s:%s:%v", limit, offset, searchQuery, categoryID, isAdmin)
 
 	// Check Cache
 	if h.Redis != nil {
@@ -60,7 +61,7 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 	var products []repository.Product
 	var err error
 
-	if searchQuery != "" {
+	if searchQuery != "" || categoryID != "" {
 		// Build stock filter conditionally
 		stockFilter := ""
 		if !isAdmin {
@@ -71,7 +72,33 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
             )`
 		}
 
-		// Search products by name
+		// Build category filter
+		categoryFilter := ""
+		categoryArgs := []interface{}{}
+		argIndex := 1
+
+		if searchQuery != "" {
+			categoryArgs = append(categoryArgs, "%"+searchQuery+"%")
+			argIndex++
+		}
+
+		if categoryID != "" {
+			categoryFilter = fmt.Sprintf(`AND EXISTS (
+				SELECT 1 FROM product_categories pc
+				WHERE pc.product_id = p.id
+				AND pc.category_id = $%d
+			)`, argIndex)
+			categoryArgs = append(categoryArgs, categoryID)
+			argIndex++
+		}
+
+		// Build WHERE clause
+		whereClause := "WHERE p.active = true"
+		if searchQuery != "" {
+			whereClause = "WHERE p.title ILIKE $1 AND p.active = true"
+		}
+
+		// Search products by name and/or category
 		query := fmt.Sprintf(`
 			SELECT 
 				p.id::text,
@@ -91,13 +118,16 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 				p.created_at,
 				p.updated_at
 			FROM products p
-			WHERE p.title ILIKE $1
-            AND p.active = true
+			%s
+            %s
             %s
 			ORDER BY p.created_at DESC
-			LIMIT $2 OFFSET $3
-		`, stockFilter)
-		rows, err := h.Repo.DB().QueryContext(ctx, query, "%"+searchQuery+"%", limit, offset)
+			LIMIT $%d OFFSET $%d
+		`, whereClause, categoryFilter, stockFilter, argIndex, argIndex+1)
+
+		categoryArgs = append(categoryArgs, limit, offset)
+
+		rows, err := h.Repo.DB().QueryContext(ctx, query, categoryArgs...)
 		if err != nil {
 			c.Logger().Errorf("Failed to search products: %v", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to search products"})
@@ -124,7 +154,7 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 			products = append(products, p)
 		}
 	} else {
-		// Regular list without search
+		// Regular list without search or category filter
 		params := repository.ListProductsParams{
 			Limit:  int32(limit),
 			Offset: int32(offset),
