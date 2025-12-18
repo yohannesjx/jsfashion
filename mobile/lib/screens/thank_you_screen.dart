@@ -123,321 +123,321 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
         ),
       ),
       floatingActionButton: const FloatingContactButton(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            // Success Icon
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check,
-                size: 40,
-                color: Colors.green.shade600,
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Thank You Message
-            Text(
-              'THANK YOU!',
-              style: GoogleFonts.inter(
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -1.0,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Your order has been successfully placed',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Order Number
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                border: Border.all(color: Colors.grey.shade200),
-                borderRadius: BorderRadius.circular(12),
-              ),
+      body: Column(
+        children: [
+          // Scrollable content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
+                  // Success Icon
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check,
+                      size: 40,
+                      color: Colors.green.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Thank You Message
                   Text(
-                    'Order Number',
+                    'THANK YOU!',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1.0,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '#${_order?.orderNumber ?? widget.orderNumber}',
+                    'Your order has been successfully placed',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.0,
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
                     ),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
-            // Order Summary
-            if (_isLoading)
-              Container(
-                padding: const EdgeInsets.all(48),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const CircularProgressIndicator(
-                  color: Colors.black,
-                ),
-              )
-            else if (_error != null)
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _error!,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-              )
-            else if (_order != null && _order!.items.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Order Summary',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Order Number
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      border: Border.all(color: Colors.grey.shade200),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 16),
-                    ..._order!.items.map((item) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Product Image
-                              Container(
-                                width: 64,
-                                height: 64,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: item.imageUrl != null &&
-                                        item.imageUrl!.isNotEmpty
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: CachedNetworkImage(
-                                          imageUrl: item.imageUrl!.startsWith('http')
-                                              ? item.imageUrl!
-                                              : 'https://api.jsfashion.et${item.imageUrl}',
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                            color: Colors.grey.shade200,
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              Container(
-                                            color: Colors.grey.shade200,
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        color: Colors.grey.shade200,
-                                      ),
-                              ),
-                              const SizedBox(width: 12),
-                              // Product Details
-                              Expanded(
-                                child: Column(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Order Number',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '#${_order?.orderNumber ?? widget.orderNumber}',
+                          style: GoogleFonts.inter(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Order Summary
+                  if (_isLoading)
+                    Container(
+                      padding: const EdgeInsets.all(48),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const CircularProgressIndicator(
+                        color: Colors.black,
+                      ),
+                    )
+                  else if (_error != null)
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _error!,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    )
+                  else if (_order != null && _order!.items.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Order Summary',
+                            style: GoogleFonts.inter(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ..._order!.items.map((item) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      item.productName,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
+                                    // Product Image
+                                    Container(
+                                      width: 64,
+                                      height: 64,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
+                                      child: item.imageUrl != null &&
+                                              item.imageUrl!.isNotEmpty
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: CachedNetworkImage(
+                                                imageUrl: item.imageUrl!.startsWith('http')
+                                                    ? item.imageUrl!
+                                                    : 'https://jsfashion.et${item.imageUrl}',
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    Container(
+                                                  color: Colors.grey.shade200,
+                                                ),
+                                                errorWidget: (context, url, error) =>
+                                                    Container(
+                                                  color: Colors.grey.shade200,
+                                                  child: const Icon(Icons.image_not_supported),
+                                                ),
+                                              ),
+                                            )
+                                          : Container(
+                                              color: Colors.grey.shade200,
+                                              child: const Icon(Icons.image_not_supported),
+                                            ),
                                     ),
-                                    if (item.variantName.isNotEmpty &&
-                                        item.variantName != ' / ')
-                                      Text(
-                                        item.variantName,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: Colors.grey.shade500,
-                                        ),
+                                    const SizedBox(width: 12),
+                                    // Product Details
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.productName,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          if (item.variantName.isNotEmpty &&
+                                              item.variantName != ' / ')
+                                            Text(
+                                              item.variantName,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: Colors.grey.shade500,
+                                              ),
+                                            ),
+                                        ],
                                       ),
+                                    ),
+                                    // Quantity and Price
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          'Qty: ${item.quantity}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${item.unitPrice} ETB',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
+                              )),
+                          const Divider(height: 32),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Total',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              // Quantity and Price
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Qty: ${item.quantity}',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${item.unitPrice} ETB',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                '${_order!.totalAmount} ETB',
+                                style: GoogleFonts.inter(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
-                        )),
-                    const Divider(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 24),
+
+                  // What's Next
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Total',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${_order!.totalAmount} ETB',
+                          'What happens next?',
                           style: GoogleFonts.inter(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        _buildStep(
+                          '1',
+                          'Orders will be delivered same day or next day',
+                          bold: true,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStep(
+                          '2',
+                          'Your order will be processed and prepared for shipping',
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStep(
+                          '3',
+                          'You\'ll receive a tracking number once your order ships',
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 24),
-
-            // What's Next
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'What happens next?',
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildStep(
-                    '1',
-                    'We\'ll send you a confirmation email with your order details',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStep(
-                    '2',
-                    'Orders will be delivered same day or next day',
-                    bold: true,
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStep(
-                    '3',
-                    'Your order will be processed and prepared for shipping',
-                  ),
-                  const SizedBox(height: 12),
-                  _buildStep(
-                    '4',
-                    'You\'ll receive a tracking number once your order ships',
-                  ),
+                  const SizedBox(height: 100), // Space for sticky button
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-
-            // Action Buttons
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+          ),
+          
+          // Sticky bottom button
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
                 ),
-                child: Text(
-                  'CONTINUE SHOPPING',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.0,
+              ],
+            ),
+            child: SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'CONTINUE SHOPPING',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.0,
+                    ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 32),
-
-            // Support
-            Container(
-              padding: const EdgeInsets.only(top: 24),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.grey.shade200),
-                ),
-              ),
-              child: Text(
-                'Need help? Contact our support team',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
