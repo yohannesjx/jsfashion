@@ -98,7 +98,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
                       child: Image.asset(
                         'assets/logo.png',
-                        width: MediaQuery.of(context).size.width - 40, // Full width minus padding
+                        width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
                         fit: BoxFit.contain,
                       ),
                     ),

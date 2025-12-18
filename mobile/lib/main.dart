@@ -3,18 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'models/cart_model.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'widgets/animated_splash_screen.dart';
 
 void main() {
   print('🚀 [TIMING] main() started');
   final startTime = DateTime.now();
   
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding.ensureInitialized();
   print('🚀 [TIMING] WidgetsBinding initialized: ${DateTime.now().difference(startTime).inMilliseconds}ms');
-  
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  print('🚀 [TIMING] Splash preserved: ${DateTime.now().difference(startTime).inMilliseconds}ms');
   
   runApp(
     MultiProvider(

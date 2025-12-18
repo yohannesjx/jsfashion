@@ -48,12 +48,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     print('🚀 [TIMING] initState started');
     final startTime = DateTime.now();
     
-    // Keep splash screen for 2 seconds to show branding
-    Future.delayed(const Duration(seconds: 2), () {
-      FlutterNativeSplash.remove();
-      print('🚀 [TIMING] Splash removed: ${DateTime.now().difference(startTime).inMilliseconds}ms');
-    });
-    
     _marqueeController = AnimationController(
       duration: const Duration(seconds: 25),
       vsync: this,
