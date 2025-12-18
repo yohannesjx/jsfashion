@@ -3,8 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'models/cart_model.dart';
-
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'widgets/animated_splash_screen.dart';
 
 void main() {
   print('🚀 [TIMING] main() started');
@@ -41,7 +41,6 @@ class MyApp extends StatelessWidget {
           primary: Colors.black,
           secondary: Colors.black,
           surface: Colors.white,
-          // background is deprecated, surface is used instead for M3
           error: Colors.red,
         ),
         appBarTheme: const AppBarTheme(
@@ -52,7 +51,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(),
       ),
-      home: const HomeScreen(),
+      home: const AnimatedSplashScreen(
+        duration: Duration(seconds: 2),
+        child: HomeScreen(),
+      ),
     );
   }
 }

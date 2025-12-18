@@ -59,14 +59,16 @@ dev_dependencies:
   flutter_native_splash: ^2.3.10
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  background_image: assets/welcome_bg_v2.png
+  color: "#0a0a0a"  # Super dark background
+  image: assets/logo.png
+  android_gravity: center
+  ios_content_mode: center
   fullscreen: true
   android: true
   ios: true
   android_12:
-    color: "#FFFFFF"
-    background_image: assets/welcome_bg_v2.png
+    color: "#0a0a0a"
+    image: assets/logo.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
