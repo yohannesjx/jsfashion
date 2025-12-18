@@ -31,23 +31,20 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
       vsync: this,
     );
 
-    // Zoom in animation (starts at 0.8, ends at 1.2 for overshoot effect)
+    // Zoom in animation (starts at 0.8, ends at 1.0 for smooth effect)
     _scaleAnimation = Tween<double>(
       begin: 0.8,
-      end: 1.2,
+      end: 1.0,
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
     ));
 
-    // Fade out animation
+    // Keep opacity at 1.0 throughout (no fade)
     _fadeAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.7, 1.0, curve: Curves.easeIn),
-    ));
+      end: 1.0,
+    ).animate(_controller);
 
     // Start animation after a brief delay
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -56,7 +53,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
       }
     });
 
-    // Hide splash screen after animation completes
+    // Hide splash screen instantly after duration (no fade)
     Future.delayed(widget.duration, () {
       if (mounted) {
         setState(() {
@@ -84,17 +81,14 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            return Opacity(
-              opacity: _fadeAnimation.value,
-              child: Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
-                  child: Image.asset(
-                    'assets/logo.png',
-                    width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
-                    fit: BoxFit.contain,
-                  ),
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                  fit: BoxFit.contain,
                 ),
               ),
             );
