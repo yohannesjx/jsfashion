@@ -58,19 +58,6 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_native_splash: ^2.3.10
 
-flutter_native_splash:
-  color: "#0a0a0a"  # Super dark background
-  image: assets/logo.png
-  android_gravity: center
-  ios_content_mode: center
-  fullscreen: true
-  android: true
-  ios: true
-  web: false
-  android_12:
-    color: "#0a0a0a"
-    image: assets/logo.png
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
