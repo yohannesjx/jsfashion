@@ -1731,10 +1731,10 @@ type StoreSetting struct {
 	StorePhone    sql.NullString `json:"store_phone"`
 	Currency      sql.NullString `json:"currency"`
 	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
-	HeroTitle     sql.NullString `json:"hero_title"`
-	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
+	HeroTitle     sql.NullString `json:"hero_title"`
+	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
 }
 
 const getStoreSettings = `-- name: GetStoreSettings :one
@@ -1751,10 +1751,10 @@ func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
 		&i.StorePhone,
 		&i.Currency,
 		&i.HeroBannerUrl,
-		&i.HeroTitle,
-		&i.HeroSubtitle,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.HeroTitle,
+		&i.HeroSubtitle,
 	)
 	return i, err
 }
@@ -1802,10 +1802,10 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		&i.StorePhone,
 		&i.Currency,
 		&i.HeroBannerUrl,
-		&i.HeroTitle,
-		&i.HeroSubtitle,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.HeroTitle,
+		&i.HeroSubtitle,
 	)
 	return i, err
 }
