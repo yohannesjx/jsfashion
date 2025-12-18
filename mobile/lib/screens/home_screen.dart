@@ -565,15 +565,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ? const Center(child: CircularProgressIndicator(color: Colors.black))
                   : RefreshIndicator(
                       color: Colors.black,
-                      onRefresh: () => _fetchProducts(
-                        searchQuery: _searchController.text,
-                        categoryId: _selectedCategoryName != null 
-                            ? _categories.firstWhere(
-                                (cat) => cat['name'] == _selectedCategoryName,
-                                orElse: () => {'id': null}
-                              )['id']?.toString()
-                            : null,
-                      ),
+                      onRefresh: () async {
+                        // Refresh both hero banner and products
+                        await Future.wait([
+                          _fetchHeroBanner(),
+                          _fetchProducts(
+                            searchQuery: _searchController.text,
+                            categoryId: _selectedCategoryName != null 
+                                ? _categories.firstWhere(
+                                    (cat) => cat['name'] == _selectedCategoryName,
+                                    orElse: () => {'id': null}
+                                  )['id']?.toString()
+                                : null,
+                          ),
+                        ]);
+                      },
                       child: SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
@@ -590,6 +596,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     // Background Image
                                     CachedNetworkImage(
                                       imageUrl: _heroBannerUrl,
+                                      cacheKey: _heroBannerUrl, // Force refresh when URL changes
                                       fit: BoxFit.cover,
                                       width: double.infinity,
                                       height: double.infinity,
