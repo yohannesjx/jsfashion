@@ -11,6 +11,7 @@ import '../models/cart_model.dart';
 import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import '../widgets/floating_contact_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -874,6 +875,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
+      floatingActionButton: const FloatingContactButton(),
     );
   }
 
