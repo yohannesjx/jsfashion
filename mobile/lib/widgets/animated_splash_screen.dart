@@ -78,37 +78,29 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
       return widget.child;
     }
 
-    return Stack(
-      children: [
-        // Main app content (hidden behind splash)
-        widget.child,
-        
-        // Animated splash overlay
-        AnimatedBuilder(
+    return Container(
+      color: const Color(0xFF0a0a0a), // Super dark background
+      child: Center(
+        child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
             return Opacity(
               opacity: _fadeAnimation.value,
-              child: Container(
-                color: const Color(0xFF0a0a0a), // Super dark background
-                child: Center(
-                  child: Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
-                      child: Image.asset(
-                        'assets/logo.png',
-                        width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20), // 20px left and right
+                  child: Image.asset(
+                    'assets/logo.png',
+                    width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
             );
           },
         ),
-      ],
+      ),
     );
   }
 }
