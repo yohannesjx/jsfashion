@@ -318,13 +318,13 @@ SELECT
     oi.quantity, 
     oi.unit_price, 
     oi.subtotal,
-    v.sku,
+    pv.sku,
     p.title as product_name,
-    v.name as variant_name,
-    COALESCE(v.image, p.thumbnail) as image_url
+    CONCAT_WS(' / ', pv.size, pv.color)::text as variant_name,
+    COALESCE(pv.image, p.thumbnail) as image_url
 FROM order_items oi
-LEFT JOIN variants v ON oi.variant_id = v.id
-LEFT JOIN products p ON v.product_id = p.id
+LEFT JOIN product_variants pv ON oi.variant_id = pv.id
+LEFT JOIN products p ON pv.product_id = p.id
 WHERE oi.order_id = $1;
 
 -- Customers
