@@ -1163,6 +1163,22 @@ export default function ProductsPage() {
                                                         </div>
                                                     )}
                                                 </TableCell>
+                                                {/* Sale column - Variant Sale Price */}
+                                                <TableCell>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {variant.sale_price ? (
+                                                            <>
+                                                                <span className="text-red-600 font-semibold">
+                                                                    {variant.sale_price.toLocaleString()} Birr
+                                                                </span>
+                                                                <Badge variant="destructive" className="text-xs ml-1">SALE</Badge>
+                                                            </>
+                                                        ) : (
+                                                            '—'
+                                                        )}
+                                                    </span>
+                                                </TableCell>
+                                                {/* Variants column - Stock */}
                                                 <TableCell>
                                                     {editingCell?.variantId === variant.id && editingCell.field === 'stock' ? (
                                                         <div className="flex items-center gap-1">
@@ -1196,6 +1212,7 @@ export default function ProductsPage() {
                                                         </div>
                                                     )}
                                                 </TableCell>
+                                                {/* Status column - Delete button */}
                                                 <TableCell>
                                                     <Button
                                                         variant="ghost"
