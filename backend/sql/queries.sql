@@ -190,6 +190,7 @@ SELECT
   v.stock_quantity, 
   v.active, 
   COALESCE(p.amount, (pr.base_price::numeric + COALESCE(v.price_adjustment, 0))::bigint) as price, 
+  p.sale_price, 
   v.display_order, 
   v.created_at, 
   v.updated_at

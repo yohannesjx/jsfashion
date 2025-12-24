@@ -108,6 +108,7 @@ type ProductVariant struct {
 	StockQuantity sql.NullInt32  `json:"stock_quantity"`
 	Active        sql.NullBool   `json:"active"`
 	Price         int64          `json:"price"`
+	SalePrice     sql.NullInt64  `json:"sale_price"`
 	DisplayOrder  int32          `json:"display_order"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 	UpdatedAt     sql.NullTime   `json:"updated_at"`

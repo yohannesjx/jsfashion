@@ -1154,6 +1154,7 @@ SELECT
   v.stock_quantity, 
   v.active, 
   COALESCE(p.amount, (pr.base_price::numeric + COALESCE(v.price_adjustment, 0))::bigint) as price, 
+  p.sale_price, 
   v.display_order, 
   v.created_at, 
   v.updated_at
@@ -1185,6 +1186,7 @@ func (q *Queries) ListProductVariants(ctx context.Context, productID string) ([]
 			&i.StockQuantity,
 			&i.Active,
 			&i.Price,
+			&i.SalePrice,
 			&i.DisplayOrder,
 			&i.CreatedAt,
 			&i.UpdatedAt,

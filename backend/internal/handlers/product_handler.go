@@ -359,6 +359,12 @@ func (h *ProductHandler) GetProduct(c echo.Context) error {
 				return nil
 			}(),
 			"price":         priceInCents, // Price in cents
+ttt"sale_price": func() interface{} {
+ttttif v.SalePrice.Valid {
+tttttreturn float64(v.SalePrice.Int64)
+tttt}
+ttttreturn nil
+ttt}(),
 			"display_order": v.DisplayOrder,
 			"created_at": func() string {
 				if v.CreatedAt.Valid {
