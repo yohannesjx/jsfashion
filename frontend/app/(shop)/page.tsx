@@ -8,6 +8,12 @@ import { useState, useEffect, useCallback } from "react";
 import QuickViewModal from "@/components/shop/QuickViewModal";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
 
+interface Variant {
+    id: string;
+    price: number;
+    sale_price?: number | null;
+}
+
 interface Product {
     id: string;
     name: string;
@@ -16,6 +22,7 @@ interface Product {
     base_price: string;
     image_url: string | null;
     is_active: boolean;
+    variants?: Variant[];
 }
 
 // Shuffle array function
@@ -295,9 +302,27 @@ export default function Home() {
                                         </div>
                                         <div className="flex flex-col px-2 py-3">
                                             <h3 className="text-xs font-medium tracking-tight mb-1 line-clamp-2">{product.name}</h3>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm font-bold">{price} {currency}</span>
-                                            </div>
+                                            {(() => {
+                                                const firstVariant = product.variants?.[0];
+                                                const hasSale = firstVariant?.sale_price && firstVariant.sale_price > 0;
+                                                const displayPrice = hasSale ? (firstVariant.sale_price || 0) : price;
+
+                                                return (
+                                                    <div className="flex items-center gap-2">
+                                                        {hasSale && (
+                                                            <span className="text-xs text-gray-400 line-through">
+                                                                {price} {currency}
+                                                            </span>
+                                                        )}
+                                                        <span className={`text-sm font-bold ${hasSale ? 'text-red-600' : ''}`}>
+                                                            {displayPrice} {currency}
+                                                        </span>
+                                                        {hasSale && (
+                                                            <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">SALE</span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </Link>
                                 );
