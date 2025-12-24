@@ -39,7 +39,7 @@ services:
       DB_NAME: jsfashion
       API_BASE_URL: https://api.jsfashion.et
       # Telegram Bot Configuration
-      TELEGRAM_BOT_TOKEN: "8372588034:AAEKayEevw-OVPAm6Vbid3X0TrcPpoIEQUk"
+      TELEGRAM_BOT_TOKEN: "8517100175:AAGaAz8IjSgk8VnhyHTHpKre2u0pecJ4ilE"
       TELEGRAM_CHAT_IDS: "358753046,6734086506,7399604556,2097854740"
     ports:
       - "8080:8080"
