@@ -92,6 +92,7 @@ export default function ProductsPage() {
     // Inline editing
     const [editingCell, setEditingCell] = useState<{ variantId: string; field: 'price' | 'stock' | 'size' | 'color' } | null>(null);
     const [editingProductPrice, setEditingProductPrice] = useState<string | null>(null);
+    const [editingProductSalePrice, setEditingProductSalePrice] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
     const updateVariant = useUpdateVariant();
     const createVariant = useCreateVariant();
@@ -647,6 +648,90 @@ export default function ProductsPage() {
         }
     };
 
+    const startProductSalePriceEdit = (productId: string, currentSalePrice: string) => {
+        setEditingProductSalePrice(productId);
+        setEditValue(currentSalePrice || '');
+    };
+
+    const cancelProductSalePriceEdit = () => {
+        setEditingProductSalePrice(null);
+        setEditValue('');
+    };
+
+    const saveProductSalePrice = async (productId: string) => {
+        const newSalePrice = editValue ? parseFloat(editValue) : null;
+        if (newSalePrice !== null && (isNaN(newSalePrice) || newSalePrice < 0)) {
+            toast.error('Invalid sale price');
+            return;
+        }
+
+        try {
+            const toastId = toast.loading('Updating sale price for all variants...');
+            const token = localStorage.getItem('access_token');
+
+            // 1. Get product details to fetch current data
+            const res = await fetch(`${API_URL}/api/v1/admin/products/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch product details');
+
+            const data = await res.json();
+            const product = data.product;
+            const variants = data.variants || [];
+
+            // 2. Update all variants with the new sale price
+            for (const variant of variants) {
+                try {
+                    // Get current price from variant
+                    const currentPrice = variant.price || parseFloat(product.base_price);
+
+                    // Update variant with sale price
+                    await fetch(`${API_URL}/api/v1/admin/products/variants/${variant.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sku: variant.sku,
+                            size: variant.size,
+                            color: variant.color,
+                            stock_quantity: variant.stock_quantity,
+                            price: currentPrice,
+                            sale_price: newSalePrice, // Set the new sale price (or null to remove)
+                        }),
+                    });
+                } catch (error) {
+                    console.error(`Failed to update variant ${variant.id}:`, error);
+                }
+            }
+
+            // Update local state
+            setProducts(prev => prev.map(p => {
+                if (p.id === productId) {
+                    return {
+                        ...p,
+                        sale_price: newSalePrice?.toString() || undefined,
+                        variants: p.variants?.map(v => ({ ...v, sale_price: newSalePrice }))
+                    };
+                }
+                return p;
+            }));
+
+            toast.dismiss(toastId);
+            if (newSalePrice === null) {
+                toast.success(`Removed sale price for ${variants.length} variant(s)`);
+            } else {
+                toast.success(`Updated sale price for ${variants.length} variant(s)`);
+            }
+            cancelProductSalePriceEdit();
+        } catch (error: any) {
+            console.error('Failed to update sale price:', error);
+            toast.error(error?.message || 'Failed to update sale price');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -870,37 +955,84 @@ export default function ProductsPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-medium">
-                                                {editingProductPrice === product.id ? (
-                                                    <div className="flex items-center gap-1">
-                                                        <Input
-                                                            type="number"
-                                                            value={editValue}
-                                                            onChange={(e) => setEditValue(e.target.value)}
-                                                            className="h-8 w-32"
-                                                            placeholder="Price"
-                                                            autoFocus
-                                                            onKeyDown={(e) => {
-                                                                if (e.key === 'Enter') saveProductPrice(product.id);
-                                                                if (e.key === 'Escape') cancelProductPriceEdit();
-                                                            }}
-                                                        />
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
-                                                            <Check className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <div
-                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
-                                                        onClick={() => startProductPriceEdit(product.id, product.base_price)}
-                                                        title="Click to edit price"
-                                                    >
-                                                        <span>{parseInt(product.base_price).toLocaleString()} Birr</span>
-                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
-                                                    </div>
-                                                )}
+                                                <div className="space-y-1">
+                                                    {/* Regular Price */}
+                                                    {editingProductPrice === product.id ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                type="number"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-8 w-32"
+                                                                placeholder="Price"
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveProductPrice(product.id);
+                                                                    if (e.key === 'Escape') cancelProductPriceEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
+                                                                <Check className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
+                                                            onClick={() => startProductPriceEdit(product.id, product.base_price)}
+                                                            title="Click to edit price"
+                                                        >
+                                                            <span className={(product as any).sale_price ? 'line-through text-muted-foreground text-sm' : ''}>
+                                                                {parseInt(product.base_price).toLocaleString()} Birr
+                                                            </span>
+                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
+                                                        </div>
+                                                    )}
+
+                                                    {/* Sale Price */}
+                                                    {editingProductSalePrice === product.id ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                type="number"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-8 w-32"
+                                                                placeholder="Sale Price (optional)"
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveProductSalePrice(product.id);
+                                                                    if (e.key === 'Escape') cancelProductSalePriceEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductSalePrice(product.id)}>
+                                                                <Check className="h-4 w-4" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductSalePriceEdit}>
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
+                                                            onClick={() => startProductSalePriceEdit(product.id, (product as any).sale_price || '')}
+                                                            title="Click to edit sale price"
+                                                        >
+                                                            {(product as any).sale_price ? (
+                                                                <>
+                                                                    <span className="text-red-600 font-semibold">
+                                                                        {parseInt((product as any).sale_price).toLocaleString()} Birr
+                                                                    </span>
+                                                                    <Badge variant="destructive" className="text-xs">SALE</Badge>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-xs text-muted-foreground">+ Add sale price</span>
+                                                            )}
+                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover/saleprice:opacity-100 transition-opacity" />
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">

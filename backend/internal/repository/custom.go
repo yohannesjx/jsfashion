@@ -97,6 +97,32 @@ func (q *Queries) UpdateVariantPrice(ctx context.Context, variantID string, amou
 	return nil
 }
 
+// UpdateVariantPriceWithSale updates or inserts a price and sale_price for a variant
+func (q *Queries) UpdateVariantPriceWithSale(ctx context.Context, variantID string, amount int64, salePrice *int64, currency string) error {
+	// First try to update existing price
+	updateQuery := `UPDATE prices SET amount = $2, sale_price = $3, updated_at = NOW() WHERE variant_id = $1::uuid`
+	result, err := q.db.ExecContext(ctx, updateQuery, variantID, amount, salePrice)
+	if err != nil {
+		return err
+	}
+
+	// Check if any row was updated
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	// If no row was updated, insert a new one
+	if rowsAffected == 0 {
+		insertQuery := `INSERT INTO prices (variant_id, amount, sale_price, currency, created_at, updated_at)
+			VALUES ($1::uuid, $2, $3, $4, NOW(), NOW())`
+		_, err = q.db.ExecContext(ctx, insertQuery, variantID, amount, salePrice, currency)
+		return err
+	}
+
+	return nil
+}
+
 // DeleteProductByStringID deletes a product using a string ID (for bigint IDs)
 func (q *Queries) DeleteProductByStringID(ctx context.Context, id string) error {
 	query := `DELETE FROM products WHERE id = $1::bigint`

@@ -805,7 +805,8 @@ type UpdateVariantRequest struct {
 	Size            *string  `json:"size"`
 	Color           *string  `json:"color"`
 	PriceAdjustment *string  `json:"price_adjustment"`
-	Price           *float64 `json:"price"` // Direct price in Birr
+	Price           *float64 `json:"price"`      // Direct price in Birr
+	SalePrice       *float64 `json:"sale_price"` // Sale/discount price in Birr
 	StockQuantity   *int32   `json:"stock_quantity"`
 	DisplayOrder    *int32   `json:"display_order"`
 	Image           *string  `json:"image"`
@@ -878,11 +879,18 @@ func (h *ProductHandler) UpdateVariant(c echo.Context) error {
 
 	// Handle price update - prioritize direct price over price_adjustment
 	if req.Price != nil {
-		// Direct price provided (in Birr), convert to cents for storage
+		// Direct price provided (in Birr)
 		newPriceCents := int64(*req.Price)
 
-		// Update or insert price in prices table
-		err = h.Repo.UpdateVariantPrice(ctx, idStr, newPriceCents, "Br")
+		// Handle sale price if provided
+		var salePriceCents *int64
+		if req.SalePrice != nil {
+			sp := int64(*req.SalePrice)
+			salePriceCents = &sp
+		}
+
+		// Update or insert price (and sale_price) in prices table
+		err = h.Repo.UpdateVariantPriceWithSale(ctx, idStr, newPriceCents, salePriceCents, "Br")
 		if err != nil {
 			c.Logger().Errorf("Failed to update price for variant %s: %v", idStr, err)
 		}
