@@ -21,6 +21,7 @@ interface Variant {
     size: string | null;
     color: string | null;
     price: number;
+    sale_price?: number | null;
     stock: number;
     active: boolean;
     image: string | null;
@@ -68,7 +69,8 @@ export function VariantSelector({ product, open, onOpenChange, onAddToCart }: Va
                     {hasVariants ? (
                         <div className="grid grid-cols-1 gap-4">
                             {variants.map((variant) => {
-                                const price = variant.price;
+                                const hasSale = variant.sale_price && variant.sale_price > 0;
+                                const displayPrice = hasSale ? variant.sale_price : variant.price;
                                 const isSelected = selectedVariant?.id === variant.id;
                                 const outOfStock = variant.stock <= 0;
 
@@ -89,7 +91,19 @@ export function VariantSelector({ product, open, onOpenChange, onAddToCart }: Va
                                             <div className="text-sm text-gray-500">SKU: {variant.sku}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-semibold">{price.toLocaleString()} Br</div>
+                                            <div className="flex items-center gap-2 justify-end">
+                                                {hasSale && (
+                                                    <span className="text-sm text-gray-400 line-through">
+                                                        {variant.price.toLocaleString()} Br
+                                                    </span>
+                                                )}
+                                                <span className={cn("font-semibold", hasSale && "text-red-600")}>
+                                                    {displayPrice!.toLocaleString()} Br
+                                                </span>
+                                                {hasSale && (
+                                                    <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded">SALE</span>
+                                                )}
+                                            </div>
                                             <div className={cn("text-xs", outOfStock ? "text-red-500" : "text-green-600")}>
                                                 {outOfStock ? "Out of Stock" : `${variant.stock} in stock`}
                                             </div>

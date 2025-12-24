@@ -17,6 +17,7 @@ interface ProductVariant {
     name: string;
     sku: string;
     price: number;
+    sale_price?: number | null;
     stock: number;
     stock_quantity: number;
     image: string | null;
@@ -104,6 +105,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                         name: v.name || 'Default',
                         sku: v.sku,
                         price: v.price || 0,
+                        sale_price: v.sale_price || null,
                         stock: v.stock_quantity || 0,
                         stock_quantity: v.stock_quantity || 0,
                         image: v.image,
@@ -149,7 +151,9 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
     const images = product.images.length > 0 ? product.images : (product.image_url ? [product.image_url] : []);
     const currentVariant = product.variants[selectedVariant] || product.variants[0];
-    const price = currentVariant?.price || parseInt(product.base_price) || 0;
+    const hasSale = currentVariant?.sale_price && currentVariant.sale_price > 0;
+    const price = hasSale ? (currentVariant.sale_price || 0) : (currentVariant?.price || parseInt(product.base_price) || 0);
+    const regularPrice = currentVariant?.price || parseInt(product.base_price) || 0;
     const currency = 'Br'; // Default currency
     const stock = currentVariant?.stock || 0;
 
@@ -205,7 +209,22 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                         {/* Header */}
                         <div>
                             <h1 className="text-lg md:text-xl font-medium text-neutral-600 mb-2">{product.name}</h1>
-                            <p className="text-3xl md:text-4xl font-bold tracking-tight">{price} {currency}</p>
+                            <div className="flex items-center gap-3">
+                                {hasSale && (
+                                    <p className="text-2xl md:text-3xl font-bold tracking-tight text-gray-400 line-through">
+                                        {regularPrice} {currency}
+                                    </p>
+                                )}
+                                <p className={cn(
+                                    "text-3xl md:text-4xl font-bold tracking-tight",
+                                    hasSale && "text-red-600"
+                                )}>
+                                    {price} {currency}
+                                </p>
+                                {hasSale && (
+                                    <span className="bg-red-600 text-white text-sm px-3 py-1 rounded-full font-bold">SALE</span>
+                                )}
+                            </div>
                         </div>
 
                         {/* Variant Selector */}
