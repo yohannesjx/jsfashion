@@ -56,6 +56,7 @@ interface Variant {
     sku: string;
     name: string;
     price: number;
+    sale_price?: number | null;
     stock_quantity: number;
     size?: string | null;
     color?: string | null;

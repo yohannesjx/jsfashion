@@ -27,6 +27,7 @@ interface Variant {
     size: string | null;
     color: string | null;
     price: number;
+    sale_price?: number | null;
     stock: number;
     active: boolean;
     image: string | null;
