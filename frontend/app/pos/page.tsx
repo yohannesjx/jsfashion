@@ -352,7 +352,27 @@ export default function POSPage() {
                                     </div>
                                     <div className="p-3">
                                         <h3 className="text-sm font-medium tracking-tight mb-1 line-clamp-2">{product.name}</h3>
-                                        <p className="text-sm font-bold">{parseFloat(product.base_price).toLocaleString()} Br</p>
+                                        {(() => {
+                                            const firstVariant = product.variants?.[0];
+                                            const hasSale = firstVariant?.sale_price && firstVariant.sale_price > 0;
+                                            const displayPrice = hasSale ? (firstVariant.sale_price || 0) : parseFloat(product.base_price);
+
+                                            return (
+                                                <div className="flex items-center gap-2">
+                                                    {hasSale && (
+                                                        <p className="text-xs text-gray-400 line-through">
+                                                            {parseFloat(product.base_price).toLocaleString()} Br
+                                                        </p>
+                                                    )}
+                                                    <p className={`text-sm font-bold ${hasSale ? 'text-red-600' : ''}`}>
+                                                        {displayPrice.toLocaleString()} Br
+                                                    </p>
+                                                    {hasSale && (
+                                                        <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">SALE</span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
                             ))}
