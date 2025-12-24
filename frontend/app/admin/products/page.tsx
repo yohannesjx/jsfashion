@@ -796,6 +796,7 @@ export default function ProductsPage() {
                             <TableHead className="w-[50px]"></TableHead>
                             <TableHead>Product</TableHead>
                             <TableHead>Price</TableHead>
+                            <TableHead>Sale</TableHead>
                             <TableHead>Variants</TableHead>
                             <TableHead>Status</TableHead>
                         </TableRow>
@@ -803,13 +804,13 @@ export default function ProductsPage() {
                     <TableBody>
                         {isLoading && products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={7} className="h-24 text-center">
                                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-neutral-500" />
                                 </TableCell>
                             </TableRow>
                         ) : products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-neutral-500">
+                                <TableCell colSpan={7} className="h-24 text-center text-neutral-500">
                                     No products found
                                 </TableCell>
                             </TableRow>
@@ -954,85 +955,84 @@ export default function ProductsPage() {
                                                     </div>
                                                 </div>
                                             </TableCell>
+                                            {/* Price Column */}
                                             <TableCell className="font-medium">
-                                                <div className="space-y-1">
-                                                    {/* Regular Price */}
-                                                    {editingProductPrice === product.id ? (
-                                                        <div className="flex items-center gap-1">
-                                                            <Input
-                                                                type="number"
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                className="h-8 w-32"
-                                                                placeholder="Price"
-                                                                autoFocus
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') saveProductPrice(product.id);
-                                                                    if (e.key === 'Escape') cancelProductPriceEdit();
-                                                                }}
-                                                            />
-                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
-                                                                <Check className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
-                                                            onClick={() => startProductPriceEdit(product.id, product.base_price)}
-                                                            title="Click to edit price"
-                                                        >
-                                                            <span className={(product as any).sale_price ? 'line-through text-muted-foreground text-sm' : ''}>
-                                                                {parseInt(product.base_price).toLocaleString()} Birr
-                                                            </span>
-                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
-                                                        </div>
-                                                    )}
-
-                                                    {/* Sale Price */}
-                                                    {editingProductSalePrice === product.id ? (
-                                                        <div className="flex items-center gap-1">
-                                                            <Input
-                                                                type="number"
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                className="h-8 w-32"
-                                                                placeholder="Sale Price (optional)"
-                                                                autoFocus
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') saveProductSalePrice(product.id);
-                                                                    if (e.key === 'Escape') cancelProductSalePriceEdit();
-                                                                }}
-                                                            />
-                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductSalePrice(product.id)}>
-                                                                <Check className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductSalePriceEdit}>
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
-                                                            onClick={() => startProductSalePriceEdit(product.id, (product as any).sale_price || '')}
-                                                            title="Click to edit sale price"
-                                                        >
-                                                            {(product as any).sale_price ? (
-                                                                <>
-                                                                    <span className="text-red-600 font-semibold">
-                                                                        {parseInt((product as any).sale_price).toLocaleString()} Birr
-                                                                    </span>
-                                                                    <Badge variant="destructive" className="text-xs">SALE</Badge>
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-xs text-muted-foreground">+ Add sale price</span>
-                                                            )}
-                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover/saleprice:opacity-100 transition-opacity" />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                {editingProductPrice === product.id ? (
+                                                    <div className="flex items-center gap-1">
+                                                        <Input
+                                                            type="number"
+                                                            value={editValue}
+                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                            className="h-8 w-32"
+                                                            placeholder="Price"
+                                                            autoFocus
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') saveProductPrice(product.id);
+                                                                if (e.key === 'Escape') cancelProductPriceEdit();
+                                                            }}
+                                                        />
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
+                                                        onClick={() => startProductPriceEdit(product.id, product.base_price)}
+                                                        title="Click to edit price"
+                                                    >
+                                                        <span className={(product as any).sale_price ? 'line-through text-muted-foreground' : ''}>
+                                                            {parseInt(product.base_price).toLocaleString()} Birr
+                                                        </span>
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
+                                                    </div>
+                                                )}
+                                            </TableCell>
+                                            {/* Sale Column */}
+                                            <TableCell>
+                                                {editingProductSalePrice === product.id ? (
+                                                    <div className="flex items-center gap-1">
+                                                        <Input
+                                                            type="number"
+                                                            value={editValue}
+                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                            className="h-8 w-32"
+                                                            placeholder="Sale Price"
+                                                            autoFocus
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') saveProductSalePrice(product.id);
+                                                                if (e.key === 'Escape') cancelProductSalePriceEdit();
+                                                            }}
+                                                        />
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductSalePrice(product.id)}>
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductSalePriceEdit}>
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
+                                                        onClick={() => startProductSalePriceEdit(product.id, (product as any).sale_price || '')}
+                                                        title="Click to edit sale price"
+                                                    >
+                                                        {(product as any).sale_price ? (
+                                                            <>
+                                                                <span className="text-red-600 font-semibold">
+                                                                    {parseInt((product as any).sale_price).toLocaleString()} Birr
+                                                                </span>
+                                                                <Badge variant="destructive" className="text-xs">SALE</Badge>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-xs text-muted-foreground">—</span>
+                                                        )}
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/saleprice:opacity-100 transition-opacity" />
+                                                    </div>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
