@@ -7,6 +7,12 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api/client";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
 
+interface Variant {
+    id: string;
+    price: number;
+    sale_price?: number | null;
+}
+
 interface Product {
     id: string;
     name: string;
@@ -16,6 +22,7 @@ interface Product {
     category?: string;
     image_url?: string;
     is_active?: boolean;
+    variants?: Variant[];
     created_at: string;
     updated_at: string;
 }
@@ -95,9 +102,27 @@ export default function NewArrivalsPage() {
                                         </div>
                                         <div className="flex flex-col px-2 py-3">
                                             <h3 className="text-xs font-medium tracking-tight mb-1 line-clamp-2">{product.name}</h3>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm font-bold">{price.toFixed(2)} {currency}</span>
-                                            </div>
+                                            {(() => {
+                                                const firstVariant = product.variants?.[0];
+                                                const hasSale = firstVariant?.sale_price && firstVariant.sale_price > 0;
+                                                const displayPrice = hasSale ? (firstVariant.sale_price || 0) : price;
+
+                                                return (
+                                                    <div className="flex items-center gap-2">
+                                                        {hasSale && (
+                                                            <span className="text-xs text-gray-400 line-through">
+                                                                {price.toFixed(2)} {currency}
+                                                            </span>
+                                                        )}
+                                                        <span className={`text-sm font-bold ${hasSale ? 'text-red-600' : ''}`}>
+                                                            {displayPrice.toFixed(2)} {currency}
+                                                        </span>
+                                                        {hasSale && (
+                                                            <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">SALE</span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </Link>
                                 );
