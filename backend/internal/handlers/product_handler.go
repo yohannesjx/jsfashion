@@ -358,13 +358,13 @@ func (h *ProductHandler) GetProduct(c echo.Context) error {
 				}
 				return nil
 			}(),
-			"price":         priceInCents, // Price in cents
-ttt"sale_price": func() interface{} {
-ttttif v.SalePrice.Valid {
-tttttreturn float64(v.SalePrice.Int64)
-tttt}
-ttttreturn nil
-ttt}(),
+			"price": priceInCents, // Price in cents
+			"sale_price": func() interface{} {
+				if v.SalePrice.Valid {
+					return float64(v.SalePrice.Int64)
+				}
+				return nil
+			}(),
 			"display_order": v.DisplayOrder,
 			"created_at": func() string {
 				if v.CreatedAt.Valid {
@@ -899,6 +899,17 @@ func (h *ProductHandler) UpdateVariant(c echo.Context) error {
 		err = h.Repo.UpdateVariantPriceWithSale(ctx, idStr, newPriceCents, salePriceCents, "Br")
 		if err != nil {
 			c.Logger().Errorf("Failed to update price for variant %s: %v", idStr, err)
+		}
+	} else if req.SalePrice != nil {
+		// Only sale_price provided, don't touch regular price
+		var salePriceCents *int64
+		sp := int64(*req.SalePrice)
+		salePriceCents = &sp
+
+		// Update only sale_price
+		err = h.Repo.UpdateVariantSalePriceOnly(ctx, idStr, salePriceCents)
+		if err != nil {
+			c.Logger().Errorf("Failed to update sale price for variant %s: %v", idStr, err)
 		}
 	} else if req.PriceAdjustment != nil {
 		// price_adjustment is the difference from base price, we need to calculate actual price and update prices table

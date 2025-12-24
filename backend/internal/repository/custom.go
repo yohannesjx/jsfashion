@@ -123,6 +123,44 @@ func (q *Queries) UpdateVariantPriceWithSale(ctx context.Context, variantID stri
 	return nil
 }
 
+// UpdateVariantSalePriceOnly updates ONLY the sale_price without touching the regular price
+func (q *Queries) UpdateVariantSalePriceOnly(ctx context.Context, variantID string, salePrice *int64) error {
+	// Update only sale_price, keep amount unchanged
+	updateQuery := `UPDATE prices SET sale_price = $2, updated_at = NOW() WHERE variant_id = $1::uuid`
+	result, err := q.db.ExecContext(ctx, updateQuery, variantID, salePrice)
+	if err != nil {
+		return err
+	}
+
+	// Check if any row was updated
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	// If no price record exists, we need to get the current price first
+	if rowsAffected == 0 {
+		// Get variant's current price from product base_price
+		var amount int64
+		getQuery := `SELECT COALESCE(p.base_price, 0)::bigint 
+					FROM product_variants pv 
+					JOIN products p ON pv.product_id = p.id 
+					WHERE pv.id = $1::uuid`
+		err = q.db.QueryRowContext(ctx, getQuery, variantID).Scan(&amount)
+		if err != nil {
+			return err
+		}
+
+		// Insert new price record with sale_price
+		insertQuery := `INSERT INTO prices (variant_id, amount, sale_price, currency, created_at, updated_at)
+			VALUES ($1::uuid, $2, $3, 'Br', NOW(), NOW())`
+		_, err = q.db.ExecContext(ctx, insertQuery, variantID, amount, salePrice)
+		return err
+	}
+
+	return nil
+}
+
 // DeleteProductByStringID deletes a product using a string ID (for bigint IDs)
 func (q *Queries) DeleteProductByStringID(ctx context.Context, id string) error {
 	query := `DELETE FROM products WHERE id = $1::bigint`

@@ -687,7 +687,7 @@ export default function ProductsPage() {
                     // Keep the current regular price - DON'T change it
                     const currentPrice = variant.price || parseFloat(product.base_price);
 
-                    // Update variant with sale price
+                    // Update variant with ONLY sale price (don't send price field)
                     await fetch(`${API_URL}/api/v1/admin/products/variants/${variant.id}`, {
                         method: 'PUT',
                         headers: {
@@ -699,8 +699,8 @@ export default function ProductsPage() {
                             size: variant.size,
                             color: variant.color,
                             stock_quantity: variant.stock_quantity,
-                            price: currentPrice,
-                            sale_price: newSalePrice, // Set the new sale price (or null to remove)
+                            // DON'T send price - only send sale_price
+                            sale_price: newSalePrice,
                         }),
                     });
                 } catch (error) {
