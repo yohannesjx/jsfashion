@@ -989,7 +989,7 @@ export default function ProductsPage() {
                                                         onClick={() => startProductPriceEdit(product.id, product.base_price)}
                                                         title="Click to edit price"
                                                     >
-                                                        <span className={(product as any).sale_price ? 'line-through text-muted-foreground' : ''}>
+                                                        <span className={product.variants?.[0]?.sale_price ? 'line-through text-muted-foreground' : ''}>
                                                             {parseInt(product.base_price).toLocaleString()} Birr
                                                         </span>
                                                         <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
@@ -1022,13 +1022,13 @@ export default function ProductsPage() {
                                                 ) : (
                                                     <div
                                                         className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
-                                                        onClick={() => startProductSalePriceEdit(product.id, (product as any).sale_price || '')}
+                                                        onClick={() => startProductSalePriceEdit(product.id, product.variants?.[0]?.sale_price?.toString() || '')}
                                                         title="Click to edit sale price"
                                                     >
-                                                        {(product as any).sale_price ? (
+                                                        {product.variants?.[0]?.sale_price ? (
                                                             <>
                                                                 <span className="text-red-600 font-semibold">
-                                                                    {parseInt((product as any).sale_price).toLocaleString()} Birr
+                                                                    {parseInt(product.variants[0].sale_price.toString()).toLocaleString()} Birr
                                                                 </span>
                                                                 <Badge variant="destructive" className="text-xs">SALE</Badge>
                                                             </>
