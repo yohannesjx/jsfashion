@@ -63,8 +63,8 @@ export default function POSPage() {
             const cached = localStorage.getItem('pos-products-cache');
             if (cached) {
                 const { data, timestamp } = JSON.parse(cached);
-                // Cache valid for 30 minutes
-                if (Date.now() - timestamp < 30 * 60 * 1000) {
+                // Cache valid for 5 minutes
+                if (Date.now() - timestamp < 5 * 60 * 1000) {
                     return data;
                 }
             }
@@ -91,8 +91,8 @@ export default function POSPage() {
             return res.data || [];
         },
         initialData: getCachedProducts, // Load from cache immediately
-        staleTime: 5 * 60 * 1000, // Consider fresh for 5 minutes
-        gcTime: 30 * 60 * 1000, // Keep in memory for 30 minutes
+        staleTime: 2 * 60 * 1000, // Consider fresh for 2 minutes
+        gcTime: 10 * 60 * 1000, // Keep in memory for 10 minutes
     });
 
     // Filtered products based on search query (shimmer while loading)
@@ -143,9 +143,8 @@ export default function POSPage() {
                 );
             }
 
-            const basePrice = parseFloat(selectedProduct!.base_price);
-            const adj = variant.price_adjustment ? parseFloat(variant.price_adjustment) : 0;
-            const price = basePrice + adj;
+            // Use the actual variant price from database (includes sale price if set)
+            const price = variant.price || parseFloat(selectedProduct!.base_price);
 
             return [...prev, {
                 variantId: variant.id,
@@ -181,9 +180,8 @@ export default function POSPage() {
                         );
                     }
 
-                    const basePrice = parseFloat(product.base_price);
-                    const adj = variant.price_adjustment ? parseFloat(variant.price_adjustment) : 0;
-                    const price = basePrice + adj;
+                    // Use the actual variant price from database (includes sale price if set)
+                    const price = variant.price || parseFloat(product.base_price);
 
                     return [...prev, {
                         variantId: variant.id,
