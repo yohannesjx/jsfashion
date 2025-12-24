@@ -144,8 +144,8 @@ export default function POSPage() {
                 );
             }
 
-            // Use the actual variant price from database (includes sale price if set)
-            const price = variant.price || parseFloat(selectedProduct!.base_price);
+            // Use sale price if available, otherwise use regular price
+            const price = variant.sale_price || variant.price || parseFloat(selectedProduct!.base_price);
 
             return [...prev, {
                 variantId: variant.id,
@@ -181,8 +181,8 @@ export default function POSPage() {
                         );
                     }
 
-                    // Use the actual variant price from database (includes sale price if set)
-                    const price = variant.price || parseFloat(product.base_price);
+                    // Use sale price if available, otherwise use regular price
+                    const price = variant.sale_price || variant.price || parseFloat(product.base_price);
 
                     return [...prev, {
                         variantId: variant.id,
