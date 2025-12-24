@@ -173,16 +173,17 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 
 	// Transform products to ensure proper JSON serialization
 	type ProductResponse struct {
-		ID          string  `json:"id"`
-		Name        string  `json:"name"`
-		Slug        string  `json:"slug"`
-		Description *string `json:"description,omitempty"`
-		BasePrice   string  `json:"base_price"`
-		Category    *string `json:"category,omitempty"`
-		ImageUrl    *string `json:"image_url,omitempty"`
-		IsActive    *bool   `json:"is_active,omitempty"`
-		CreatedAt   string  `json:"created_at"`
-		UpdatedAt   string  `json:"updated_at"`
+		ID          string                   `json:"id"`
+		Name        string                   `json:"name"`
+		Slug        string                   `json:"slug"`
+		Description *string                  `json:"description,omitempty"`
+		BasePrice   string                   `json:"base_price"`
+		Category    *string                  `json:"category,omitempty"`
+		ImageUrl    *string                  `json:"image_url,omitempty"`
+		IsActive    *bool                    `json:"is_active,omitempty"`
+		Variants    []map[string]interface{} `json:"variants"`
+		CreatedAt   string                   `json:"created_at"`
+		UpdatedAt   string                   `json:"updated_at"`
 	}
 
 	var response []ProductResponse
@@ -193,6 +194,7 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 			Name:      p.Name,
 			Slug:      p.Slug,
 			BasePrice: p.BasePrice, // Price in cents
+			Variants:  []map[string]interface{}{},
 		}
 
 		if p.Description.Valid {
@@ -215,6 +217,21 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 		}
 		if p.UpdatedAt.Valid {
 			pr.UpdatedAt = p.UpdatedAt.Time.Format("2006-01-02T15:04:05Z07:00")
+		}
+
+		// Fetch first variant with sale_price for POS grid display
+		variants, err := h.Repo.ListProductVariants(ctx, p.ID)
+		if err == nil && len(variants) > 0 {
+			// Just include the first variant with sale_price info
+			v := variants[0]
+			variantMap := map[string]interface{}{
+				"id":    v.ID,
+				"price": float64(v.Price),
+			}
+			if v.SalePrice.Valid {
+				variantMap["sale_price"] = float64(v.SalePrice.Int64)
+			}
+			pr.Variants = append(pr.Variants, variantMap)
 		}
 
 		response = append(response, pr)
