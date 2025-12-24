@@ -684,8 +684,8 @@ export default function ProductsPage() {
             // 2. Update all variants with the new sale price
             for (const variant of variants) {
                 try {
-                    // When sale price is set, use it as the actual price
-                    const currentPrice = newSalePrice !== null ? newSalePrice : (variant.price || parseFloat(product.base_price));
+                    // Keep the current regular price - DON'T change it
+                    const currentPrice = variant.price || parseFloat(product.base_price);
 
                     // Update variant with sale price
                     await fetch(`${API_URL}/api/v1/admin/products/variants/${variant.id}`, {
@@ -711,13 +711,11 @@ export default function ProductsPage() {
             // Update local state
             setProducts(prev => prev.map(p => {
                 if (p.id === productId) {
-                    const updatedPrice = newSalePrice !== null ? newSalePrice.toString() : p.base_price;
                     return {
                         ...p,
                         sale_price: newSalePrice?.toString() || undefined,
                         variants: p.variants?.map(v => ({
                             ...v,
-                            price: newSalePrice !== null ? newSalePrice : v.price,
                             sale_price: newSalePrice
                         }))
                     };
