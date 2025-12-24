@@ -801,13 +801,14 @@ func (h *ProductHandler) CreateVariant(c echo.Context) error {
 }
 
 type UpdateVariantRequest struct {
-	Sku             *string `json:"sku"`
-	Size            *string `json:"size"`
-	Color           *string `json:"color"`
-	PriceAdjustment *string `json:"price_adjustment"`
-	StockQuantity   *int32  `json:"stock_quantity"`
-	DisplayOrder    *int32  `json:"display_order"`
-	Image           *string `json:"image"`
+	Sku             *string  `json:"sku"`
+	Size            *string  `json:"size"`
+	Color           *string  `json:"color"`
+	PriceAdjustment *string  `json:"price_adjustment"`
+	Price           *float64 `json:"price"` // Direct price in Birr
+	StockQuantity   *int32   `json:"stock_quantity"`
+	DisplayOrder    *int32   `json:"display_order"`
+	Image           *string  `json:"image"`
 }
 
 func (h *ProductHandler) UpdateVariant(c echo.Context) error {
@@ -875,9 +876,18 @@ func (h *ProductHandler) UpdateVariant(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update variant"})
 	}
 
-	// Handle price update if price_adjustment is provided
-	// price_adjustment is the difference from base price, we need to calculate actual price and update prices table
-	if req.PriceAdjustment != nil {
+	// Handle price update - prioritize direct price over price_adjustment
+	if req.Price != nil {
+		// Direct price provided (in Birr), convert to cents for storage
+		newPriceCents := int64(*req.Price)
+
+		// Update or insert price in prices table
+		err = h.Repo.UpdateVariantPrice(ctx, idStr, newPriceCents, "Br")
+		if err != nil {
+			c.Logger().Errorf("Failed to update price for variant %s: %v", idStr, err)
+		}
+	} else if req.PriceAdjustment != nil {
+		// price_adjustment is the difference from base price, we need to calculate actual price and update prices table
 		// Get product base price
 		product, err := h.Repo.GetProduct(ctx, existing.ProductID)
 		if err == nil {
@@ -886,7 +896,7 @@ func (h *ProductHandler) UpdateVariant(c echo.Context) error {
 			newPriceCents := int64(basePriceFloat + adjustmentFloat)
 
 			// Update or insert price in prices table
-			err = h.Repo.UpdateVariantPrice(ctx, idStr, newPriceCents, "ETB")
+			err = h.Repo.UpdateVariantPrice(ctx, idStr, newPriceCents, "Br")
 			if err != nil {
 				c.Logger().Errorf("Failed to update price for variant %s: %v", idStr, err)
 			}

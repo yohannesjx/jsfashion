@@ -91,6 +91,7 @@ export default function ProductsPage() {
 
     // Inline editing
     const [editingCell, setEditingCell] = useState<{ variantId: string; field: 'price' | 'stock' | 'size' | 'color' } | null>(null);
+    const [editingProductPrice, setEditingProductPrice] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
     const updateVariant = useUpdateVariant();
     const createVariant = useCreateVariant();
@@ -560,6 +561,92 @@ export default function ProductsPage() {
         }
     };
 
+    const startProductPriceEdit = (productId: string, currentPrice: string) => {
+        setEditingProductPrice(productId);
+        setEditValue(currentPrice);
+    };
+
+    const cancelProductPriceEdit = () => {
+        setEditingProductPrice(null);
+        setEditValue('');
+    };
+
+    const saveProductPrice = async (productId: string) => {
+        const newPrice = parseFloat(editValue);
+        if (isNaN(newPrice) || newPrice < 0) {
+            toast.error('Invalid price');
+            return;
+        }
+
+        try {
+            const toastId = toast.loading('Updating product price and all variants...');
+            const token = localStorage.getItem('access_token');
+
+            // 1. Get product details to fetch current data
+            const res = await fetch(`${API_URL}/api/v1/admin/products/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch product details');
+
+            const data = await res.json();
+            const product = data.product;
+            const variants = data.variants || [];
+
+            // 2. Update product base price
+            await updateProduct.mutateAsync({
+                id: productId,
+                name: product.name,
+                description: product.description || '',
+                base_price: newPrice.toString(),
+                is_active: product.is_active,
+                image_url: product.image_url,
+            });
+
+            // 3. Update all variants to inherit the new price
+            for (const variant of variants) {
+                try {
+                    // Update variant price via the prices table
+                    await fetch(`${API_URL}/api/v1/admin/products/variants/${variant.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sku: variant.sku,
+                            size: variant.size,
+                            color: variant.color,
+                            stock_quantity: variant.stock_quantity,
+                            price: newPrice, // Set the new price
+                        }),
+                    });
+                } catch (error) {
+                    console.error(`Failed to update variant ${variant.id}:`, error);
+                }
+            }
+
+            // Update local state
+            setProducts(prev => prev.map(p => {
+                if (p.id === productId) {
+                    return {
+                        ...p,
+                        base_price: newPrice.toString(),
+                        variants: p.variants?.map(v => ({ ...v, price: newPrice }))
+                    };
+                }
+                return p;
+            }));
+
+            toast.dismiss(toastId);
+            toast.success(`Updated price for product and ${variants.length} variant(s)`);
+            cancelProductPriceEdit();
+        } catch (error: any) {
+            console.error('Failed to update price:', error);
+            toast.error(error?.message || 'Failed to update price');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -783,7 +870,37 @@ export default function ProductsPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="font-medium">
-                                                {parseInt(product.base_price).toLocaleString()} Birr
+                                                {editingProductPrice === product.id ? (
+                                                    <div className="flex items-center gap-1">
+                                                        <Input
+                                                            type="number"
+                                                            value={editValue}
+                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                            className="h-8 w-32"
+                                                            placeholder="Price"
+                                                            autoFocus
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') saveProductPrice(product.id);
+                                                                if (e.key === 'Escape') cancelProductPriceEdit();
+                                                            }}
+                                                        />
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
+                                                        onClick={() => startProductPriceEdit(product.id, product.base_price)}
+                                                        title="Click to edit price"
+                                                    >
+                                                        <span>{parseInt(product.base_price).toLocaleString()} Birr</span>
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
+                                                    </div>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
