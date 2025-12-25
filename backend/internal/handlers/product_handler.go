@@ -1073,6 +1073,12 @@ func (h *ProductHandler) GetVariantBySku(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Variant not found"})
 	}
 
+	// Format sale price (null if not set)
+	var salePriceValue interface{} = nil
+	if result.SalePrice.Valid {
+		salePriceValue = result.SalePrice.Int64
+	}
+
 	// Format response
 	response := map[string]interface{}{
 		"variant": map[string]interface{}{
@@ -1080,8 +1086,11 @@ func (h *ProductHandler) GetVariantBySku(c echo.Context) error {
 			"sku":              result.VariantSku,
 			"size":             nullStringValue(result.Size),
 			"color":            nullStringValue(result.Color),
+			"price":            result.Price,
+			"sale_price":       salePriceValue,
 			"price_adjustment": nullStringValue(result.PriceAdjustment),
 			"stock_quantity":   result.StockQuantity,
+			"image":            nullStringValue(result.VariantImage),
 		},
 		"product": map[string]interface{}{
 			"id":         result.ProductID,

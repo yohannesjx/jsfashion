@@ -273,7 +273,10 @@ type VariantWithProduct struct {
 	Size            sql.NullString
 	Color           sql.NullString
 	PriceAdjustment sql.NullString
+	VariantImage    sql.NullString
 	StockQuantity   int32
+	Price           int64
+	SalePrice       sql.NullInt64
 	ProductID       string
 	ProductName     string
 	ProductPrice    string
@@ -289,13 +292,17 @@ func (q *Queries) GetVariantBySku(ctx context.Context, sku string) (VariantWithP
 			v.size,
 			v.color,
 			v.price_adjustment::text,
+			v.thumbnail,
 			COALESCE(v.stock_quantity, 0),
+			COALESCE(pr.price, 0),
+			pr.sale_price,
 			p.id::text,
 			p.title,
 			COALESCE(p.base_price, 0)::text,
 			p.thumbnail
 		FROM product_variants v
 		JOIN products p ON v.product_id = p.id
+		LEFT JOIN prices pr ON pr.variant_id = v.id
 		WHERE LOWER(v.sku) = LOWER($1)
 		LIMIT 1
 	`
@@ -307,7 +314,10 @@ func (q *Queries) GetVariantBySku(ctx context.Context, sku string) (VariantWithP
 		&v.Size,
 		&v.Color,
 		&v.PriceAdjustment,
+		&v.VariantImage,
 		&v.StockQuantity,
+		&v.Price,
+		&v.SalePrice,
 		&v.ProductID,
 		&v.ProductName,
 		&v.ProductPrice,

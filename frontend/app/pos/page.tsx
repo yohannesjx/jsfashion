@@ -297,10 +297,16 @@ export default function POSPage() {
     }, [barcodeBuffer, addToCartBySku]);
 
     // Handle search input Enter key for SKU search
-    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleSearchKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
+            e.preventDefault();
+            const sku = searchQuery.trim();
+
             // Try to find by SKU first
-            addToCartBySku(searchQuery.trim());
+            await addToCartBySku(sku);
+
+            // Clear search input after attempting to add
+            setSearchQuery('');
         }
     };
 
