@@ -418,40 +418,63 @@ export default function ProductsPage() {
     const handleExportCSV = async () => {
         try {
             const toastId = toast.loading('Generating CSV...');
-            const token = localStorage.getItem('access_token');
-            const res = await fetch(`${API_URL}/api/v1/admin/inventory/export`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
 
-            if (!res.ok) throw new Error('Failed to fetch export data');
+            // Collect all variants from all products
+            const csvRows: string[] = [];
+            csvRows.push('SKU,Price,Sale,Stock'); // Header
 
-            const data = await res.json();
+            for (const product of products) {
+                // Fetch variants for this product if not already loaded
+                let variants = product.variants || [];
 
-            if (!data || data.length === 0) {
+                if (variants.length === 0) {
+                    // Fetch variants from API
+                    const token = localStorage.getItem('access_token');
+                    try {
+                        const res = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            variants = data.variants || [];
+                        }
+                    } catch (e) {
+                        console.error(`Failed to fetch variants for product ${product.id}:`, e);
+                    }
+                }
+
+                // Add each variant as a row
+                for (const variant of variants) {
+                    const sku = variant.sku || '';
+                    const price = variant.price || 0;
+                    const sale = variant.sale_price || 0;
+                    const stock = variant.stock_quantity || 0;
+
+                    csvRows.push(`${sku},${price},${sale},${stock}`);
+                }
+            }
+
+            if (csvRows.length <= 1) {
                 toast.dismiss(toastId);
-                toast.info('No inventory data to export');
+                toast.info('No products to export');
                 return;
             }
 
-            // Convert to CSV
-            const csvContent = "data:text/csv;charset=utf-8,"
-                + "Product Name,SKU,Price,Stock\n"
-                + data.map((item: any) => {
-                    // Escape quotes in product name
-                    const name = item.product_name.replace(/"/g, '""');
-                    return `"${name}","${item.sku}",${item.price},${item.stock}`;
-                }).join("\n");
+            // Create CSV content
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `inventory_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
             toast.dismiss(toastId);
-            toast.success('Exported successfully');
+            toast.success(`Exported ${csvRows.length - 1} variants`);
         } catch (error) {
             console.error(error);
             toast.error('Failed to export CSV');
