@@ -292,7 +292,7 @@ func (q *Queries) GetVariantBySku(ctx context.Context, sku string) (VariantWithP
 			v.size,
 			v.color,
 			v.price_adjustment::text,
-			v.thumbnail,
+			v.image,
 			COALESCE(v.stock_quantity, 0),
 			COALESCE(pr.amount, 0),
 			pr.sale_price,
