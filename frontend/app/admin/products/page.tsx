@@ -417,35 +417,21 @@ export default function ProductsPage() {
 
     const handleExportCSV = async () => {
         try {
-            const toastId = toast.loading('Fetching all products...');
-            const token = localStorage.getItem('access_token');
+            const toastId = toast.loading('Generating CSV...');
 
-            // Fetch ALL products from API (not just current page)
-            const res = await fetch(`${API_URL}/api/v1/admin/products?limit=10000&offset=0`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-
-            if (!res.ok) {
-                toast.dismiss(toastId);
-                toast.error('Failed to fetch products');
-                return;
-            }
-
-            const allProducts = await res.json();
-
-            if (!allProducts || allProducts.length === 0) {
-                toast.dismiss(toastId);
-                toast.info('No products to export');
-                return;
-            }
-
-            toast.loading(`Exporting ${allProducts.length} products...`, { id: toastId });
-
-            // Collect all variants from all products
+            // Collect all variants from current page products only
             const csvRows: string[] = [];
             csvRows.push('SKU,Price,Sale,Stock'); // Header
 
-            for (const product of allProducts) {
+            if (products.length === 0) {
+                toast.dismiss(toastId);
+                toast.info('No products on current page to export');
+                return;
+            }
+
+            toast.loading(`Exporting ${products.length} products...`, { id: toastId });
+
+            for (const product of products) {
                 // Fetch variants for this product if not already loaded
                 let variants = product.variants || [];
 
@@ -496,7 +482,7 @@ export default function ProductsPage() {
             document.body.removeChild(link);
 
             toast.dismiss(toastId);
-            toast.success(`Exported ${csvRows.length - 1} variants from ${allProducts.length} products`);
+            toast.success(`Exported ${csvRows.length - 1} variants from ${products.length} products`);
         } catch (error) {
             console.error(error);
             toast.error('Failed to export CSV');
