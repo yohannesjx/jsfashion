@@ -417,13 +417,35 @@ export default function ProductsPage() {
 
     const handleExportCSV = async () => {
         try {
-            const toastId = toast.loading('Generating CSV...');
+            const toastId = toast.loading('Fetching all products...');
+            const token = localStorage.getItem('access_token');
+
+            // Fetch ALL products from API (not just current page)
+            const res = await fetch(`${API_URL}/api/v1/admin/products?limit=10000&offset=0`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+
+            if (!res.ok) {
+                toast.dismiss(toastId);
+                toast.error('Failed to fetch products');
+                return;
+            }
+
+            const allProducts = await res.json();
+
+            if (!allProducts || allProducts.length === 0) {
+                toast.dismiss(toastId);
+                toast.info('No products to export');
+                return;
+            }
+
+            toast.loading(`Exporting ${allProducts.length} products...`, { id: toastId });
 
             // Collect all variants from all products
             const csvRows: string[] = [];
             csvRows.push('SKU,Price,Sale,Stock'); // Header
 
-            for (const product of products) {
+            for (const product of allProducts) {
                 // Fetch variants for this product if not already loaded
                 let variants = product.variants || [];
 
@@ -474,7 +496,7 @@ export default function ProductsPage() {
             document.body.removeChild(link);
 
             toast.dismiss(toastId);
-            toast.success(`Exported ${csvRows.length - 1} variants`);
+            toast.success(`Exported ${csvRows.length - 1} variants from ${allProducts.length} products`);
         } catch (error) {
             console.error(error);
             toast.error('Failed to export CSV');
