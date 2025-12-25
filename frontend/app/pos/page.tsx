@@ -7,6 +7,7 @@ import { Search, ShoppingBag, Trash2, RotateCcw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { VariantSelector } from "@/components/pos/VariantSelector";
+import { CheckoutConfirmation } from "@/components/pos/CheckoutConfirmation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -43,12 +44,14 @@ interface CartItem {
     color: string | null;
     price: number;
     quantity: number;
+    image_url: string | null;
 }
 export default function POSPage() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isVariantSelectorOpen, setIsVariantSelectorOpen] = useState(false);
+    const [showCheckoutConfirmation, setShowCheckoutConfirmation] = useState(false);
     const queryClient = useQueryClient();
 
     // Barcode scanner state
@@ -155,7 +158,8 @@ export default function POSPage() {
                 size: variant.size,
                 color: variant.color,
                 price: price,
-                quantity: quantity
+                quantity: quantity,
+                image_url: variant.image || selectedProduct!.image_url
             }];
         });
         toast.success("Added to cart");
@@ -192,7 +196,8 @@ export default function POSPage() {
                         size: variant.size,
                         color: variant.color,
                         price: price,
-                        quantity: 1
+                        quantity: 1,
+                        image_url: variant.image || product.image_url
                     }];
                 });
                 toast.success(`Added ${product.name} to cart`);
@@ -211,7 +216,10 @@ export default function POSPage() {
 
     const handleCheckout = () => {
         if (cart.length === 0) return;
+        setShowCheckoutConfirmation(true);
+    };
 
+    const handleCompleteOrder = () => {
         const orderData = {
             payment_method: "cash",
             source: "pos", // Add source to mark as POS order
@@ -222,6 +230,7 @@ export default function POSPage() {
         };
 
         checkoutMutation.mutate(orderData);
+        setShowCheckoutConfirmation(false);
     };
 
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -403,8 +412,19 @@ export default function POSPage() {
                     ) : (
                         <div className="space-y-4">
                             {cart.map((item, idx) => (
-                                <div key={`${item.variantId}-${idx}`} className="flex justify-between items-start p-3 bg-gray-50 rounded-lg group">
-                                    <div className="flex-1">
+                                <div key={`${item.variantId}-${idx}`} className="flex gap-3 p-3 bg-gray-50 rounded-lg group">
+                                    {/* Product Thumbnail */}
+                                    <img
+                                        src={item.image_url || '/placeholder-1.jpg'}
+                                        alt={item.name}
+                                        className="w-16 h-16 object-cover rounded flex-shrink-0"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = '/placeholder-1.jpg';
+                                        }}
+                                    />
+
+                                    {/* Item Details */}
+                                    <div className="flex-1 min-w-0">
                                         <p className="font-medium line-clamp-1">{item.name}</p>
                                         <p className="text-xs text-gray-500 mb-1">
                                             {item.size && <span className="mr-2">{item.size}</span>}
@@ -413,6 +433,8 @@ export default function POSPage() {
                                         </p>
                                         <p className="text-sm text-gray-500">{item.quantity} x {item.price.toLocaleString()} Br</p>
                                     </div>
+
+                                    {/* Price and Delete */}
                                     <div className="flex flex-col items-end gap-2">
                                         <p className="font-medium">{(item.price * item.quantity).toLocaleString()} Br</p>
                                         <Button
@@ -456,6 +478,15 @@ export default function POSPage() {
                 open={isVariantSelectorOpen}
                 onOpenChange={setIsVariantSelectorOpen}
                 onAddToCart={handleAddToCart}
+            />
+
+            <CheckoutConfirmation
+                open={showCheckoutConfirmation}
+                onOpenChange={setShowCheckoutConfirmation}
+                cart={cart}
+                total={total}
+                onConfirm={handleCompleteOrder}
+                isLoading={checkoutMutation.isPending}
             />
         </div>
     );
