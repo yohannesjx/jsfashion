@@ -437,48 +437,65 @@ export default function ProductsPage() {
 
     const handleExportCSV = async () => {
         try {
-            const toastId = toast.loading('Generating CSV...');
+            const toastId = toast.loading('Fetching all products...');
+            const token = localStorage.getItem('access_token');
 
-            // Collect all variants from current page products only
-            const csvRows: string[] = [];
-            csvRows.push('SKU,Price,Sale,Stock'); // Header
+            // Fetch ALL products from API (not just current page)
+            const res = await fetch(`${API_URL}/api/v1/admin/products?page=1&limit=10000`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
 
-            if (products.length === 0) {
+            if (!res.ok) {
+                throw new Error('Failed to fetch products');
+            }
+
+            const data = await res.json();
+            const allProducts = data.products || [];
+
+            if (allProducts.length === 0) {
                 toast.dismiss(toastId);
-                toast.info('No products on current page to export');
+                toast.info('No products to export');
                 return;
             }
 
-            toast.loading(`Exporting ${products.length} products...`, { id: toastId });
+            toast.loading(`Exporting ${allProducts.length} products...`, { id: toastId });
 
-            for (const product of products) {
-                // Fetch variants for this product if not already loaded
+            // Collect all variants with enhanced details
+            const csvRows: string[] = [];
+            csvRows.push('Product Name,SKU,Variant Name,Size,Color,Price,Sale Price,Stock,Category,Image URL,Active');
+
+            for (const product of allProducts) {
                 let variants = product.variants || [];
 
                 if (variants.length === 0) {
-                    // Fetch variants from API
-                    const token = localStorage.getItem('access_token');
                     try {
-                        const res = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
+                        const productRes = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
                             headers: { 'Authorization': `Bearer ${token}` },
                         });
-                        if (res.ok) {
-                            const data = await res.json();
-                            variants = data.variants || [];
+                        if (productRes.ok) {
+                            const productData = await productRes.json();
+                            variants = productData.variants || [];
                         }
                     } catch (e) {
                         console.error(`Failed to fetch variants for product ${product.id}:`, e);
                     }
                 }
 
-                // Add each variant as a row
-                for (const variant of variants) {
-                    const sku = variant.sku || '';
-                    const price = variant.price || 0;
-                    const sale = variant.sale_price || 0;
-                    const stock = variant.stock_quantity || 0;
+                const categories = product.categories?.map((c: any) => c.name).join('; ') || '';
 
-                    csvRows.push(`${sku},${price},${sale},${stock}`);
+                for (const variant of variants) {
+                    const productName = (product.name || '').replace(/,/g, ';');
+                    const sku = variant.sku || '';
+                    const variantName = (variant.name || '').replace(/,/g, ';');
+                    const size = variant.size || '';
+                    const color = variant.color || '';
+                    const price = variant.price || 0;
+                    const salePrice = variant.sale_price || '';
+                    const stock = variant.stock_quantity || 0;
+                    const imageUrl = variant.image || product.image_url || '';
+                    const active = variant.active ? 'Yes' : 'No';
+
+                    csvRows.push(`"${productName}","${sku}","${variantName}","${size}","${color}",${price},${salePrice},${stock},"${categories}","${imageUrl}",${active}`);
                 }
             }
 
@@ -488,21 +505,20 @@ export default function ProductsPage() {
                 return;
             }
 
-            // Create CSV content
             const csvContent = csvRows.join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `all_products_export_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
             toast.dismiss(toastId);
-            toast.success(`Exported ${csvRows.length - 1} variants from ${products.length} products`);
+            toast.success(`Exported ${csvRows.length - 1} variants from ${allProducts.length} products`);
         } catch (error) {
             console.error(error);
             toast.error('Failed to export CSV');
