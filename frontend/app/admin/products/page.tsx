@@ -442,15 +442,20 @@ export default function ProductsPage() {
 
             // Fetch ALL products from API (not just current page)
             const res = await fetch(`${API_URL}/api/v1/admin/products?page=1&limit=10000`, {
+                cache: 'no-store',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
 
             if (!res.ok) {
-                throw new Error('Failed to fetch products');
+                const errorText = await res.text();
+                console.error('API Error:', errorText);
+                throw new Error(`Failed to fetch products: ${res.status}`);
             }
 
             const data = await res.json();
-            const allProducts = data.products || [];
+            console.log('API Response:', data);
+            const allProducts = data.products || data || [];
+            console.log('Products count:', allProducts.length);
 
             if (allProducts.length === 0) {
                 toast.dismiss(toastId);
@@ -501,7 +506,7 @@ export default function ProductsPage() {
 
             if (csvRows.length <= 1) {
                 toast.dismiss(toastId);
-                toast.info('No products to export');
+                toast.info('No variants found to export');
                 return;
             }
 
@@ -520,8 +525,8 @@ export default function ProductsPage() {
             toast.dismiss(toastId);
             toast.success(`Exported ${csvRows.length - 1} variants from ${allProducts.length} products`);
         } catch (error) {
-            console.error(error);
-            toast.error('Failed to export CSV');
+            console.error('Export error:', error);
+            toast.error(`Failed to export CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 
