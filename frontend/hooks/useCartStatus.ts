@@ -15,19 +15,25 @@ export function useCartStatus() {
     const { data, isLoading } = useQuery({
         queryKey: ['cart-status'],
         queryFn: async () => {
-            const response = await fetch(`${API_URL}/api/v1/admin/settings`, {
-                cache: 'no-store',
-            });
+            try {
+                const response = await fetch(`${API_URL}/api/v1/admin/settings`, {
+                    cache: 'no-store',
+                });
 
-            if (!response.ok) {
-                // Default to enabled if we can't fetch settings
+                if (!response.ok) {
+                    // Default to enabled if we can't fetch settings
+                    return { cartEnabled: true };
+                }
+
+                const settings: StoreSettings = await response.json();
+                return {
+                    cartEnabled: settings.cart_enabled?.Bool ?? true
+                };
+            } catch (error) {
+                // Default to enabled on error
+                console.error('Failed to fetch cart status:', error);
                 return { cartEnabled: true };
             }
-
-            const settings: StoreSettings = await response.json();
-            return {
-                cartEnabled: settings.cart_enabled?.Bool ?? true
-            };
         },
         staleTime: 1000 * 60 * 5, // Cache for 5 minutes
         refetchOnWindowFocus: true,
