@@ -1376,21 +1376,36 @@ type GetRelatedProductsParams struct {
 	Limit     int32  `json:"limit"`
 }
 
-func (q *Queries) GetRelatedProducts(ctx context.Context, arg GetRelatedProductsParams) ([]Product, error) {
+type GetRelatedProductsRow struct {
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Slug        string         `json:"slug"`
+	Description sql.NullString `json:"description"`
+	BasePrice   string         `json:"base_price"`
+	SalePrice   sql.NullInt64  `json:"sale_price"`
+	Category    sql.NullString `json:"category"`
+	ImageUrl    sql.NullString `json:"image_url"`
+	IsActive    sql.NullBool   `json:"is_active"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
+}
+
+func (q *Queries) GetRelatedProducts(ctx context.Context, arg GetRelatedProductsParams) ([]GetRelatedProductsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRelatedProducts, arg.ProductID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Product
+	var items []GetRelatedProductsRow
 	for rows.Next() {
-		var i Product
+		var i GetRelatedProductsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Slug,
 			&i.Description,
 			&i.BasePrice,
+			&i.SalePrice,
 			&i.Category,
 			&i.ImageUrl,
 			&i.IsActive,

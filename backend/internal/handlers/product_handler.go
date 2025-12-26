@@ -441,12 +441,14 @@ func (h *ProductHandler) GetRelatedProducts(c echo.Context) error {
 	}
 
 	// Transform response
+	// Transform response
 	type ProductResponse struct {
 		ID          string  `json:"id"`
 		Name        string  `json:"name"`
 		Slug        string  `json:"slug"`
 		Description *string `json:"description,omitempty"`
 		BasePrice   string  `json:"base_price"`
+		SalePrice   *int64  `json:"sale_price,omitempty"`
 		Category    *string `json:"category,omitempty"`
 		ImageUrl    *string `json:"image_url,omitempty"`
 		IsActive    *bool   `json:"is_active,omitempty"`
@@ -461,6 +463,10 @@ func (h *ProductHandler) GetRelatedProducts(c echo.Context) error {
 			Name:      p.Name,
 			Slug:      p.Slug,
 			BasePrice: p.BasePrice,
+		}
+		if p.SalePrice.Valid {
+			salePrice := p.SalePrice.Int64
+			pr.SalePrice = &salePrice
 		}
 		if p.Description.Valid {
 			pr.Description = &p.Description.String

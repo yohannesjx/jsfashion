@@ -73,9 +73,24 @@ export default function RelatedProducts({ productId }: { productId: string }) {
                             <h3 className="text-sm font-medium text-neutral-900 group-hover:underline underline-offset-4">
                                 {product.name}
                             </h3>
-                            <p className="text-sm text-neutral-500 mt-1">
-                                {product.base_price} Br
-                            </p>
+                            <div className="mt-1 flex items-baseline gap-2">
+                                {product.sale_price ? (
+                                    <>
+                                        <span className="text-sm font-semibold text-red-600">
+                                            {// Assuming base_price is coming as string from backend like "1200", we just display it.
+                                                // sale_price comes as number/float from our earlier handlers.
+                                                product.sale_price.toLocaleString()} Br
+                                        </span>
+                                        <span className="text-xs text-neutral-400 line-through">
+                                            {parseInt(product.base_price).toLocaleString()} Br
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span className="text-sm text-neutral-500">
+                                        {parseInt(product.base_price).toLocaleString()} Br
+                                    </span>
+                                )}
+                            </div>
                         </Link>
                     ))}
                 </div>

@@ -137,6 +137,15 @@ SELECT DISTINCT
     p.slug,
     p.description,
     COALESCE(p.base_price, 0)::text as base_price,
+    (
+        SELECT sale_price
+        FROM product_variants pv
+        WHERE pv.product_id = p.id
+        AND pv.active = true
+        AND pv.sale_price IS NOT NULL
+        ORDER BY pv.price ASC
+        LIMIT 1
+    )::bigint as sale_price,
     ''::text as category,
     COALESCE(pi.url, p.thumbnail) as image_url,
     p.active as is_active,
