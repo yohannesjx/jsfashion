@@ -317,9 +317,15 @@ export default function Home() {
                                                         <span className={`text-sm font-bold ${hasSale ? 'text-red-600' : ''}`}>
                                                             {displayPrice} {currency}
                                                         </span>
-                                                        {hasSale && (
-                                                            <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">SALE</span>
-                                                        )}
+                                                        {hasSale && (() => {
+                                                            const discount = Math.round(((price - displayPrice) / price) * 100);
+                                                            return (
+                                                                <>
+                                                                    <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">SALE</span>
+                                                                    <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded font-semibold">-{discount}%</span>
+                                                                </>
+                                                            );
+                                                        })()}
                                                     </div>
                                                 );
                                             })()}
