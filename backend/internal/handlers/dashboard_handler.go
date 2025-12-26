@@ -184,7 +184,6 @@ func (h *DashboardHandler) ExportInventory(c echo.Context) error {
 		FROM product_variants v
 		JOIN products p ON v.product_id = p.id
 		LEFT JOIN prices pr ON pr.variant_id = v.id AND pr.currency = 'Br'
-		WHERE p.is_active = true
 		ORDER BY p.name, v.sku
 	`)
 	if err != nil {
