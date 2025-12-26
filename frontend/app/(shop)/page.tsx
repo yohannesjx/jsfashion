@@ -205,7 +205,7 @@ export default function Home() {
 
             {/* Hero Section */}
             <section className="relative h-[90vh] w-full flex flex-col justify-center items-center overflow-hidden bg-neutral-100">
-                <div className="absolute inset-0 bg-cover bg-center opacity-90 grayscale contrast-125" style={{ backgroundImage: `url('${heroBannerUrl}')` }} />
+                <div className="absolute inset-0 bg-cover bg-center opacity-90" style={{ backgroundImage: `url('${heroBannerUrl}')` }} />
 
                 <div className="relative z-10 text-center space-y-6 max-w-5xl px-4">
                     <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter text-black mix-blend-overlay">
