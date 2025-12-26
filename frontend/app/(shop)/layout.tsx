@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/Header";
+import { CartDisabledBanner } from "@/components/shop/CartDisabledBanner";
 
 export default function ShopLayout({
     children,
@@ -8,6 +9,7 @@ export default function ShopLayout({
     return (
         <>
             <Header />
+            <CartDisabledBanner />
             {children}
         </>
     );

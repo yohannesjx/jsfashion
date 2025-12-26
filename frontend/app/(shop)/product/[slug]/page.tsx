@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
 import RelatedProducts from "@/components/shop/RelatedProducts";
 import ImagePlaceholder from "@/components/ImagePlaceholder";
+import { useCartStatus } from "@/hooks/useCartStatus";
 
 interface ProductVariant {
     id: string; // UUID
@@ -77,6 +78,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     const [addedToCart, setAddedToCart] = useState(false);
 
     const addItem = useCartStore((state) => state.addItem);
+    const { cartEnabled } = useCartStatus();
 
     useEffect(() => {
         async function load() {
@@ -334,13 +336,15 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                         ? "bg-green-600 hover:bg-green-700"
                                         : "bg-black text-white hover:bg-neutral-800"
                                 )}
-                                disabled={stock === 0}
+                                disabled={stock === 0 || !cartEnabled}
                             >
                                 {addedToCart ? (
                                     <span className="flex items-center gap-2">
                                         <Check className="w-5 h-5" />
                                         ADDED TO BAG
                                     </span>
+                                ) : !cartEnabled ? (
+                                    'CART DISABLED - VISIT SHOP'
                                 ) : stock > 0 ? (
                                     <span className="flex items-center gap-3">
                                         <span>ADD TO BAG</span>
