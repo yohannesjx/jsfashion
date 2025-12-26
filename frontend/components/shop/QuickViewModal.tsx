@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
 import Link from "next/link";
 import Image from "next/image";
+import { useCartStatus } from "@/hooks/useCartStatus";
 
 interface ProductVariant {
     id: string;
@@ -68,6 +69,7 @@ export default function QuickViewModal({
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const addItem = useCartStore((state) => state.addItem);
+    const { cartEnabled } = useCartStatus();
 
     useEffect(() => {
         if (!isOpen || !productSlug) return;
@@ -295,13 +297,15 @@ export default function QuickViewModal({
                                                         ? "bg-green-600 hover:bg-green-700"
                                                         : "bg-black text-white hover:bg-neutral-800"
                                                 )}
-                                                disabled={stock === 0}
+                                                disabled={stock === 0 || !cartEnabled}
                                             >
                                                 {addedToCart ? (
                                                     <span className="flex items-center gap-2">
                                                         <Check className="w-5 h-5" />
                                                         ADDED
                                                     </span>
+                                                ) : !cartEnabled ? (
+                                                    'CART DISABLED'
                                                 ) : stock > 0 ? (
                                                     'ADD TO BAG'
                                                 ) : (
