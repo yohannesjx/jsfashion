@@ -191,7 +191,13 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 			})
 		}
 
-		subtotal := variant.Price * int64(item.Quantity)
+		// Use sale price if available, otherwise use regular price
+		unitPrice := variant.Price
+		if variant.SalePrice.Valid && variant.SalePrice.Int64 > 0 {
+			unitPrice = variant.SalePrice.Int64
+		}
+
+		subtotal := unitPrice * int64(item.Quantity)
 		totalAmount += subtotal
 
 		imageUrl := ""
@@ -204,7 +210,7 @@ func (h *OrderHandler) CreateOrder(c echo.Context) error {
 		itemsWithPrices = append(itemsWithPrices, ItemWithPrice{
 			VariantID:     item.VariantID,
 			Quantity:      item.Quantity,
-			UnitPrice:     variant.Price,
+			UnitPrice:     unitPrice,
 			PreviousStock: stockQty,
 			ProductName:   product.Name,
 			VariantName:   variant.Name,
