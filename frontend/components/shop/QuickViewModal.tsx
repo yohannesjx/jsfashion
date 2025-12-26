@@ -16,6 +16,7 @@ interface ProductVariant {
     name: string;
     sku: string;
     price: number;
+    sale_price?: number | null;
     stock: number;
     stock_quantity: number;
     image: string | null;
@@ -100,6 +101,7 @@ export default function QuickViewModal({
                         name: v.name || 'Default',
                         sku: v.sku,
                         price: v.price || 0,
+                        sale_price: v.sale_price || null,
                         stock: v.stock_quantity || 0,
                         stock_quantity: v.stock_quantity || 0,
                         image: v.image,
@@ -262,6 +264,7 @@ export default function QuickViewModal({
                                                         variantId: currentVariant.id,
                                                         variantName: currentVariant.name,
                                                         price: price,
+                                                        sale_price: currentVariant.sale_price,
                                                         currency: 'Br',
                                                         thumbnail: product.image_url,
                                                         quantity: quantity,
