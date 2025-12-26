@@ -138,12 +138,14 @@ SELECT DISTINCT
     p.description,
     COALESCE(p.base_price, 0)::text as base_price,
     (
-        SELECT sale_price
+        SELECT pr.sale_price
         FROM product_variants pv
+        JOIN prices pr ON pr.variant_id = pv.id
         WHERE pv.product_id = p.id
         AND pv.active = true
-        AND pv.sale_price IS NOT NULL
-        ORDER BY pv.price ASC
+        AND pr.currency = 'Br'
+        AND pr.sale_price IS NOT NULL
+        ORDER BY pr.sale_price ASC
         LIMIT 1
     )::bigint as sale_price,
     ''::text as category,

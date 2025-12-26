@@ -1344,6 +1344,17 @@ SELECT DISTINCT
     p.slug,
     p.description,
     COALESCE(p.base_price, 0)::text as base_price,
+    (
+        SELECT pr.sale_price
+        FROM product_variants pv
+        JOIN prices pr ON pr.variant_id = pv.id
+        WHERE pv.product_id = p.id
+        AND pv.active = true
+        AND pr.currency = 'Br'
+        AND pr.sale_price IS NOT NULL
+        ORDER BY pr.sale_price ASC
+        LIMIT 1
+    )::bigint as sale_price,
     ''::text as category,
     COALESCE(pi.url, p.thumbnail) as image_url,
     p.active as is_active,
@@ -1366,7 +1377,7 @@ AND p.active = true
 AND EXISTS (
     SELECT 1 FROM product_variants pv 
     WHERE pv.product_id = p.id 
-    AND pv.stock_quantity > 0
+    AND COALESCE(pv.stock_quantity, 0) > 0
 )
 LIMIT $2
 `
