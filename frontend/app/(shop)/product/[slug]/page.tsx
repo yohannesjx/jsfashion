@@ -342,7 +342,15 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                         ADDED TO BAG
                                     </span>
                                 ) : stock > 0 ? (
-                                    'ADD TO BAG'
+                                    <span className="flex items-center gap-3">
+                                        <span>ADD TO BAG</span>
+                                        <span className="flex items-center gap-2">
+                                            {hasSale && (
+                                                <span className="text-sm line-through opacity-70">{regularPrice} {currency}</span>
+                                            )}
+                                            <span className="font-bold">{price} {currency}</span>
+                                        </span>
+                                    </span>
                                 ) : (
                                     'OUT OF STOCK'
                                 )}

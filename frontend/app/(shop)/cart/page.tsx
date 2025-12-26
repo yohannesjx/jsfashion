@@ -13,6 +13,10 @@ export default function CartPage() {
 
     const subtotal = getTotalPrice();
 
+    // Calculate regular price total (without sales)
+    const regularTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const hasSaleItems = cartItems.some(item => item.sale_price && item.sale_price > 0);
+
     return (
         <main className="min-h-screen bg-white text-black pb-32 md:pb-12">
             <div className="container mx-auto px-4 py-12">
@@ -107,7 +111,15 @@ export default function CartPage() {
 
                             <div className="hidden md:block pt-8">
                                 <Button asChild className="w-full md:w-96 bg-black text-white hover:bg-neutral-800 rounded-none h-14 text-lg tracking-widest">
-                                    <Link href="/checkout">CHECKOUT</Link>
+                                    <Link href="/checkout" className="flex items-center justify-center gap-3">
+                                        <span>CHECKOUT</span>
+                                        <span className="flex items-center gap-2">
+                                            {hasSaleItems && (
+                                                <span className="text-sm line-through opacity-70">{regularTotal.toFixed(2)} Br</span>
+                                            )}
+                                            <span className="font-bold">{subtotal.toFixed(2)} Br</span>
+                                        </span>
+                                    </Link>
                                 </Button>
                             </div>
                         </div>
