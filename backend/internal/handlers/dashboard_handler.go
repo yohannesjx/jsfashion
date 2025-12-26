@@ -176,7 +176,7 @@ func (h *DashboardHandler) ExportInventory(c echo.Context) error {
 
 	rows, err := h.DB.QueryContext(ctx, `
 		SELECT 
-			p.name as product_name,
+			p.title as product_name,
 			v.sku,
 			COALESCE(pr.amount, 0) as price,
 			pr.sale_price,
@@ -184,7 +184,7 @@ func (h *DashboardHandler) ExportInventory(c echo.Context) error {
 		FROM product_variants v
 		JOIN products p ON v.product_id = p.id
 		LEFT JOIN prices pr ON pr.variant_id = v.id AND pr.currency = 'Br'
-		ORDER BY p.name, v.sku
+		ORDER BY p.title, v.sku
 	`)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
