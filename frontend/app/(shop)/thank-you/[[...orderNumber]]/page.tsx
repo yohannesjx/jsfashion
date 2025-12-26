@@ -125,7 +125,7 @@ export default function ThankYouPage({ params }: { params: { orderNumber?: strin
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm font-medium">Qty: {item.quantity}</p>
-                                        <p className="text-sm text-neutral-600">{item.unit_price} ETB</p>
+                                        <p className="text-sm font-semibold text-red-600">{item.unit_price} ETB</p>
                                     </div>
                                 </div>
                             ))}
