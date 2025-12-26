@@ -9,6 +9,7 @@ export interface CartItem {
     variantId: string; // Changed to string to support UUID variant IDs
     variantName: string;
     price: number;
+    sale_price?: number | null; // Sale price if available
     currency: string;
     quantity: number;
     maxStock: number; // Added to track available stock
@@ -101,7 +102,10 @@ export const useCartStore = create<CartStore>()(
             },
 
             getTotalPrice: () => {
-                return get().items.reduce((total, item) => total + (item.price * item.quantity), 0);
+                return get().items.reduce((total, item) => {
+                    const effectivePrice = item.sale_price && item.sale_price > 0 ? item.sale_price : item.price;
+                    return total + (effectivePrice * item.quantity);
+                }, 0);
             },
         }),
         {

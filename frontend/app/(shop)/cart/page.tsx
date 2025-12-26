@@ -81,7 +81,16 @@ export default function CartPage() {
                                                     <Plus className="w-3 h-3" />
                                                 </button>
                                             </div>
-                                            <p className="font-medium text-lg">{(item.price * item.quantity).toFixed(2)} {item.currency}</p>
+                                            <div className="text-right">
+                                                {item.sale_price && item.sale_price > 0 ? (
+                                                    <div className="flex flex-col items-end gap-1">
+                                                        <p className="text-xs text-gray-400 line-through">{(item.price * item.quantity).toFixed(2)} {item.currency}</p>
+                                                        <p className="font-bold text-lg text-red-600">{(item.sale_price * item.quantity).toFixed(2)} {item.currency}</p>
+                                                    </div>
+                                                ) : (
+                                                    <p className="font-medium text-lg">{(item.price * item.quantity).toFixed(2)} {item.currency}</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
