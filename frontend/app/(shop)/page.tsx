@@ -208,7 +208,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-cover bg-center opacity-90" style={{ backgroundImage: `url('${heroBannerUrl}')` }} />
 
                 <div className="relative z-10 text-center space-y-6 max-w-5xl px-4">
-                    <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter text-black mix-blend-overlay">
+                    <h1 className="text-[12vw] leading-[0.8] font-black tracking-tighter text-white drop-shadow-lg">
                         {heroTitle.split('\n').map((line, i) => (
                             <span key={i}>
                                 {line}
@@ -217,7 +217,7 @@ export default function Home() {
                         ))}
                     </h1>
                     {heroSubtitle && (
-                        <p className="text-xl md:text-2xl font-medium text-black mix-blend-overlay">
+                        <p className="text-xl md:text-2xl font-medium text-white drop-shadow-md">
                             {heroSubtitle}
                         </p>
                     )}
