@@ -392,7 +392,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <div className="fixed bottom-0 left-0 w-full bg-white border-t border-neutral-200 p-4 md:hidden z-40 safe-area-pb">
                 <Button
                     onClick={() => {
-                        if (!product || stock === 0) return;
+                        if (!product || stock === 0 || !cartEnabled) return;
 
                         // Check locally first
                         const currentCartItem = useCartStore.getState().items.find(i => i.variantId === currentVariant.id);
@@ -426,13 +426,15 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                             ? "bg-green-600 hover:bg-green-700"
                             : "bg-black text-white hover:bg-neutral-800"
                     )}
-                    disabled={stock === 0}
+                    disabled={stock === 0 || !cartEnabled}
                 >
                     {addedToCart ? (
                         <span className="flex items-center gap-2">
                             <Check className="w-5 h-5" />
                             ADDED TO BAG
                         </span>
+                    ) : !cartEnabled ? (
+                        'CART DISABLED'
                     ) : stock > 0 ? (
                         `ADD TO BAG • ${price} ${currency}`
                     ) : (
