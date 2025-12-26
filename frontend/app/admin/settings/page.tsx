@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Loader2, Save, Image } from 'lucide-react';
 import { toast } from 'sonner';
 import { MediaPicker } from '@/components/admin/MediaPicker';
@@ -29,7 +30,8 @@ export default function SettingsPage() {
         currency: 'ETB',
         hero_banner_url: '',
         hero_title: '',
-        hero_subtitle: ''
+        hero_subtitle: '',
+        cart_enabled: true
     });
 
     useEffect(() => {
@@ -54,7 +56,8 @@ export default function SettingsPage() {
                     currency: data.currency?.String || 'ETB',
                     hero_banner_url: data.hero_banner_url?.String || '',
                     hero_title: data.hero_title?.String || '',
-                    hero_subtitle: data.hero_subtitle?.String || ''
+                    hero_subtitle: data.hero_subtitle?.String || '',
+                    cart_enabled: data.cart_enabled?.Bool ?? true
                 });
             } else {
                 toast.error('Failed to load settings');
@@ -86,7 +89,8 @@ export default function SettingsPage() {
                     currency: formData.currency || null,
                     hero_banner_url: formData.hero_banner_url || null,
                     hero_title: formData.hero_title || null,
-                    hero_subtitle: formData.hero_subtitle || null
+                    hero_subtitle: formData.hero_subtitle || null,
+                    cart_enabled: formData.cart_enabled
                 }),
             });
 
@@ -221,6 +225,20 @@ export default function SettingsPage() {
                                 <SelectItem value="EUR">Euro (EUR)</SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="flex items-center justify-between space-x-4 rounded-lg border p-4">
+                        <div className="flex-1 space-y-1">
+                            <Label htmlFor="cart_enabled" className="text-base font-medium">Enable Shopping Cart</Label>
+                            <p className="text-sm text-neutral-500">
+                                When disabled, customers can browse products but cannot add items to cart. A notice will be displayed.
+                            </p>
+                        </div>
+                        <Switch
+                            id="cart_enabled"
+                            checked={formData.cart_enabled}
+                            onCheckedChange={(checked) => setFormData({ ...formData, cart_enabled: checked })}
+                        />
                     </div>
                 </div>
 
