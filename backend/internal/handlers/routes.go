@@ -32,6 +32,9 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	authGroup.POST("/logout", authHandler.Logout)
 	authGroup.GET("/me", authHandler.Me, auth.AuthMiddleware())
 
+	// Public cart status endpoint (no auth required)
+	api.GET("/cart-status", settingsHandler.GetCartStatus)
+
 	// ============================================================================
 	// PROTECTED ADMIN ROUTES (Authentication required)
 	// ============================================================================

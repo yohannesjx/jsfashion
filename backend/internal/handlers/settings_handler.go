@@ -36,6 +36,22 @@ func (h *SettingsHandler) GetSettings(c echo.Context) error {
 	return c.JSON(http.StatusOK, settings)
 }
 
+// GetCartStatus returns only the cart_enabled status (public endpoint)
+func (h *SettingsHandler) GetCartStatus(c echo.Context) error {
+	settings, err := h.Repo.GetStoreSettings(c.Request().Context())
+	if err != nil {
+		// Default to enabled if settings don't exist
+		return c.JSON(http.StatusOK, map[string]bool{"cart_enabled": true})
+	}
+
+	cartEnabled := true
+	if settings.CartEnabled.Valid {
+		cartEnabled = settings.CartEnabled.Bool
+	}
+
+	return c.JSON(http.StatusOK, map[string]bool{"cart_enabled": cartEnabled})
+}
+
 type UpdateSettingsRequest struct {
 	StoreName     string  `json:"store_name"`
 	StoreEmail    *string `json:"store_email"`
