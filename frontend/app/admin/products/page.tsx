@@ -36,6 +36,8 @@ import {
     Trash2,
     ChevronDown,
     ChevronRight as ChevronRightIcon,
+    ChevronsDown,
+    ChevronsRight,
     Tags,
     Edit2,
     Check,
@@ -224,6 +226,16 @@ export default function ProductsPage() {
             }
             return next;
         });
+    };
+
+    const toggleExpandAll = () => {
+        if (expandedProducts.size === products.length) {
+            // Collapse all
+            setExpandedProducts(new Set());
+        } else {
+            // Expand all
+            setExpandedProducts(new Set(products.map(p => p.id)));
+        }
     };
 
     const toggleSelectAll = () => {
@@ -828,7 +840,21 @@ export default function ProductsPage() {
                                     onCheckedChange={toggleSelectAll}
                                 />
                             </TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
+                            <TableHead className="w-[50px]">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2"
+                                    onClick={toggleExpandAll}
+                                    title={expandedProducts.size === products.length ? "Collapse All" : "Expand All"}
+                                >
+                                    {expandedProducts.size === products.length ? (
+                                        <ChevronsDown className="h-4 w-4" />
+                                    ) : (
+                                        <ChevronsRight className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            </TableHead>
                             <TableHead>Product</TableHead>
                             <TableHead>Price</TableHead>
                             <TableHead>Sale</TableHead>
