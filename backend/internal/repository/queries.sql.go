@@ -1737,6 +1737,7 @@ type StoreSetting struct {
 	UpdatedAt     sql.NullTime   `json:"updated_at"`
 	HeroTitle     sql.NullString `json:"hero_title"`
 	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
+	CartEnabled   sql.NullBool   `json:"cart_enabled"`
 }
 
 const getStoreSettings = `-- name: GetStoreSettings :one
@@ -1757,6 +1758,7 @@ func (q *Queries) GetStoreSettings(ctx context.Context) (StoreSetting, error) {
 		&i.UpdatedAt,
 		&i.HeroTitle,
 		&i.HeroSubtitle,
+		&i.CartEnabled,
 	)
 	return i, err
 }
@@ -1784,6 +1786,7 @@ type UpdateStoreSettingsParams struct {
 	HeroBannerUrl sql.NullString `json:"hero_banner_url"`
 	HeroTitle     sql.NullString `json:"hero_title"`
 	HeroSubtitle  sql.NullString `json:"hero_subtitle"`
+	CartEnabled   sql.NullBool   `json:"cart_enabled"`
 }
 
 func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettingsParams) (StoreSetting, error) {
@@ -1795,6 +1798,7 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		arg.HeroBannerUrl,
 		arg.HeroTitle,
 		arg.HeroSubtitle,
+		arg.CartEnabled,
 	)
 	var i StoreSetting
 	err := row.Scan(
@@ -1808,6 +1812,7 @@ func (q *Queries) UpdateStoreSettings(ctx context.Context, arg UpdateStoreSettin
 		&i.UpdatedAt,
 		&i.HeroTitle,
 		&i.HeroSubtitle,
+		&i.CartEnabled,
 	)
 	return i, err
 }

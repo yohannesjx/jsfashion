@@ -44,6 +44,7 @@ type UpdateSettingsRequest struct {
 	HeroBannerUrl *string `json:"hero_banner_url"`
 	HeroTitle     *string `json:"hero_title"`
 	HeroSubtitle  *string `json:"hero_subtitle"`
+	CartEnabled   *bool   `json:"cart_enabled"`
 }
 
 func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
@@ -123,6 +124,15 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 				return ""
 			}(),
 			Valid: req.HeroSubtitle != nil,
+		},
+		CartEnabled: sql.NullBool{
+			Bool: func() bool {
+				if req.CartEnabled != nil {
+					return *req.CartEnabled
+				}
+				return true
+			}(),
+			Valid: req.CartEnabled != nil,
 		},
 	}
 
