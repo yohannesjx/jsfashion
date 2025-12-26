@@ -440,22 +440,18 @@ export default function ProductsPage() {
             const toastId = toast.loading('Fetching all products...');
             const token = localStorage.getItem('access_token');
 
-            // Fetch ALL products from API (not just current page)
+            // Fetch ALL products from API
             const res = await fetch(`${API_URL}/api/v1/admin/products?page=1&limit=10000`, {
                 cache: 'no-store',
                 headers: { 'Authorization': `Bearer ${token}` },
             });
 
             if (!res.ok) {
-                const errorText = await res.text();
-                console.error('API Error:', errorText);
                 throw new Error(`Failed to fetch products: ${res.status}`);
             }
 
             const data = await res.json();
-            console.log('API Response:', data);
             const allProducts = data.products || data || [];
-            console.log('Products count:', allProducts.length);
 
             if (allProducts.length === 0) {
                 toast.dismiss(toastId);
@@ -465,13 +461,14 @@ export default function ProductsPage() {
 
             toast.loading(`Exporting ${allProducts.length} products...`, { id: toastId });
 
-            // Collect all variants with enhanced details
+            // Simple CSV with just SKU, Price, Sale, Stock
             const csvRows: string[] = [];
-            csvRows.push('Product Name,SKU,Variant Name,Size,Color,Price,Sale Price,Stock,Category,Image URL,Active');
+            csvRows.push('SKU,Price,Sale,Stock'); // Simple header
 
             for (const product of allProducts) {
                 let variants = product.variants || [];
 
+                // Fetch variants if not loaded
                 if (variants.length === 0) {
                     try {
                         const productRes = await fetch(`${API_URL}/api/v1/products/${product.id}`, {
@@ -486,21 +483,14 @@ export default function ProductsPage() {
                     }
                 }
 
-                const categories = product.categories?.map((c: any) => c.name).join('; ') || '';
-
+                // Add each variant as a row
                 for (const variant of variants) {
-                    const productName = (product.name || '').replace(/,/g, ';');
                     const sku = variant.sku || '';
-                    const variantName = (variant.name || '').replace(/,/g, ';');
-                    const size = variant.size || '';
-                    const color = variant.color || '';
                     const price = variant.price || 0;
-                    const salePrice = variant.sale_price || '';
+                    const sale = variant.sale_price || 0;
                     const stock = variant.stock_quantity || 0;
-                    const imageUrl = variant.image || product.image_url || '';
-                    const active = variant.active ? 'Yes' : 'No';
 
-                    csvRows.push(`"${productName}","${sku}","${variantName}","${size}","${color}",${price},${salePrice},${stock},"${categories}","${imageUrl}",${active}`);
+                    csvRows.push(`${sku},${price},${sale},${stock}`);
                 }
             }
 
@@ -510,13 +500,14 @@ export default function ProductsPage() {
                 return;
             }
 
+            // Create and download CSV
             const csvContent = csvRows.join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
 
             link.setAttribute('href', url);
-            link.setAttribute('download', `all_products_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `products_export_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
