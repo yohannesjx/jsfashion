@@ -470,7 +470,8 @@ SELECT
   COUNT(*) FILTER (WHERE COALESCE(pv.stock_quantity, 0) < 1) as low_stock_count,
   COALESCE(SUM(pv.stock_quantity), 0)::bigint as total_stock_items,
   COUNT(pv.id)::bigint as variant_count,
-  COALESCE(SUM(pv.stock_quantity * COALESCE(pr.amount, prod.base_price, 0)), 0)::bigint as total_inventory_value
+  COALESCE(SUM(pv.stock_quantity * COALESCE(pr.amount, prod.base_price, 0)), 0)::bigint as total_inventory_value,
+  COALESCE(SUM(CASE WHEN pr.sale_price IS NOT NULL AND pr.sale_price > 0 THEN pv.stock_quantity * pr.sale_price ELSE 0 END), 0)::bigint as total_sale_value
 FROM product_variants pv
 LEFT JOIN prices pr ON pr.variant_id = pv.id AND pr.currency = 'Br'
 LEFT JOIN products prod ON prod.id = pv.product_id;
