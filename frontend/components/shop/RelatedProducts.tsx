@@ -9,6 +9,7 @@ interface Product {
     name: string;
     slug: string;
     base_price: string;
+    sale_price?: number;
     image_url: string | null;
 }
 
