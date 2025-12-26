@@ -50,10 +50,11 @@ type TopProduct struct {
 }
 
 type InventoryExportItem struct {
-	ProductName string  `json:"product_name"`
-	SKU         string  `json:"sku"`
-	Price       float64 `json:"price"`
-	Stock       int     `json:"stock"`
+	ProductName string   `json:"product_name"`
+	SKU         string   `json:"sku"`
+	Price       float64  `json:"price"`
+	SalePrice   *float64 `json:"sale_price"`
+	Stock       int      `json:"stock"`
 }
 
 // GetStats returns dashboard statistics
@@ -175,14 +176,16 @@ func (h *DashboardHandler) ExportInventory(c echo.Context) error {
 
 	rows, err := h.DB.QueryContext(ctx, `
 		SELECT 
-			p.title as product_name,
+			p.name as product_name,
 			v.sku,
-			v.price,
-			v.stock_quantity
+			COALESCE(pr.amount, 0) as price,
+			pr.sale_price,
+			COALESCE(v.stock_quantity, 0) as stock_quantity
 		FROM product_variants v
 		JOIN products p ON v.product_id = p.id
-		WHERE v.active = true AND p.active = true
-		ORDER BY p.title, v.sku
+		LEFT JOIN prices pr ON pr.variant_id = v.id AND pr.currency = 'Br'
+		WHERE p.is_active = true
+		ORDER BY p.name, v.sku
 	`)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -194,8 +197,13 @@ func (h *DashboardHandler) ExportInventory(c echo.Context) error {
 	var items []InventoryExportItem
 	for rows.Next() {
 		var item InventoryExportItem
-		if err := rows.Scan(&item.ProductName, &item.SKU, &item.Price, &item.Stock); err != nil {
+		var salePrice sql.NullInt64
+		if err := rows.Scan(&item.ProductName, &item.SKU, &item.Price, &salePrice, &item.Stock); err != nil {
 			continue
+		}
+		if salePrice.Valid {
+			salePriceFloat := float64(salePrice.Int64)
+			item.SalePrice = &salePriceFloat
 		}
 		items = append(items, item)
 	}
