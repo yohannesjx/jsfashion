@@ -4,9 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Upload, X } from "lucide-react";
+import { Check, Copy, Upload, X, AlertTriangle } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { toast } from "sonner";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -25,6 +33,7 @@ export default function CheckoutPage() {
         city: "",
         couponCode: ""
     });
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     const cartItems = useCartStore((state) => state.items);
     const getTotalPrice = useCartStore((state) => state.getTotalPrice);
@@ -112,6 +121,12 @@ export default function CheckoutPage() {
             return;
         }
 
+        // Show confirmation dialog
+        setShowConfirmDialog(true);
+    };
+
+    const handleConfirmOrder = async () => {
+
         // Validate Ethiopian phone number
         const cleanPhone = formData.phone.replace(/\s/g, '').trim();
         const phoneRegex = /^(0[97]\d{8}|[97]\d{8})$/;
@@ -189,6 +204,8 @@ export default function CheckoutPage() {
         } catch (error) {
             console.error('Order creation failed:', error);
             alert(`Failed to create order: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`);
+        } finally {
+            setShowConfirmDialog(false);
         }
     };
 
@@ -487,6 +504,60 @@ export default function CheckoutPage() {
                     </Button>
                 </div>
             </div>
+
+            {/* Order Confirmation Dialog */}
+            <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl">
+                            <AlertTriangle className="h-6 w-6 text-amber-600" />
+                            Important Notice
+                        </DialogTitle>
+                        <DialogDescription className="sr-only">
+                            Order policy confirmation
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+                            <p className="font-semibold text-amber-900">Please read carefully before proceeding:</p>
+                            <ul className="space-y-2 text-sm text-amber-800">
+                                <li className="flex items-start gap-2">
+                                    <span className="text-amber-600 mt-0.5">•</span>
+                                    <span><strong>All sales are final.</strong> Items cannot be returned or refunded once the order is placed.</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-amber-600 mt-0.5">•</span>
+                                    <span><strong>No exchanges allowed.</strong> Please ensure you've selected the correct size, color, and quantity.</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <span className="text-amber-600 mt-0.5">•</span>
+                                    <span><strong>Unpaid orders will be canceled</strong> automatically after 30 minutes.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <p className="text-sm text-neutral-600 text-center">
+                            By clicking "I Understand, Place Order", you acknowledge and accept these terms.
+                        </p>
+                    </div>
+                    <DialogFooter className="flex-col sm:flex-row gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setShowConfirmDialog(false)}
+                            className="w-full sm:w-auto"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleConfirmOrder}
+                            className="w-full sm:w-auto bg-black text-white hover:bg-neutral-800"
+                        >
+                            I Understand, Place Order
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </main>
     );
 }
