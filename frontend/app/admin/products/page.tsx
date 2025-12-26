@@ -93,7 +93,7 @@ export default function ProductsPage() {
     const setProductCategories = useSetProductCategories();
 
     // Inline editing
-    const [editingCell, setEditingCell] = useState<{ variantId: string; field: 'price' | 'stock' | 'size' | 'color' } | null>(null);
+    const [editingCell, setEditingCell] = useState<{ variantId: string; field: 'price' | 'sale_price' | 'stock' | 'size' | 'color' } | null>(null);
     const [editingProductPrice, setEditingProductPrice] = useState<string | null>(null);
     const [editingProductSalePrice, setEditingProductSalePrice] = useState<string | null>(null);
     const [editValue, setEditValue] = useState('');
@@ -284,7 +284,7 @@ export default function ProductsPage() {
         }
     };
 
-    const startEdit = (variantId: string, field: 'price' | 'stock' | 'size' | 'color', currentValue: number | string | null | undefined) => {
+    const startEdit = (variantId: string, field: 'price' | 'sale_price' | 'stock' | 'size' | 'color', currentValue: number | string | null | undefined) => {
         setEditingCell({ variantId, field });
         setEditValue(currentValue?.toString() || '');
     };
@@ -300,14 +300,20 @@ export default function ProductsPage() {
         try {
             let updateData: any = { id: editingCell.variantId };
 
-            if (editingCell.field === 'price' || editingCell.field === 'stock') {
+            if (editingCell.field === 'price' || editingCell.field === 'sale_price' || editingCell.field === 'stock') {
                 const value = parseFloat(editValue);
                 if (isNaN(value) || value < 0) {
                     toast.error('Invalid value');
                     return;
                 }
-                updateData[editingCell.field === 'price' ? 'price_adjustment' : 'stock_quantity'] =
-                    editingCell.field === 'price' ? value.toString() : value;
+
+                if (editingCell.field === 'price') {
+                    updateData['price_adjustment'] = value.toString();
+                } else if (editingCell.field === 'sale_price') {
+                    updateData['sale_price'] = value;
+                } else {
+                    updateData['stock_quantity'] = value;
+                }
             } else if (editingCell.field === 'size' || editingCell.field === 'color') {
                 // For size and color, accept string values
                 updateData[editingCell.field] = editValue.trim() || null;
@@ -324,6 +330,8 @@ export default function ProductsPage() {
                             if (v.id === editingCell.variantId) {
                                 if (editingCell.field === 'price') {
                                     return { ...v, price: parseFloat(editValue) };
+                                } else if (editingCell.field === 'sale_price') {
+                                    return { ...v, sale_price: parseFloat(editValue) };
                                 } else if (editingCell.field === 'stock') {
                                     return { ...v, stock_quantity: parseFloat(editValue) };
                                 } else if (editingCell.field === 'size') {
@@ -1222,18 +1230,45 @@ export default function ProductsPage() {
                                                 </TableCell>
                                                 {/* Sale column - Variant Sale Price */}
                                                 <TableCell>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {variant.sale_price ? (
-                                                            <>
-                                                                <span className="text-red-600 font-semibold">
-                                                                    {variant.sale_price.toLocaleString()} Birr
-                                                                </span>
-                                                                <Badge variant="destructive" className="text-xs ml-1">SALE</Badge>
-                                                            </>
-                                                        ) : (
-                                                            '—'
-                                                        )}
-                                                    </span>
+                                                    {editingCell?.variantId === variant.id && editingCell.field === 'sale_price' ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                type="number"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-7 w-24"
+                                                                autoFocus
+                                                                placeholder="Sale price"
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveEdit(product.id);
+                                                                    if (e.key === 'Escape') cancelEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
+                                                                <Check className="h-3 w-3" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
+                                                            onClick={() => startEdit(variant.id, 'sale_price', variant.sale_price || 0)}
+                                                        >
+                                                            {variant.sale_price ? (
+                                                                <>
+                                                                    <span className="text-red-600 font-semibold text-sm">
+                                                                        {variant.sale_price.toLocaleString()} Birr
+                                                                    </span>
+                                                                    <Badge variant="destructive" className="text-xs">SALE</Badge>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-xs text-muted-foreground">Add Sale</span>
+                                                            )}
+                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
+                                                        </div>
+                                                    )}
                                                 </TableCell>
                                                 {/* Variants column - Stock */}
                                                 <TableCell>
