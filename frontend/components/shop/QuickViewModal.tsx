@@ -190,11 +190,23 @@ export default function QuickViewModal({
                                 {(() => {
                                     const currentVariant = product.variants[selectedVariant];
                                     const price = currentVariant?.price || parseInt(product.base_price) || 0;
+                                    const salePrice = currentVariant?.sale_price;
+                                    const hasSale = salePrice && salePrice > 0;
                                     const stock = currentVariant?.stock || 0;
 
                                     return (
                                         <div className="space-y-6">
-                                            <p className="text-xl font-medium">{price} Br</p>
+                                            {hasSale ? (
+                                                <div className="flex items-center gap-3">
+                                                    <p className="text-sm text-gray-400 line-through">{price} Br</p>
+                                                    <p className="text-2xl font-bold text-red-600">{salePrice} Br</p>
+                                                    <span className="text-xs bg-red-600 text-white px-2 py-1 rounded font-semibold">
+                                                        -{Math.round(((price - salePrice) / price) * 100)}%
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <p className="text-xl font-medium">{price} Br</p>
+                                            )}
 
                                             {/* Variants */}
                                             {product.variants.length > 1 && (

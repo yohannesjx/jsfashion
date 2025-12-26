@@ -318,6 +318,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                         variantId: currentVariant.id, // Now a UUID string
                                         variantName: currentVariant.name,
                                         price: price,
+                                        sale_price: currentVariant.sale_price,
                                         currency: currency,
                                         thumbnail: product.image_url,
                                         quantity: quantity,
@@ -397,6 +398,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                             variantId: currentVariant.id, // Now a UUID string
                             variantName: currentVariant.name,
                             price: price,
+                            sale_price: currentVariant.sale_price,
                             currency: currency,
                             thumbnail: product.image_url,
                             quantity: quantity,
