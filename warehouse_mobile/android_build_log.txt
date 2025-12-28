@@ -1,0 +1,2573 @@
+[ +128 ms] executing: sysctl hw.optional.arm64
+[  +13 ms] Exit code 0 from: sysctl hw.optional.arm64
+[        ] hw.optional.arm64: 1
+[  +10 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[ +115 ms] executing: sysctl hw.optional.arm64
+[   +5 ms] Exit code 0 from: sysctl hw.optional.arm64
+[        ] hw.optional.arm64: 1
+[        ] executing: /usr/bin/arch -arm64e xcrun xcodebuild -version
+[ +366 ms] Exit code 0 from: /usr/bin/arch -arm64e xcrun xcodebuild -version
+[        ] Xcode 26.0.1
+           Build version 17A400
+[   +1 ms] executing: /usr/bin/arch -arm64e xcrun xcdevice list --timeout 5
+[   +2 ms] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[   +1 ms] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[  +23 ms] executing: /Users/gashawarega/Library/Android/sdk/platform-tools/adb devices -l
+[        ] executing: /usr/bin/arch -arm64e xcrun xcdevice list --timeout 2
+[        ] executing: /usr/bin/arch -arm64e xcrun simctl list devices booted
+[+1058 ms] /usr/bin/arch -arm64e xcrun simctl list devices booted iOS --json
+[        ] executing: /usr/bin/arch -arm64e xcrun simctl list devices booted iOS --json
+[  +37 ms] List of devices attached
+           emulator-5554          device product:sdk_gphone64_arm64 model:sdk_gphone64_arm64 device:emu64a transport_id:1
+[   +3 ms] /Users/gashawarega/Library/Android/sdk/platform-tools/adb -s emulator-5554 shell getprop
+[  +77 ms] {
+             "devices" : {
+               "com.apple.CoreSimulator.SimRuntime.iOS-26-0" : [
+
+               ],
+               "com.apple.CoreSimulator.SimRuntime.iOS-18-6" : [
+
+               ]
+             }
+           }
+[  +74 ms] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[  +11 ms] executing: /usr/bin/arch -arm64e xcrun xcdevice list --timeout 2
+[  +42 ms] Skipping pub get: version match.
+[  +40 ms] Found plugin shared_preferences at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences-2.5.4/
+[   +2 ms] Found plugin shared_preferences_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +3 ms] Found plugin path_provider_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +4 ms] Found plugin shared_preferences_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[   +2 ms] Found plugin shared_preferences_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[   +1 ms] Found plugin path_provider_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +2 ms] Found plugin shared_preferences_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[   +3 ms] Found plugin shared_preferences_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.18/
+[   +5 ms] Found plugin mobile_scanner at /Users/gashawarega/.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/
+[  +11 ms] Found plugin path_provider at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +1 ms] Found plugin path_provider_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_android-2.2.22/
+[  +10 ms] Found plugin sqflite at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +3 ms] Found plugin sqflite_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[        ] Found plugin sqflite_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_android-2.4.2+2/
+[   +2 ms] Found plugin audioplayers at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers-6.5.1/
+[        ] Found plugin audioplayers_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_windows-4.2.1/
+[   +1 ms] Found plugin audioplayers_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_web-5.1.1/
+[        ] Found plugin audioplayers_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_linux-4.2.1/
+[        ] Found plugin audioplayers_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_darwin-6.3.0/
+[        ] Found plugin audioplayers_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_android-5.2.1/
+[  +20 ms] Found plugin shared_preferences at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences-2.5.4/
+[        ] Found plugin shared_preferences_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[        ] Found plugin path_provider_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +1 ms] Found plugin shared_preferences_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[        ] Found plugin shared_preferences_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[        ] Found plugin path_provider_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +1 ms] Found plugin shared_preferences_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[        ] Found plugin shared_preferences_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.18/
+[   +1 ms] Found plugin mobile_scanner at /Users/gashawarega/.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/
+[   +2 ms] Found plugin path_provider at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[        ] Found plugin path_provider_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_android-2.2.22/
+[   +4 ms] Found plugin sqflite at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +1 ms] Found plugin sqflite_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[        ] Found plugin sqflite_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_android-2.4.2+2/
+[   +1 ms] Found plugin audioplayers at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers-6.5.1/
+[        ] Found plugin audioplayers_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_windows-4.2.1/
+[        ] Found plugin audioplayers_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_web-5.1.1/
+[        ] Found plugin audioplayers_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_linux-4.2.1/
+[        ] Found plugin audioplayers_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_darwin-6.3.0/
+[        ] Found plugin audioplayers_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_android-5.2.1/
+[   +4 ms] Generating /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+[   +7 ms] Skipping generating GeneratedPluginRegistrant.java because it is up-to-date.
+[   +1 ms] Skipping generating GeneratedPluginRegistrant.h because it is up-to-date.
+[   +2 ms] Skipping generating GeneratedPluginRegistrant.m because it is up-to-date.
+[  +36 ms] ro.hardware = ranchu
+[  +66 ms] Initializing file store
+[  +12 ms] Skipping target: gen_localizations
+[        ] gen_dart_plugin_registrant: Starting due to {InvalidatedReasonKind.inputChanged: The following inputs have updated contents: /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/package_config.json,/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/dart_plugin_registrant.dart}
+[  +17 ms] Found plugin shared_preferences at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences-2.5.4/
+[        ] Found plugin shared_preferences_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +1 ms] Found plugin path_provider_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +1 ms] Found plugin shared_preferences_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[        ] Found plugin shared_preferences_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[        ] Found plugin path_provider_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[        ] Found plugin shared_preferences_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[        ] Found plugin shared_preferences_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.18/
+[        ] Found plugin mobile_scanner at /Users/gashawarega/.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/
+[   +2 ms] Found plugin path_provider at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[        ] Found plugin path_provider_foundation at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_android-2.2.22/
+[   +2 ms] Found plugin sqflite at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite-2.4.2/
+[   +1 ms] Found plugin sqflite_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_darwin-2.4.2/
+[        ] Found plugin sqflite_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_android-2.4.2+2/
+[   +1 ms] Found plugin audioplayers at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers-6.5.1/
+[        ] Found plugin audioplayers_windows at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_windows-4.2.1/
+[        ] Found plugin audioplayers_web at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_web-5.1.1/
+[        ] Found plugin audioplayers_linux at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_linux-4.2.1/
+[        ] Found plugin audioplayers_darwin at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_darwin-6.3.0/
+[        ] Found plugin audioplayers_android at /Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_android-5.2.1/
+[   +3 ms] Skipping generating dart_plugin_registrant.dart because it is up-to-date.
+[        ] gen_dart_plugin_registrant: Complete
+[        ] Skipping target: _composite
+[        ] complete
+[   +1 ms] Launching lib/main.dart on sdk gphone64 arm64 in debug mode...
+[   +1 ms] /Users/gashawarega/Documents/F/flutter/bin/cache/dart-sdk/bin/dartaotruntime /Users/gashawarega/Documents/F/flutter/bin/cache/dart-sdk/bin/snapshots/frontend_server_aot.dart.snapshot --sdk-root /Users/gashawarega/Documents/F/flutter/bin/cache/artifacts/engine/common/flutter_patched_sdk/ --incremental --target=flutter --experimental-emit-debug-metadata -DFLUTTER_VERSION=3.35.5 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=ac4e799d23 -DFLUTTER_ENGINE_REVISION=d3d45dcf25 -DFLUTTER_DART_VERSION=3.9.2 --output-dill /var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/flutter_tool.Uq1Ain/app.dill --packages /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/package_config.json -Ddart.vm.profile=false -Ddart.vm.product=false --enable-asserts --track-widget-creation --filesystem-scheme org-dartlang-root --initialize-from-dill build/210bad4901163cba762d02a4a1c86c00.cache.dill.track.dill --source file:///Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/dart_plugin_registrant.dart --source package:flutter/src/dart_plugin_registrant.dart -Dflutter.dart_plugin_registrant=file:///Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/dart_plugin_registrant.dart --verbosity=error --enable-experiment=alternative-invalidation-strategy
+[   +6 ms] executing: /Users/gashawarega/Library/Android/sdk/platform-tools/adb -s emulator-5554 shell -x logcat -v time -t 1
+[   +6 ms] <- compile package:warehouse_mobile/main.dart
+[ +300 ms] --------- beginning of system
+           12-28 22:09:28.500 E/JobScheduler.Quota(  537): <0>com.google.android.contacts has 0 EJ quota without running anything
+[   +7 ms] executing: /Users/gashawarega/Library/Android/sdk/platform-tools/adb version
+[  +15 ms] Android Debug Bridge version 1.0.41
+           Version 36.0.0-13206524
+           Installed as /Users/gashawarega/Library/Android/sdk/platform-tools/adb
+           Running on Darwin 25.0.0 (arm64)
+[        ] executing: /Users/gashawarega/Library/Android/sdk/platform-tools/adb start-server
+[  +16 ms] Building APK
+[ +500 ms] executing: /usr/bin/plutil -convert xml1 -o - /Applications/Android Studio.app/Contents/Info.plist
+[  +18 ms] Exit code 0 from: /usr/bin/plutil -convert xml1 -o - /Applications/Android Studio.app/Contents/Info.plist
+[        ] <?xml version="1.0" encoding="UTF-8"?>
+           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+           <plist version="1.0">
+           <dict>
+           	<key>CFBundleDevelopmentRegion</key>
+           	<string>English</string>
+           	<key>CFBundleDocumentTypes</key>
+           	<array>
+           		<dict>
+           			<key>CFBundleTypeExtensions</key>
+           			<array>
+           				<string>ipr</string>
+           			</array>
+           			<key>CFBundleTypeIconFile</key>
+           			<string>studio.icns</string>
+           			<key>CFBundleTypeName</key>
+           			<string>Android Studio Project File</string>
+           			<key>CFBundleTypeRole</key>
+           			<string>Editor</string>
+           		</dict>
+           		<dict>
+           			<key>CFBundleTypeExtensions</key>
+           			<array>
+           				<string>*</string>
+           			</array>
+           			<key>CFBundleTypeName</key>
+           			<string>All documents</string>
+           			<key>CFBundleTypeOSTypes</key>
+           			<array>
+           				<string>****</string>
+           			</array>
+           			<key>CFBundleTypeRole</key>
+           			<string>Editor</string>
+           			<key>LSTypeIsPackage</key>
+           			<false/>
+           		</dict>
+           	</array>
+           	<key>CFBundleExecutable</key>
+           	<string>studio</string>
+           	<key>CFBundleGetInfoString</key>
+           	<string>Android Studio 2025.2, build AI-252.25557.131.2521.14432022. Copyright JetBrains s.r.o., (c) 2000-2025</string>
+           	<key>CFBundleIconFile</key>
+           	<string>studio.icns</string>
+           	<key>CFBundleIdentifier</key>
+           	<string>com.google.android.studio</string>
+           	<key>CFBundleInfoDictionaryVersion</key>
+           	<string>6.0</string>
+           	<key>CFBundleName</key>
+           	<string>Android Studio</string>
+           	<key>CFBundlePackageType</key>
+           	<string>APPL</string>
+           	<key>CFBundleShortVersionString</key>
+           	<string>2025.2</string>
+           	<key>CFBundleURLTypes</key>
+           	<array>
+           		<dict>
+           			<key>CFBundleTypeRole</key>
+           			<string>Editor</string>
+           			<key>CFBundleURLName</key>
+           			<string>Stacktrace</string>
+           			<key>CFBundleURLSchemes</key>
+           			<array>
+           				<string>idea</string>
+           			</array>
+           		</dict>
+           	</array>
+           	<key>CFBundleVersion</key>
+           	<string>AI-252.25557.131.2521.14432022</string>
+           	<key>LSApplicationCategoryType</key>
+           	<string>public.app-category.developer-tools</string>
+           	<key>LSArchitecturePriority</key>
+           	<array>
+           		<string>arm64</string>
+           	</array>
+           	<key>LSMinimumSystemVersion</key>
+           	<string>10.13</string>
+           	<key>LSRequiresNativeExecution</key>
+           	<string>YES</string>
+           	<key>NSAppleEventsUsageDescription</key>
+           	<string>An application in Android Studio requests the ability to send Apple events.</string>
+           	<key>NSBluetoothAlwaysUsageDescription</key>
+           	<string>An application in Android Studio requests access to Bluetooth.</string>
+           	<key>NSCameraUsageDescription</key>
+           	<string>An application in Android Studio requests access to the device's camera.</string>
+           	<key>NSDesktopFolderUsageDescription</key>
+           	<string>An application in Android Studio requests access to the user's Desktop folder.</string>
+           	<key>NSDocumentsFolderUsageDescription</key>
+           	<string>An application in Android Studio requests access to the user's Documents folder.</string>
+           	<key>NSDownloadsFolderUsageDescription</key>
+           	<string>An application in Android Studio requests access to the user's Downloads folder.</string>
+           	<key>NSHighResolutionCapable</key>
+           	<true/>
+           	<key>NSLocalNetworkUsageDescription</key>
+           	<string>Android Studio's features, such as SSH and database connectivity, require permissions for accessing the local network and sending broadcast requests.</string>
+           	<key>NSLocationUsageDescription</key>
+           	<string>An application in Android Studio requests access to the user's location information.</string>
+           	<key>NSMicrophoneUsageDescription</key>
+           	<string>An application in Android Studio requests access to the device's microphone.</string>
+           	<key>NSNetworkVolumesUsageDescription</key>
+           	<string>An application in Android Studio requests access to files on a network volume.</string>
+           	<key>NSRemovableVolumesUsageDescription</key>
+           	<string>An application in Android Studio requests access to files on a removable volume.</string>
+           	<key>NSSupportsAutomaticGraphicsSwitching</key>
+           	<true/>
+           </dict>
+           </plist>
+[   +6 ms] executing: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java -version
+[ +197 ms] Exit code 0 from: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java -version
+[        ] openjdk version "21.0.8" 2025-07-15
+           OpenJDK Runtime Environment (build 21.0.8+-14196175-b1038.72)
+           OpenJDK 64-Bit Server VM (build 21.0.8+-14196175-b1038.72, mixed mode)
+[   +5 ms] Top-level Gradle build file not found, skipping migration of task "clean".
+[   +1 ms] executing: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java --version
+[  +80 ms] Exit code 0 from: /Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java --version
+[        ] openjdk 21.0.8 2025-07-15
+           OpenJDK Runtime Environment (build 21.0.8+-14196175-b1038.72)
+           OpenJDK 64-Bit Server VM (build 21.0.8+-14196175-b1038.72, mixed mode)
+[   +1 ms] Version of Java is different than impacted version, no migration attempted.
+[   +7 ms] CMake project not found, skipping support Android 15 16k page size migration.
+[   +2 ms] Using gradle from /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/gradlew.
+[  +74 ms] LocalFile: '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/build.gradle.kts' doesn't provide an AGP version. Checking settings.
+[   +8 ms] LocalFile: '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/settings.gradle.kts' provides AGP version: 8.9.1
+[  +29 ms] Running Gradle task 'assembleDebug'...
+[        ] executing: [/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/] /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/gradlew --full-stacktrace --info -Pverbose=true -Ptarget-platform=android-arm64 -Ptarget=/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/lib/main.dart -Pbase-application-name=android.app.Application -Pdart-defines=RkxVVFRFUl9WRVJTSU9OPTMuMzUuNQ==,RkxVVFRFUl9DSEFOTkVMPXN0YWJsZQ==,RkxVVFRFUl9HSVRfVVJMPWh0dHBzOi8vZ2l0aHViLmNvbS9mbHV0dGVyL2ZsdXR0ZXIuZ2l0,RkxVVFRFUl9GUkFNRVdPUktfUkVWSVNJT049YWM0ZTc5OWQyMw==,RkxVVFRFUl9FTkdJTkVfUkVWSVNJT049ZDNkNDVkY2YyNQ==,RkxVVFRFUl9EQVJUX1ZFUlNJT049My45LjI= -Pdart-obfuscation=false -Ptrack-widget-creation=true -Ptree-shake-icons=false -Pfilesystem-scheme=org-dartlang-root assembleDebug
+[        ] lib/features/picking/screens/picking_list_screen.dart:2:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] import '../../shared/models/fulfillment_models.dart';
+[        ]        ^
+[        ] lib/features/packing/screens/packing_list_screen.dart:2:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] import '../../shared/models/fulfillment_models.dart';
+[        ]        ^
+[        ] lib/features/picking/screens/picking_list_screen.dart:3:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] import '../../shared/services/fulfillment_service.dart';
+[        ]        ^
+[        ] lib/features/packing/screens/packing_list_screen.dart:3:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] import '../../shared/services/fulfillment_service.dart';
+[        ]        ^
+[        ] lib/features/picking/screens/picking_screen.dart:4:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] import '../../shared/models/fulfillment_models.dart';
+[        ]        ^
+[        ] lib/features/picking/screens/picking_screen.dart:5:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] import '../../shared/services/fulfillment_service.dart';
+[        ]        ^
+[        ] Error: Couldn't resolve the package 'url_launcher' in 'package:url_launcher/url_launcher.dart'.
+[        ] lib/features/packing/screens/packing_screen.dart:5:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] import '../../shared/models/fulfillment_models.dart';
+[        ]        ^
+[        ] lib/features/packing/screens/packing_screen.dart:6:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] import '../../shared/services/fulfillment_service.dart';
+[        ]        ^
+[        ] lib/features/packing/screens/packing_screen.dart:3:8: Error: Not found: 'package:url_launcher/url_launcher.dart'
+[        ] import 'package:url_launcher/url_launcher.dart';
+[        ]        ^
+[        ] lib/features/picking/screens/picking_list_screen.dart:15:20: Error: Type 'FulfillmentOrder' not found.
+[        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ]                    ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_list_screen.dart:77:30: Error: Type 'FulfillmentOrder' not found.
+[        ]   Future<void> _startPicking(FulfillmentOrder order) async {
+[        ]                              ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:15:20: Error: Type 'FulfillmentOrder' not found.
+[        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ]                    ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:77:30: Error: Type 'FulfillmentOrder' not found.
+[        ]   Future<void> _startPacking(FulfillmentOrder order) async {
+[        ]                              ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:8:9: Error: Type 'FulfillmentOrder' not found.
+[        ]   final FulfillmentOrder order;
+[        ]         ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:22:3: Error: Type 'OrderProgress' not found.
+[        ]   OrderProgress? _progress;
+[        ]   ^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_screen.dart:9:9: Error: Type 'FulfillmentOrder' not found.
+[   +4 ms]   final FulfillmentOrder order;
+[        ]         ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_screen.dart:22:3: Error: Type 'OrderProgress' not found.
+[        ]   OrderProgress? _progress;
+[        ]   ^^^^^^^^^^^^^
+[ +258 ms] lib/features/picking/screens/picking_list_screen.dart:14:20: Error: Method not found: 'FulfillmentService'.
+[        ]   final _service = FulfillmentService();
+[        ]                    ^^^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:14:20: Error: Method not found: 'FulfillmentService'.
+[        ]   final _service = FulfillmentService();
+[        ]                    ^^^^^^^^^^^^^^^^^^
+[   +6 ms] lib/features/picking/screens/picking_screen.dart:17:20: Error: Method not found: 'FulfillmentService'.
+[        ]   final _service = FulfillmentService();
+[        ]                    ^^^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_screen.dart:18:20: Error: Method not found: 'FulfillmentService'.
+[        ]   final _service = FulfillmentService();
+[        ]                    ^^^^^^^^^^^^^^^^^^
+[ +230 ms] lib/features/picking/screens/picking_list_screen.dart:15:20: Error: 'FulfillmentOrder' isn't a type.
+[        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ]                    ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_list_screen.dart:41:32: Error: 'FulfillmentOrder' isn't a type.
+[        ]       body: FutureBuilder<List<FulfillmentOrder>>(
+[        ]                                ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_list_screen.dart:77:30: Error: 'FulfillmentOrder' isn't a type.
+[        ]   Future<void> _startPicking(FulfillmentOrder order) async {
+[        ]                              ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:15:20: Error: 'FulfillmentOrder' isn't a type.
+[        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ]                    ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:41:32: Error: 'FulfillmentOrder' isn't a type.
+[        ]       body: FutureBuilder<List<FulfillmentOrder>>(
+[        ]                                ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_list_screen.dart:77:30: Error: 'FulfillmentOrder' isn't a type.
+[        ]   Future<void> _startPacking(FulfillmentOrder order) async {
+[        ]                              ^^^^^^^^^^^^^^^^
+[   +5 ms] Initialized native services in: /Users/gashawarega/.gradle/native
+[        ] Initialized jansi services in: /Users/gashawarega/.gradle/native
+[ +107 ms] Welcome to Gradle 8.12!
+[        ] Here are the highlights of this release:
+[        ]  - Enhanced error and warning reporting with the Problems API
+[        ]  - File-system watching support on Alpine Linux
+[        ]  - Build and test Swift 6 libraries and apps
+[        ] For more details see https://docs.gradle.org/8.12/release-notes.html
+[ +287 ms] lib/features/picking/screens/picking_screen.dart:8:9: Error: 'FulfillmentOrder' isn't a type.
+[        ]   final FulfillmentOrder order;
+[        ]         ^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:22:3: Error: 'OrderProgress' isn't a type.
+[        ]   OrderProgress? _progress;
+[        ]   ^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:143:38: Error: 'CameraFacingState' isn't a type.
+[        ]                     switch (state as CameraFacingState) {
+[        ]                                      ^^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:144:26: Error: Not a constant expression.
+[        ]                     case CameraFacingState.back:
+[        ]                          ^^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:146:26: Error: Not a constant expression.
+[        ]                     case CameraFacingState.front:
+[        ]                          ^^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:121:53: Error: The getter 'torchState' isn't defined for the type 'MobileScannerController'.
+[        ]  - 'MobileScannerController' is from 'package:mobile_scanner/src/mobile_scanner_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/mobile_scanner_controller.dart').
+[        ] Try correcting the name to the name of an existing getter, or defining a getter or field named 'torchState'.
+[        ]                 valueListenable: _scannerController.torchState,
+[        ]                                                     ^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:138:53: Error: The getter 'cameraFacingState' isn't defined for the type 'MobileScannerController'.
+[        ]  - 'MobileScannerController' is from 'package:mobile_scanner/src/mobile_scanner_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/mobile_scanner_controller.dart').
+[        ] Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameraFacingState'.
+[        ]                 valueListenable: _scannerController.cameraFacingState,
+[        ]                                                     ^^^^^^^^^^^^^^^^^
+[        ] lib/features/picking/screens/picking_screen.dart:139:26: Error: A non-null value must be returned since the return type 'Widget' doesn't allow null.
+[        ]  - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../F/flutter/packages/flutter/lib/src/widgets/framework.dart').
+[        ]                 builder: (context, state, child) {
+[        ]                          ^
+[        ] lib/features/packing/screens/packing_screen.dart:9:9: Error: 'FulfillmentOrder' isn't a type.
+[        ]   final FulfillmentOrder order;
+[        ]         ^^^^^^^^^^^^^^^^
+[        ] lib/features/packing/screens/packing_screen.dart:22:3: Error: 'OrderProgress' isn't a type.
+[        ]   OrderProgress? _progress;
+[        ]   ^^^^^^^^^^^^^
+[ +210 ms] The client will now receive all logging from the daemon (pid: 54197). The daemon log file: /Users/gashawarega/.gradle/daemon/8.12/daemon-54197.out.log
+[   +1 ms] Starting 3rd build in daemon [uptime: 10 mins 3.759 secs, performance: 97%, GC rate: 0.00/s, heap usage: 0% of 8 GiB, non-heap usage: 5% of 4 GiB]
+[ +102 ms] Using 8 worker leases.
+[ +296 ms] Now considering [/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android, /Users/gashawarega/Documents/F/flutter/packages/flutter_tools/gradle] as hierarchies to watch
+[ +103 ms] Watching the file system is configured to be enabled if available
+[  +98 ms] File system watching is active
+[        ] Starting Build
+[  +70 ms] lib/features/picking/screens/picking_screen.dart:126:35: Error: The type 'TorchState' is not exhaustively matched by the switch cases since it doesn't match 'TorchState.auto'.
+[        ]  - 'TorchState' is from 'package:mobile_scanner/src/enums/torch_state.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/enums/torch_state.dart').
+[        ] Try adding a default case or cases that match 'TorchState.auto'.
+[        ]                     switch (state as TorchState) {
+[        ]                                   ^
+[ +127 ms] Now considering [/Users/gashawarega/Documents/F/flutter/packages/flutter_tools/gradle, /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android] as hierarchies to watch
+[ +196 ms] [
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "F269D2B0-2D96-4259-901A-22112D9EA45C",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "412894F3-BD32-4096-BA5F-195AB2BAE258",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "0DB68871-523A-4D9F-979C-06B6F26B60B0",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "06CA6198-63EA-439C-8E49-8382C153327B",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "9808391F-A96C-43A2-8E6A-3E2BE7574996",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "CFC85607-E586-4F39-ABE6-5AD9CCD5049E",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "Mac15,3",
+               "simulator" : false,
+               "modelName" : "MacBook Pro",
+               "operatingSystemVersion" : "26.0.1 (25A362)",
+               "identifier" : "00008122-0005592A0401401C",
+               "platform" : "com.apple.platform.macosx",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "My Mac",
+               "modelUTI" : "com.apple.macbookpro-14-late-2023"
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "error" : {
+                 "code" : -27,
+                 "failureReason" : "",
+                 "description" : "Browsing on the local area network for iPhone can",
+                 "recoverySuggestion" : "Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.\nThe device must be opted into Developer Mode to connect wirelessly.",
+                 "domain" : "com.apple.dt.deviceprep"
+               },
+               "operatingSystemVersion" : "18.2 (22C152)",
+               "identifier" : "00008140-000909DA0E68801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : false,
+               "name" : "iPhone can",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,1",
+               "identifier" : "3A1F5523-FEB3-4054-9342-661C7C5A883A",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-1",
+               "modelName" : "iPhone 16 Pro",
+               "name" : "iPhone 16 Pro",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "operatingSystemVersion" : "18.5 (22F76)",
+               "identifier" : "00008140-001915180CE0801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "J",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             }
+           ]
+[   +2 ms] executing: /usr/bin/arch -arm64e xcrun devicectl --version
+[ +109 ms] executing: /usr/bin/arch -arm64e xcrun devicectl list devices --timeout 5 --json-output /var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.eqoBJm/core_device_list.json
+[   +1 ms] [
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "F269D2B0-2D96-4259-901A-22112D9EA45C",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "412894F3-BD32-4096-BA5F-195AB2BAE258",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "0DB68871-523A-4D9F-979C-06B6F26B60B0",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "06CA6198-63EA-439C-8E49-8382C153327B",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "9808391F-A96C-43A2-8E6A-3E2BE7574996",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "CFC85607-E586-4F39-ABE6-5AD9CCD5049E",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "Mac15,3",
+               "simulator" : false,
+               "modelName" : "MacBook Pro",
+               "operatingSystemVersion" : "26.0.1 (25A362)",
+               "identifier" : "00008122-0005592A0401401C",
+               "platform" : "com.apple.platform.macosx",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "My Mac",
+               "modelUTI" : "com.apple.macbookpro-14-late-2023"
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "error" : {
+                 "code" : -27,
+                 "failureReason" : "",
+                 "description" : "Browsing on the local area network for iPhone can",
+                 "recoverySuggestion" : "Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.\nThe device must be opted into Developer Mode to connect wirelessly.",
+                 "domain" : "com.apple.dt.deviceprep"
+               },
+               "operatingSystemVersion" : "18.2 (22C152)",
+               "identifier" : "00008140-000909DA0E68801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : false,
+               "name" : "iPhone can",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,1",
+               "identifier" : "3A1F5523-FEB3-4054-9342-661C7C5A883A",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-1",
+               "modelName" : "iPhone 16 Pro",
+               "name" : "iPhone 16 Pro",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "operatingSystemVersion" : "18.5 (22F76)",
+               "identifier" : "00008140-001915180CE0801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "J",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             }
+           ]
+[        ] executing: /usr/bin/arch -arm64e xcrun devicectl list devices --timeout 5 --json-output /var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.Dm0yo6/core_device_list.json
+[ +158 ms] Name         Hostname                      Identifier                             State         Model                         
+           ----------   ---------------------------   ------------------------------------   -----------   ------------------------------
+           J            J.coredevice.local            E727025A-7A8C-55E5-9013-6592FEB10C2C   connected     iPhone 16 Pro Max (iPhone17,2)
+           iPhone can   iPhone-can.coredevice.local   1E2E90A2-D590-5A77-8F50-DC489517BA75   unavailable   iPhone 16 Pro Max (iPhone17,2)
+[        ] {
+             "info" : {
+               "arguments" : [
+                 "devicectl",
+                 "list",
+                 "devices",
+                 "--timeout",
+                 "5",
+                 "--json-output",
+                 "/var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.Dm0yo6/core_device_list.json"
+               ],
+               "commandType" : "devicectl.list.devices",
+               "environment" : {
+                 "TERM" : "xterm-256color"
+               },
+               "jsonVersion" : 2,
+               "outcome" : "success",
+               "version" : "477.30"
+             },
+             "result" : {
+               "devices" : [
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.acquireusageassertion",
+                       "name" : "Acquire Usage Assertion"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.capturesysdiagnose",
+                       "name" : "Capture Sysdiagnose"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.serviceconnection.create",
+                       "name" : "Create Service Connection"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.servicesocket.create",
+                       "name" : "Create Service Socket"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disableddiservices",
+                       "name" : "Disable Developer Disk Image Services"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disconnectdevice",
+                       "name" : "Disconnect from Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchappicons",
+                       "name" : "Fetch Application Icons"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getauthlistingidentifiers",
+                       "name" : "Fetch AuthListing Identifiers"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchddimetadata",
+                       "name" : "Fetch Developer Disk Image Services Metadata"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdeviceinfo",
+                       "name" : "Fetch Extended Device Info"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdisplayinfo",
+                       "name" : "Get Display Information"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getlockstate",
+                       "name" : "Get Lock State"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installapp",
+                       "name" : "Install Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installroot",
+                       "name" : "Install Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.launchapplication",
+                       "name" : "Launch Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listFiles",
+                       "name" : "List Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listroots",
+                       "name" : "List Roots"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.monitorprocesstermination",
+                       "name" : "Monitor Process for Termination"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.customer.postdarwinnotification",
+                       "name" : "Post Darwin Notification"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.querymobilegestalt",
+                       "name" : "Query MobileGestalt"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.rebootdevice",
+                       "name" : "Reboot Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendmemorywarningtoprocess",
+                       "name" : "Send Memory Warning to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendsignaltoprocess",
+                       "name" : "Send Signal to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.profile",
+                       "name" : "Service Hub Profile"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.spawnexecutable",
+                       "name" : "Spawn Executable"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamapplist",
+                       "name" : "Stream Application List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamprocesslist",
+                       "name" : "Stream Process List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.transferFiles",
+                       "name" : "Transfer Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallapp",
+                       "name" : "Uninstall Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallroot",
+                       "name" : "Uninstall Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.viewdevicescreen",
+                       "name" : "View Device Screen"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-28T19:08:00.449Z",
+                     "localHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "transportType" : "localNetwork",
+                     "tunnelIPAddress" : "fd9b:b66f:cf3d::1",
+                     "tunnelState" : "connected",
+                     "tunnelTransportProtocol" : "tcp"
+                   },
+                   "deviceProperties" : {
+                     "bootState" : "booted",
+                     "bootedFromSnapshot" : true,
+                     "bootedSnapshotName" : "com.apple.os.update-420BEAC401BC6D38A22E5937C87951816081129DDAD2A951E5891AE837022FF7",
+                     "ddiServicesAvailable" : true,
+                     "developerModeStatus" : "enabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "J",
+                     "osBuildUpdate" : "22F76",
+                     "osVersionNumber" : "18.5",
+                     "rootFileSystemIsWritable" : false,
+                     "screenViewingURL" : "devices://device/open?id=E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                     "supportsCheckedAllocations" : false
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 7060067457204252,
+                     "hardwareModel" : "D94AP",
+                     "internalStorageCapacity" : 256000000000,
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "CM26LR19DV",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-001915180CE0801C"
+                   },
+                   "identifier" : "E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 },
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-27T05:07:22.560Z",
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "iPhone-can.coredevice.local",
+                       "1E2E90A2-D590-5A77-8F50-DC489517BA75.coredevice.local",
+                       "00008140-000909DA0E68801C.coredevice.local"
+                     ],
+                     "tunnelState" : "unavailable"
+                   },
+                   "deviceProperties" : {
+                     "ddiServicesAvailable" : false,
+                     "developerModeStatus" : "disabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "iPhone can",
+                     "osBuildUpdate" : "22C152",
+                     "osVersionNumber" : "18.2"
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 2544106939645980,
+                     "hardwareModel" : "D94AP",
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "GK60TQJPDW",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-000909DA0E68801C"
+                   },
+                   "identifier" : "1E2E90A2-D590-5A77-8F50-DC489517BA75",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 }
+               ]
+             }
+           }
+
+[   +4 ms] Error: Browsing on the local area network for iPhone can. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+           The device must be opted into Developer Mode to connect wirelessly. (code -27)
+[   +2 ms] Name         Hostname                      Identifier                             State         Model                         
+           ----------   ---------------------------   ------------------------------------   -----------   ------------------------------
+           J            J.coredevice.local            E727025A-7A8C-55E5-9013-6592FEB10C2C   connected     iPhone 16 Pro Max (iPhone17,2)
+           iPhone can   iPhone-can.coredevice.local   1E2E90A2-D590-5A77-8F50-DC489517BA75   unavailable   iPhone 16 Pro Max (iPhone17,2)
+[        ] {
+             "info" : {
+               "arguments" : [
+                 "devicectl",
+                 "list",
+                 "devices",
+                 "--timeout",
+                 "5",
+                 "--json-output",
+                 "/var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.eqoBJm/core_device_list.json"
+               ],
+               "commandType" : "devicectl.list.devices",
+               "environment" : {
+                 "TERM" : "xterm-256color"
+               },
+               "jsonVersion" : 2,
+               "outcome" : "success",
+               "version" : "477.30"
+             },
+             "result" : {
+               "devices" : [
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.acquireusageassertion",
+                       "name" : "Acquire Usage Assertion"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.capturesysdiagnose",
+                       "name" : "Capture Sysdiagnose"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.serviceconnection.create",
+                       "name" : "Create Service Connection"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.servicesocket.create",
+                       "name" : "Create Service Socket"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disableddiservices",
+                       "name" : "Disable Developer Disk Image Services"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disconnectdevice",
+                       "name" : "Disconnect from Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchappicons",
+                       "name" : "Fetch Application Icons"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getauthlistingidentifiers",
+                       "name" : "Fetch AuthListing Identifiers"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchddimetadata",
+                       "name" : "Fetch Developer Disk Image Services Metadata"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdeviceinfo",
+                       "name" : "Fetch Extended Device Info"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdisplayinfo",
+                       "name" : "Get Display Information"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getlockstate",
+                       "name" : "Get Lock State"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installapp",
+                       "name" : "Install Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installroot",
+                       "name" : "Install Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.launchapplication",
+                       "name" : "Launch Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listFiles",
+                       "name" : "List Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listroots",
+                       "name" : "List Roots"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.monitorprocesstermination",
+                       "name" : "Monitor Process for Termination"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.customer.postdarwinnotification",
+                       "name" : "Post Darwin Notification"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.querymobilegestalt",
+                       "name" : "Query MobileGestalt"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.rebootdevice",
+                       "name" : "Reboot Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendmemorywarningtoprocess",
+                       "name" : "Send Memory Warning to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendsignaltoprocess",
+                       "name" : "Send Signal to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.profile",
+                       "name" : "Service Hub Profile"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.spawnexecutable",
+                       "name" : "Spawn Executable"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamapplist",
+                       "name" : "Stream Application List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamprocesslist",
+                       "name" : "Stream Process List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.transferFiles",
+                       "name" : "Transfer Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallapp",
+                       "name" : "Uninstall Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallroot",
+                       "name" : "Uninstall Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.viewdevicescreen",
+                       "name" : "View Device Screen"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-28T19:08:00.449Z",
+                     "localHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "transportType" : "localNetwork",
+                     "tunnelIPAddress" : "fd9b:b66f:cf3d::1",
+                     "tunnelState" : "connected",
+                     "tunnelTransportProtocol" : "tcp"
+                   },
+                   "deviceProperties" : {
+                     "bootState" : "booted",
+                     "bootedFromSnapshot" : true,
+                     "bootedSnapshotName" : "com.apple.os.update-420BEAC401BC6D38A22E5937C87951816081129DDAD2A951E5891AE837022FF7",
+                     "ddiServicesAvailable" : true,
+                     "developerModeStatus" : "enabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "J",
+                     "osBuildUpdate" : "22F76",
+                     "osVersionNumber" : "18.5",
+                     "rootFileSystemIsWritable" : false,
+                     "screenViewingURL" : "devices://device/open?id=E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                     "supportsCheckedAllocations" : false
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 7060067457204252,
+                     "hardwareModel" : "D94AP",
+                     "internalStorageCapacity" : 256000000000,
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "CM26LR19DV",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-001915180CE0801C"
+                   },
+                   "identifier" : "E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 },
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-27T05:07:22.560Z",
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "iPhone-can.coredevice.local",
+                       "1E2E90A2-D590-5A77-8F50-DC489517BA75.coredevice.local",
+                       "00008140-000909DA0E68801C.coredevice.local"
+                     ],
+                     "tunnelState" : "unavailable"
+                   },
+                   "deviceProperties" : {
+                     "ddiServicesAvailable" : false,
+                     "developerModeStatus" : "disabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "iPhone can",
+                     "osBuildUpdate" : "22C152",
+                     "osVersionNumber" : "18.2"
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 2544106939645980,
+                     "hardwareModel" : "D94AP",
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "GK60TQJPDW",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-000909DA0E68801C"
+                   },
+                   "identifier" : "1E2E90A2-D590-5A77-8F50-DC489517BA75",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 }
+               ]
+             }
+           }
+
+[        ] Error: Browsing on the local area network for iPhone can. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+           The device must be opted into Developer Mode to connect wirelessly. (code -27)
+[ +726 ms] > Configure project :gradle
+[   +1 ms] Evaluating project ':gradle' using build file '/Users/gashawarega/Documents/F/flutter/packages/flutter_tools/gradle/build.gradle.kts'.
+[        ] Resolved plugin [id: 'org.gradle.java-gradle-plugin']
+[        ] Resolved plugin [id: 'org.gradle.groovy']
+[        ] Resolved plugin [id: 'org.gradle.kotlin.kotlin-dsl', version: '5.1.2']
+[        ] Resolved plugin [id: 'org.jetbrains.kotlin.jvm', version: '1.9.20']
+[        ] Using Kotlin Gradle Plugin gradle85 variant
+[        ] kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+[        ] kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+[        ] file or directory '/Users/gashawarega/Documents/F/flutter/packages/flutter_tools/gradle/src/main/java', not found
+[        ] Resolved plugin [id: 'dev.flutter.flutter-plugin-loader', version: '1.0.0']
+[        ] Resolved plugin [id: 'com.android.application', version: '8.9.1', apply: false]
+[        ] Resolved plugin [id: 'org.jetbrains.kotlin.android', version: '2.1.0', apply: false]
+[        ] Resolve mutations for :gradle:checkKotlinGradlePluginConfigurationErrors (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:checkKotlinGradlePluginConfigurationErrors (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:checkKotlinGradlePluginConfigurationErrors SKIPPED
+[        ] Skipping task ':gradle:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+[        ] Resolve mutations for :gradle:compileKotlin (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:compileKotlin (Thread[#301,Execution worker,5,main]) started.
+[  +94 ms] > Task :gradle:compileKotlin UP-TO-DATE
+[        ] Caching disabled for task ':gradle:compileKotlin' because:
+[        ]   Build cache is disabled
+[        ] Skipping task ':gradle:compileKotlin' as it is up-to-date.
+[        ] Resolve mutations for :gradle:compileJava (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:compileJava (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:compileJava NO-SOURCE
+[        ] Skipping task ':gradle:compileJava' as it has no source files and no previous output files.
+[        ] Resolve mutations for :gradle:compileGroovy (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:compileGroovy (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:compileGroovy NO-SOURCE
+[        ] Skipping task ':gradle:compileGroovy' as it has no source files and no previous output files.
+[        ] Resolve mutations for :gradle:pluginDescriptors (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:pluginDescriptors (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:pluginDescriptors UP-TO-DATE
+[        ] Caching disabled for task ':gradle:pluginDescriptors' because:
+[        ]   Build cache is disabled
+[        ]   Not worth caching
+[        ] Skipping task ':gradle:pluginDescriptors' as it is up-to-date.
+[        ] Resolve mutations for :gradle:processResources (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:processResources (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:processResources UP-TO-DATE
+[        ] Caching disabled for task ':gradle:processResources' because:
+[        ]   Build cache is disabled
+[        ]   Not worth caching
+[        ] Skipping task ':gradle:processResources' as it is up-to-date.
+[        ] Resolve mutations for :gradle:classes (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:classes (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:classes UP-TO-DATE
+[        ] Skipping task ':gradle:classes' as it has no actions.
+[        ] Resolve mutations for :gradle:jar (Thread[#301,Execution worker,5,main]) started.
+[        ] :gradle:jar (Thread[#301,Execution worker,5,main]) started.
+[        ] > Task :gradle:jar UP-TO-DATE
+[        ] Caching disabled for task ':gradle:jar' because:
+[        ]   Build cache is disabled
+[        ]   Not worth caching
+[        ] Skipping task ':gradle:jar' as it is up-to-date.
+[ +297 ms] Settings evaluated using settings file '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/settings.gradle.kts'.
+[        ] Projects loaded. Root project using build file '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/build.gradle.kts'.
+[        ] Included projects: [root project 'android', project ':app', project ':audioplayers_android', project ':mobile_scanner', project ':path_provider_android', project ':shared_preferences_android', project ':sqflite_android']
+[ +602 ms] > Configure project :app
+[        ] Evaluating project ':app' using build file '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/app/build.gradle.kts'.
+[        ] Resolved plugin [id: 'com.android.application']
+[        ] Resolved plugin [id: 'kotlin-android']
+[        ] Resolved plugin [id: 'dev.flutter.flutter-gradle-plugin']
+[        ] Using default execution profile
+[        ] Using Kotlin Gradle Plugin gradle85 variant
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] C/C++: android.ndkVersion from module build.gradle is [27.0.12077973]
+[        ] C/C++: android.ndkPath from module build.gradle is not set
+[        ] C/C++: ndk.dir in local.properties is not set
+[        ] C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+[        ] C/C++: sdkFolder is /Users/gashawarega/Library/Android/sdk
+[        ] > Configure project :
+[        ] Evaluating root project 'android' using build file '/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/android/build.gradle.kts'.
+[ +198 ms] > Configure project :audioplayers_android
+[        ] Evaluating project ':audioplayers_android' using build file '/Users/gashawarega/.pub-cache/hosted/pub.dev/audioplayers_android-5.2.1/android/build.gradle'.
+[        ] Using default execution profile
+[        ] Using Kotlin Gradle Plugin gradle85 variant
+[  +95 ms] > Configure project :mobile_scanner
+[        ] Evaluating project ':mobile_scanner' using build file '/Users/gashawarega/.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/android/build.gradle'.
+[        ] Using default execution profile
+[        ] Using Kotlin Gradle Plugin gradle85 variant
+[  +98 ms] > Configure project :path_provider_android
+[        ] Evaluating project ':path_provider_android' using build file '/Users/gashawarega/.pub-cache/hosted/pub.dev/path_provider_android-2.2.22/android/build.gradle'.
+[        ] Using default execution profile
+[        ] > Configure project :shared_preferences_android
+[        ] Evaluating project ':shared_preferences_android' using build file '/Users/gashawarega/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.18/android/build.gradle'.
+[        ] Using default execution profile
+[        ] Using Kotlin Gradle Plugin gradle85 variant
+[        ] > Configure project :sqflite_android
+[        ] Evaluating project ':sqflite_android' using build file '/Users/gashawarega/.pub-cache/hosted/pub.dev/sqflite_android-2.4.2+2/android/build.gradle'.
+[        ] Using default execution profile
+[        ] All projects evaluated.
+[        ] Task name matched 'assembleDebug'
+[        ] Selected primary task 'assembleDebug' from project :
+[ +100 ms] Adding -Xuse-inline-scopes-numbers Kotlin compiler flag for task :app:compileDebugKotlin
+[ +100 ms] Tasks to be executed: [task ':app:DebugMinSdkCheck', task ':app:preBuild', task ':app:preDebugBuild', task ':app:mergeDebugNativeDebugMetadata', task ':app:checkKotlinGradlePluginConfigurationErrors', task ':app:compileFlutterBuildDebug', task ':app:packJniLibsflutterBuildDebug', task ':audioplayers_android:preBuild', task ':audioplayers_android:preDebugBuild', task ':audioplayers_android:writeDebugAarMetadata', task ':mobile_scanner:preBuild', task ':mobile_scanner:preDebugBuild', task ':mobile_scanner:writeDebugAarMetadata', task ':path_provider_android:preBuild', task ':path_provider_android:preDebugBuild', task ':path_provider_android:writeDebugAarMetadata', task ':shared_preferences_android:preBuild', task ':shared_preferences_android:preDebugBuild', task ':shared_preferences_android:writeDebugAarMetadata', task ':sqflite_android:preBuild', task ':sqflite_android:preDebugBuild', task ':sqflite_android:writeDebugAarMetadata', task ':app:checkDebugAarMetadata', task ':app:cleanMergeDebugAssets', task ':app:mergeDebugShaders', task ':app:compileDebugShaders', task ':app:generateDebugAssets', task ':audioplayers_android:mergeDebugShaders', task ':audioplayers_android:compileDebugShaders', task ':audioplayers_android:generateDebugAssets', task ':audioplayers_android:mergeDebugAssets', task ':mobile_scanner:mergeDebugShaders', task ':mobile_scanner:compileDebugShaders', task ':mobile_scanner:generateDebugAssets', task ':mobile_scanner:mergeDebugAssets', task ':path_provider_android:mergeDebugShaders', task ':path_provider_android:compileDebugShaders', task ':path_provider_android:generateDebugAssets', task ':path_provider_android:mergeDebugAssets', task ':shared_preferences_android:mergeDebugShaders', task ':shared_preferences_android:compileDebugShaders', task ':shared_preferences_android:generateDebugAssets', task ':shared_preferences_android:mergeDebugAssets', task ':sqflite_android:mergeDebugShaders', task ':sqflite_android:compileDebugShaders', task ':sqflite_android:generateDebugAssets', task ':sqflite_android:mergeDebugAssets', task ':app:mergeDebugAssets', task ':app:copyFlutterAssetsDebug', task ':app:generateDebugResValues', task ':audioplayers_android:generateDebugResValues', task ':audioplayers_android:generateDebugResources', task ':audioplayers_android:packageDebugResources', task ':mobile_scanner:generateDebugResValues', task ':mobile_scanner:generateDebugResources', task ':mobile_scanner:packageDebugResources', task ':path_provider_android:generateDebugResValues', task ':path_provider_android:generateDebugResources', task ':path_provider_android:packageDebugResources', task ':shared_preferences_android:generateDebugResValues', task ':shared_preferences_android:generateDebugResources', task ':shared_preferences_android:packageDebugResources', task ':sqflite_android:generateDebugResValues', task ':sqflite_android:generateDebugResources', task ':sqflite_android:packageDebugResources', task ':app:mapDebugSourceSetPaths', task ':app:generateDebugResources', task ':app:mergeDebugResources', task ':app:packageDebugResources', task ':app:parseDebugLocalResources', task ':app:createDebugCompatibleScreenManifests', task ':app:extractDeepLinksDebug', task ':audioplayers_android:extractDeepLinksDebug', task ':audioplayers_android:processDebugManifest', task ':mobile_scanner:extractDeepLinksDebug', task ':mobile_scanner:processDebugManifest', task ':path_provider_android:extractDeepLinksDebug', task ':path_provider_android:processDebugManifest', task ':shared_preferences_android:extractDeepLinksDebug', task ':shared_preferences_android:processDebugManifest', task ':sqflite_android:extractDeepLinksDebug', task ':sqflite_android:processDebugManifest', task ':app:processDebugMainManifest', task ':app:processDebugManifest', task ':app:processDebugManifestForPackage', task ':audioplayers_android:compileDebugLibraryResources', task ':audioplayers_android:parseDebugLocalResources', task ':audioplayers_android:generateDebugRFile', task ':mobile_scanner:compileDebugLibraryResources', task ':mobile_scanner:parseDebugLocalResources', task ':mobile_scanner:generateDebugRFile', task ':path_provider_android:compileDebugLibraryResources', task ':path_provider_android:parseDebugLocalResources', task ':path_provider_android:generateDebugRFile', task ':shared_preferences_android:compileDebugLibraryResources', task ':shared_preferences_android:parseDebugLocalResources', task ':shared_preferences_android:generateDebugRFile', task ':sqflite_android:compileDebugLibraryResources', task ':sqflite_android:parseDebugLocalResources', task ':sqflite_android:generateDebugRFile', task ':app:processDebugResources', task ':audioplayers_android:checkKotlinGradlePluginConfigurationErrors', task ':audioplayers_android:compileDebugKotlin', task ':audioplayers_android:javaPreCompileDebug', task ':audioplayers_android:compileDebugJavaWithJavac', task ':audioplayers_android:bundleLibCompileToJarDebug', task ':mobile_scanner:checkKotlinGradlePluginConfigurationErrors', task ':mobile_scanner:compileDebugKotlin', task ':mobile_scanner:javaPreCompileDebug', task ':mobile_scanner:compileDebugJavaWithJavac', task ':mobile_scanner:bundleLibCompileToJarDebug', task ':path_provider_android:javaPreCompileDebug', task ':path_provider_android:compileDebugJavaWithJavac', task ':path_provider_android:bundleLibCompileToJarDebug', task ':shared_preferences_android:checkKotlinGradlePluginConfigurationErrors', task ':shared_preferences_android:compileDebugKotlin', task ':shared_preferences_android:javaPreCompileDebug', task ':shared_preferences_android:compileDebugJavaWithJavac', task ':shared_preferences_android:bundleLibCompileToJarDebug', task ':sqflite_android:javaPreCompileDebug', task ':sqflite_android:compileDebugJavaWithJavac', task ':sqflite_android:bundleLibCompileToJarDebug', task ':app:compileDebugKotlin', task ':app:javaPreCompileDebug', task ':app:compileDebugJavaWithJavac', task ':app:compressDebugAssets', task ':app:processDebugJavaRes', task ':audioplayers_android:processDebugJavaRes', task ':mobile_scanner:processDebugJavaRes', task ':path_provider_android:processDebugJavaRes', task ':shared_preferences_android:processDebugJavaRes', task ':sqflite_android:processDebugJavaRes', task ':app:mergeDebugJavaResource', task ':app:checkDebugDuplicateClasses', task ':app:desugarDebugFileDependencies', task ':app:mergeExtDexDebug', task ':audioplayers_android:bundleLibRuntimeToDirDebug', task ':mobile_scanner:bundleLibRuntimeToDirDebug', task ':path_provider_android:bundleLibRuntimeToDirDebug', task ':shared_preferences_android:bundleLibRuntimeToDirDebug', task ':sqflite_android:bundleLibRuntimeToDirDebug', task ':app:mergeLibDexDebug', task ':app:dexBuilderDebug', task ':app:mergeProjectDexDebug', task ':app:configureCMakeDebug[arm64-v8a]', task ':app:buildCMakeDebug[arm64-v8a]', task ':app:configureCMakeDebug[armeabi-v7a]', task ':app:buildCMakeDebug[armeabi-v7a]', task ':app:configureCMakeDebug[x86_64]', task ':app:buildCMakeDebug[x86_64]', task ':app:mergeDebugJniLibFolders', task ':audioplayers_android:mergeDebugJniLibFolders', task ':audioplayers_android:mergeDebugNativeLibs', task ':audioplayers_android:copyDebugJniLibsProjectOnly', task ':mobile_scanner:mergeDebugJniLibFolders', task ':mobile_scanner:mergeDebugNativeLibs', task ':mobile_scanner:copyDebugJniLibsProjectOnly', task ':path_provider_android:mergeDebugJniLibFolders', task ':path_provider_android:mergeDebugNativeLibs', task ':path_provider_android:copyDebugJniLibsProjectOnly', task ':shared_preferences_android:mergeDebugJniLibFolders', task ':shared_preferences_android:mergeDebugNativeLibs', task ':shared_preferences_android:copyDebugJniLibsProjectOnly', task ':sqflite_android:mergeDebugJniLibFolders', task ':sqflite_android:mergeDebugNativeLibs', task ':sqflite_android:copyDebugJniLibsProjectOnly', task ':app:mergeDebugNativeLibs', task ':app:stripDebugDebugSymbols', task ':app:validateSigningDebug', task ':app:writeDebugAppMetadata', task ':app:writeDebugSigningConfigVersions', task ':app:packageDebug', task ':app:createDebugApkListingFileRedirect', task ':app:assembleDebug', task ':audioplayers_android:stripDebugDebugSymbols', task ':audioplayers_android:copyDebugJniLibsProjectAndLocalJars', task ':audioplayers_android:extractDebugAnnotations', task ':audioplayers_android:extractDeepLinksForAarDebug', task ':audioplayers_android:mergeDebugGeneratedProguardFiles', task ':audioplayers_android:mergeDebugConsumerProguardFiles', task ':audioplayers_android:prepareDebugArtProfile', task ':audioplayers_android:prepareLintJarForPublish', task ':audioplayers_android:mergeDebugJavaResource', task ':audioplayers_android:syncDebugLibJars', task ':audioplayers_android:bundleDebugAar', task ':audioplayers_android:assembleDebug', task ':mobile_scanner:stripDebugDebugSymbols', task ':mobile_scanner:copyDebugJniLibsProjectAndLocalJars', task ':mobile_scanner:extractDebugAnnotations', task ':mobile_scanner:extractDeepLinksForAarDebug', task ':mobile_scanner:mergeDebugGeneratedProguardFiles', task ':mobile_scanner:mergeDebugConsumerProguardFiles', task ':mobile_scanner:prepareDebugArtProfile', task ':mobile_scanner:prepareLintJarForPublish', task ':mobile_scanner:mergeDebugJavaResource', task ':mobile_scanner:syncDebugLibJars', task ':mobile_scanner:bundleDebugAar', task ':mobile_scanner:assembleDebug', task ':path_provider_android:stripDebugDebugSymbols', task ':path_provider_android:copyDebugJniLibsProjectAndLocalJars', task ':path_provider_android:extractDebugAnnotations', task ':path_provider_android:extractDeepLinksForAarDebug', task ':path_provider_android:mergeDebugGeneratedProguardFiles', task ':path_provider_android:mergeDebugConsumerProguardFiles', task ':path_provider_android:prepareDebugArtProfile', task ':path_provider_android:prepareLintJarForPublish', task ':path_provider_android:mergeDebugJavaResource', task ':path_provider_android:syncDebugLibJars', task ':path_provider_android:bundleDebugAar', task ':path_provider_android:assembleDebug', task ':shared_preferences_android:stripDebugDebugSymbols', task ':shared_preferences_android:copyDebugJniLibsProjectAndLocalJars', task ':shared_preferences_android:extractDebugAnnotations', task ':shared_preferences_android:extractDeepLinksForAarDebug', task ':shared_preferences_android:mergeDebugGeneratedProguardFiles', task ':shared_preferences_android:mergeDebugConsumerProguardFiles', task ':shared_preferences_android:prepareDebugArtProfile', task ':shared_preferences_android:prepareLintJarForPublish', task ':shared_preferences_android:mergeDebugJavaResource', task ':shared_preferences_android:syncDebugLibJars', task ':shared_preferences_android:bundleDebugAar', task ':shared_preferences_android:assembleDebug', task ':sqflite_android:stripDebugDebugSymbols', task ':sqflite_android:copyDebugJniLibsProjectAndLocalJars', task ':sqflite_android:extractDebugAnnotations', task ':sqflite_android:extractDeepLinksForAarDebug', task ':sqflite_android:mergeDebugGeneratedProguardFiles', task ':sqflite_android:mergeDebugConsumerProguardFiles', task ':sqflite_android:prepareDebugArtProfile', task ':sqflite_android:prepareLintJarForPublish', task ':sqflite_android:mergeDebugJavaResource', task ':sqflite_android:syncDebugLibJars', task ':sqflite_android:bundleDebugAar', task ':sqflite_android:assembleDebug']
+[        ] Tasks that were excluded: []
+[        ] work action Parameters of ClassesDirToClassesTransform (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] work action Parameters of DexingNoClasspathTransform (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] Resolve mutations for :app:DebugMinSdkCheck (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:DebugMinSdkCheck (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] > Task :app:DebugMinSdkCheck
+[        ] Caching disabled for task ':app:DebugMinSdkCheck' because:
+[        ]   Build cache is disabled
+[        ] Task ':app:DebugMinSdkCheck' is not up-to-date because:
+[        ]   Task has not declared any outputs despite executing actions.
+[        ] Resolve mutations for :app:preBuild (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:preBuild (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] > Task :app:preBuild UP-TO-DATE
+[        ] Skipping task ':app:preBuild' as it has no actions.
+[        ] Resolve mutations for :app:preDebugBuild (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:preDebugBuild (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] > Task :app:preDebugBuild UP-TO-DATE
+[        ] Skipping task ':app:preDebugBuild' as it has no actions.
+[        ] Resolve mutations for :app:mergeDebugNativeDebugMetadata (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:mergeDebugNativeDebugMetadata (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+[        ] Skipping task ':app:mergeDebugNativeDebugMetadata' as it has no source files and no previous output files.
+[        ] Resolve mutations for :app:checkKotlinGradlePluginConfigurationErrors (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:checkKotlinGradlePluginConfigurationErrors (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+[        ] Skipping task ':app:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+[        ] Resolve mutations for :app:compileFlutterBuildDebug (Thread[#304,Execution worker Thread 4,5,main]) started.
+[        ] :app:compileFlutterBuildDebug (Thread[#304,Execution worker Thread 4,5,main]) started.
+[ +377 ms] [
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "F269D2B0-2D96-4259-901A-22112D9EA45C",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "412894F3-BD32-4096-BA5F-195AB2BAE258",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "0DB68871-523A-4D9F-979C-06B6F26B60B0",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "06CA6198-63EA-439C-8E49-8382C153327B",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "9808391F-A96C-43A2-8E6A-3E2BE7574996",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "26.0 (23A343)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,2",
+               "identifier" : "CFC85607-E586-4F39-ABE6-5AD9CCD5049E",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1",
+               "modelName" : "iPhone 16 Pro Max",
+               "name" : "iPhone 16 Pro Max (iOS 26.0)",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "Mac15,3",
+               "simulator" : false,
+               "modelName" : "MacBook Pro",
+               "operatingSystemVersion" : "26.0.1 (25A362)",
+               "identifier" : "00008122-0005592A0401401C",
+               "platform" : "com.apple.platform.macosx",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "My Mac",
+               "modelUTI" : "com.apple.macbookpro-14-late-2023"
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "error" : {
+                 "code" : -27,
+                 "failureReason" : "",
+                 "description" : "Browsing on the local area network for iPhone can",
+                 "recoverySuggestion" : "Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.\nThe device must be opted into Developer Mode to connect wirelessly.",
+                 "domain" : "com.apple.dt.deviceprep"
+               },
+               "operatingSystemVersion" : "18.2 (22C152)",
+               "identifier" : "00008140-000909DA0E68801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : false,
+               "name" : "iPhone can",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             },
+             {
+               "simulator" : true,
+               "operatingSystemVersion" : "18.6 (22G86)",
+               "available" : true,
+               "platform" : "com.apple.platform.iphonesimulator",
+               "modelCode" : "iPhone17,1",
+               "identifier" : "3A1F5523-FEB3-4054-9342-661C7C5A883A",
+               "architecture" : "arm64",
+               "modelUTI" : "com.apple.iphone-16-pro-1",
+               "modelName" : "iPhone 16 Pro",
+               "name" : "iPhone 16 Pro",
+               "ignored" : false
+             },
+             {
+               "ignored" : false,
+               "modelCode" : "iPhone17,2",
+               "simulator" : false,
+               "modelName" : "iPhone 16 Pro Max",
+               "operatingSystemVersion" : "18.5 (22F76)",
+               "identifier" : "00008140-001915180CE0801C",
+               "platform" : "com.apple.platform.iphoneos",
+               "architecture" : "arm64e",
+               "interface" : "usb",
+               "available" : true,
+               "name" : "J",
+               "modelUTI" : "com.apple.iphone-16-pro-max-1"
+             }
+           ]
+[   +1 ms] executing: /usr/bin/arch -arm64e xcrun devicectl list devices --timeout 5 --json-output /var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.o8MS6r/core_device_list.json
+[ +128 ms] Name         Hostname                      Identifier                             State         Model                         
+           ----------   ---------------------------   ------------------------------------   -----------   ------------------------------
+           J            J.coredevice.local            E727025A-7A8C-55E5-9013-6592FEB10C2C   connected     iPhone 16 Pro Max (iPhone17,2)
+           iPhone can   iPhone-can.coredevice.local   1E2E90A2-D590-5A77-8F50-DC489517BA75   unavailable   iPhone 16 Pro Max (iPhone17,2)
+[        ] {
+             "info" : {
+               "arguments" : [
+                 "devicectl",
+                 "list",
+                 "devices",
+                 "--timeout",
+                 "5",
+                 "--json-output",
+                 "/var/folders/ny/73kdx_n94lj1549lzv1fnw1c0000gn/T/flutter_tools.S76m5U/core_devices.o8MS6r/core_device_list.json"
+               ],
+               "commandType" : "devicectl.list.devices",
+               "environment" : {
+                 "TERM" : "xterm-256color"
+               },
+               "jsonVersion" : 2,
+               "outcome" : "success",
+               "version" : "477.30"
+             },
+             "result" : {
+               "devices" : [
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.acquireusageassertion",
+                       "name" : "Acquire Usage Assertion"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.capturesysdiagnose",
+                       "name" : "Capture Sysdiagnose"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.serviceconnection.create",
+                       "name" : "Create Service Connection"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.servicesocket.create",
+                       "name" : "Create Service Socket"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disableddiservices",
+                       "name" : "Disable Developer Disk Image Services"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.disconnectdevice",
+                       "name" : "Disconnect from Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchappicons",
+                       "name" : "Fetch Application Icons"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getauthlistingidentifiers",
+                       "name" : "Fetch AuthListing Identifiers"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.fetchddimetadata",
+                       "name" : "Fetch Developer Disk Image Services Metadata"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdeviceinfo",
+                       "name" : "Fetch Extended Device Info"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getdisplayinfo",
+                       "name" : "Get Display Information"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.getlockstate",
+                       "name" : "Get Lock State"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installapp",
+                       "name" : "Install Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.installroot",
+                       "name" : "Install Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.launchapplication",
+                       "name" : "Launch Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listFiles",
+                       "name" : "List Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.listroots",
+                       "name" : "List Roots"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.monitorprocesstermination",
+                       "name" : "Monitor Process for Termination"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.customer.postdarwinnotification",
+                       "name" : "Post Darwin Notification"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.querymobilegestalt",
+                       "name" : "Query MobileGestalt"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.rebootdevice",
+                       "name" : "Reboot Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendmemorywarningtoprocess",
+                       "name" : "Send Memory Warning to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.sendsignaltoprocess",
+                       "name" : "Send Signal to Process"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.dt.profile",
+                       "name" : "Service Hub Profile"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.spawnexecutable",
+                       "name" : "Spawn Executable"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamapplist",
+                       "name" : "Stream Application List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.streamprocesslist",
+                       "name" : "Stream Process List"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.transferFiles",
+                       "name" : "Transfer Files"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallapp",
+                       "name" : "Uninstall Application"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.uninstallroot",
+                       "name" : "Uninstall Root"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.viewdevicescreen",
+                       "name" : "View Device Screen"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-28T19:08:00.449Z",
+                     "localHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "J.coredevice.local",
+                       "E727025A-7A8C-55E5-9013-6592FEB10C2C.coredevice.local",
+                       "00008140-001915180CE0801C.coredevice.local"
+                     ],
+                     "transportType" : "localNetwork",
+                     "tunnelIPAddress" : "fd9b:b66f:cf3d::1",
+                     "tunnelState" : "connected",
+                     "tunnelTransportProtocol" : "tcp"
+                   },
+                   "deviceProperties" : {
+                     "bootState" : "booted",
+                     "bootedFromSnapshot" : true,
+                     "bootedSnapshotName" : "com.apple.os.update-420BEAC401BC6D38A22E5937C87951816081129DDAD2A951E5891AE837022FF7",
+                     "ddiServicesAvailable" : true,
+                     "developerModeStatus" : "enabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "J",
+                     "osBuildUpdate" : "22F76",
+                     "osVersionNumber" : "18.5",
+                     "rootFileSystemIsWritable" : false,
+                     "screenViewingURL" : "devices://device/open?id=E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                     "supportsCheckedAllocations" : false
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 7060067457204252,
+                     "hardwareModel" : "D94AP",
+                     "internalStorageCapacity" : 256000000000,
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "CM26LR19DV",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-001915180CE0801C"
+                   },
+                   "identifier" : "E727025A-7A8C-55E5-9013-6592FEB10C2C",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 },
+                 {
+                   "capabilities" : [
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.tags",
+                       "name" : "Modify Tags"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.default.user.credentials",
+                       "name" : "Modify credentials for default users for a device"
+                     },
+                     {
+                       "featureIdentifier" : "com.apple.coredevice.feature.unpairdevice",
+                       "name" : "Unpair Device"
+                     }
+                   ],
+                   "connectionProperties" : {
+                     "authenticationType" : "manualPairing",
+                     "isMobileDeviceOnly" : false,
+                     "lastConnectionDate" : "2025-12-27T05:07:22.560Z",
+                     "pairingState" : "paired",
+                     "potentialHostnames" : [
+                       "iPhone-can.coredevice.local",
+                       "1E2E90A2-D590-5A77-8F50-DC489517BA75.coredevice.local",
+                       "00008140-000909DA0E68801C.coredevice.local"
+                     ],
+                     "tunnelState" : "unavailable"
+                   },
+                   "deviceProperties" : {
+                     "ddiServicesAvailable" : false,
+                     "developerModeStatus" : "disabled",
+                     "hasInternalOSBuild" : false,
+                     "name" : "iPhone can",
+                     "osBuildUpdate" : "22C152",
+                     "osVersionNumber" : "18.2"
+                   },
+                   "hardwareProperties" : {
+                     "cpuType" : {
+                       "name" : "arm64e",
+                       "subType" : 2,
+                       "type" : 16777228
+                     },
+                     "deviceType" : "iPhone",
+                     "ecid" : 2544106939645980,
+                     "hardwareModel" : "D94AP",
+                     "isProductionFused" : true,
+                     "marketingName" : "iPhone 16 Pro Max",
+                     "platform" : "iOS",
+                     "productType" : "iPhone17,2",
+                     "reality" : "physical",
+                     "serialNumber" : "GK60TQJPDW",
+                     "supportedCPUTypes" : [
+                       {
+                         "name" : "arm64e",
+                         "subType" : 2,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "arm64",
+                         "subType" : 0,
+                         "type" : 16777228
+                       },
+                       {
+                         "name" : "armv8",
+                         "subType" : 13,
+                         "type" : 12
+                       }
+                     ],
+                     "supportedDeviceFamilies" : [
+                       1
+                     ],
+                     "thinningProductType" : "iPhone17,2",
+                     "udid" : "00008140-000909DA0E68801C"
+                   },
+                   "identifier" : "1E2E90A2-D590-5A77-8F50-DC489517BA75",
+                   "tags" : [
+
+                   ],
+                   "visibilityClass" : "default"
+                 }
+               ]
+             }
+           }
+
+[        ] Error: Browsing on the local area network for iPhone can. Ensure the device is unlocked and attached with a cable or associated with the same local area network as this Mac.
+           The device must be opted into Developer Mode to connect wirelessly. (code -27)
+[+1498 ms] > Task :app:compileFlutterBuildDebug
+[        ] Caching disabled for task ':app:compileFlutterBuildDebug' because:
+[        ]   Build cache is disabled
+[        ]   Caching has not been enabled for the task
+[        ] Task ':app:compileFlutterBuildDebug' is not up-to-date because:
+[        ]   Task has failed previously.
+[        ] Starting process 'command '/Users/gashawarega/Documents/F/flutter/bin/flutter''. Working directory: /Users/gashawarega/Documents/Projects/Js/warehouse_mobile Command: /Users/gashawarega/Documents/F/flutter/bin/flutter --verbose assemble --no-version-check --depfile /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/build/app/intermediates/flutter/debug/flutter_build.d --output /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/build/app/intermediates/flutter/debug -dTargetFile=/Users/gashawarega/Documents/Projects/Js/warehouse_mobile/lib/main.dart -dTargetPlatform=android -dBuildMode=debug -dTrackWidgetCreation=true --DartDefines=RkxVVFRFUl9WRVJTSU9OPTMuMzUuNQ==,RkxVVFRFUl9DSEFOTkVMPXN0YWJsZQ==,RkxVVFRFUl9HSVRfVVJMPWh0dHBzOi8vZ2l0aHViLmNvbS9mbHV0dGVyL2ZsdXR0ZXIuZ2l0,RkxVVFRFUl9GUkFNRVdPUktfUkVWSVNJT049YWM0ZTc5OWQyMw==,RkxVVFRFUl9FTkdJTkVfUkVWSVNJT049ZDNkNDVkY2YyNQ==,RkxVVFRFUl9EQVJUX1ZFUlNJT049My45LjI= -dFlavor= -dAndroidArchs=android-arm64 -dMinSdkVersion=24 debug_android_application
+[        ] Successfully started process 'command '/Users/gashawarega/Documents/F/flutter/bin/flutter''
+[        ] [  +22 ms] executing: sysctl hw.optional.arm64
+[        ] [  +12 ms] Exit code 0 from: sysctl hw.optional.arm64
+[        ] [        ] hw.optional.arm64: 1
+[        ] [   +4 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[        ] [  +10 ms] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] [   +1 ms] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] [  +24 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] [        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[        ] [  +36 ms] Initializing file store
+[        ] [        ] Done initializing file store
+[        ] [  +21 ms] Skipping target: gen_dart_plugin_registrant
+[        ] [   +1 ms] Skipping target: dart_build
+[        ] [        ] Skipping target: gen_localizations
+[        ] [        ] Skipping target: install_code_assets
+[        ] [   +1 ms] kernel_snapshot_program: Starting due to {InvalidatedReasonKind.outputSetAddition: The following outputs were added to the output set: /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/app.dill, InvalidatedReasonKind.inputChanged: The following inputs have updated contents: /Users/gashawarega/Documents/F/flutter/packages/flutter_tools/lib/src/build_system/targets/common.dart,/Users/gashawarega/Documents/F/flutter/bin/cache/engine.stamp,/Users/gashawarega/Documents/F/flutter/bin/cache/engine.stamp,/Users/gashawarega/Documents/F/flutter/bin/cache/engine.stamp,/Users/gashawarega/Documents/F/flutter/bin/cache/engine.stamp}
+[        ] [   +7 ms] /Users/gashawarega/Documents/F/flutter/bin/cache/dart-sdk/bin/dartaotruntime /Users/gashawarega/Documents/F/flutter/bin/cache/dart-sdk/bin/snapshots/frontend_server_aot.dart.snapshot --sdk-root /Users/gashawarega/Documents/F/flutter/bin/cache/artifacts/engine/common/flutter_patched_sdk/ --target=flutter --no-print-incremental-dependencies -DFLUTTER_VERSION=3.35.5 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=ac4e799d23 -DFLUTTER_ENGINE_REVISION=d3d45dcf25 -DFLUTTER_DART_VERSION=3.9.2 -DFLUTTER_APP_FLAVOR= -Ddart.vm.profile=false -Ddart.vm.product=false --enable-asserts --track-widget-creation --no-link-platform --packages /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/package_config.json --output-dill /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/app.dill --depfile /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/kernel_snapshot_program.d --incremental --initialize-from-dill /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/app.dill --source file:///Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/dart_plugin_registrant.dart --source package:flutter/src/dart_plugin_registrant.dart -Dflutter.dart_plugin_registrant=file:///Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/dart_plugin_registrant.dart --verbosity=error package:warehouse_mobile/main.dart
+[        ] [   +4 ms] Invalid depfile: /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/kernel_snapshot_program.d
+[   +2 ms] [   +1 ms] Invalid depfile: /Users/gashawarega/Documents/Projects/Js/warehouse_mobile/.dart_tool/flutter_build/c5cb04a1130f21cf36309e9dac840c59/kernel_snapshot_program.d
+[        ] [ +984 ms] lib/features/picking/screens/picking_list_screen.dart:2:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] [        ] import '../../shared/models/fulfillment_models.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:2:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] [        ] import '../../shared/models/fulfillment_models.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/picking/screens/picking_list_screen.dart:3:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] [        ] import '../../shared/services/fulfillment_service.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:3:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] [        ] import '../../shared/services/fulfillment_service.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:4:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] [        ] import '../../shared/models/fulfillment_models.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:5:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] [        ] import '../../shared/services/fulfillment_service.dart';
+[        ] [        ]        ^
+[        ] [        ] Error: Couldn't resolve the package 'url_launcher' in 'package:url_launcher/url_launcher.dart'.
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:5:8: Error: Error when reading 'lib/features/shared/models/fulfillment_models.dart': No such file or directory
+[        ] [        ] import '../../shared/models/fulfillment_models.dart';
+[        ] [        ]        ^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:6:8: Error: Error when reading 'lib/features/shared/services/fulfillment_service.dart': No such file or directory
+[        ] [        ] import '../../shared/services/fulfillment_service.dart';
+[        ] [        ]        ^
+[        ] [  +96 ms] lib/features/packing/screens/packing_screen.dart:3:8: Error: Not found: 'package:url_launcher/url_launcher.dart'
+[        ] [        ] import 'package:url_launcher/url_launcher.dart';
+[        ] [        ]        ^
+[        ] [ +283 ms] lib/features/picking/screens/picking_list_screen.dart:15:20: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ] [        ]                    ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_list_screen.dart:77:30: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   Future<void> _startPicking(FulfillmentOrder order) async {
+[        ] [        ]                              ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:15:20: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ] [        ]                    ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:77:30: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   Future<void> _startPacking(FulfillmentOrder order) async {
+[        ] [        ]                              ^^^^^^^^^^^^^^^^
+[        ] [   +3 ms] lib/features/picking/screens/picking_screen.dart:8:9: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   final FulfillmentOrder order;
+[        ] [        ]         ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:22:3: Error: Type 'OrderProgress' not found.
+[        ] [        ]   OrderProgress? _progress;
+[        ] [        ]   ^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:9:9: Error: Type 'FulfillmentOrder' not found.
+[        ] [        ]   final FulfillmentOrder order;
+[        ] [        ]         ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:22:3: Error: Type 'OrderProgress' not found.
+[        ] [        ]   OrderProgress? _progress;
+[        ] [        ]   ^^^^^^^^^^^^^
+[        ] [ +252 ms] lib/features/picking/screens/picking_list_screen.dart:14:20: Error: Method not found: 'FulfillmentService'.
+[        ] [        ]   final _service = FulfillmentService();
+[        ] [        ]                    ^^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:14:20: Error: Method not found: 'FulfillmentService'.
+[        ] [        ]   final _service = FulfillmentService();
+[        ] [        ]                    ^^^^^^^^^^^^^^^^^^
+[        ] [   +4 ms] lib/features/picking/screens/picking_screen.dart:17:20: Error: Method not found: 'FulfillmentService'.
+[        ] [        ]   final _service = FulfillmentService();
+[        ] [        ]                    ^^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:18:20: Error: Method not found: 'FulfillmentService'.
+[        ] [        ]   final _service = FulfillmentService();
+[        ] [        ]                    ^^^^^^^^^^^^^^^^^^
+[  +83 ms] [ +220 ms] lib/features/picking/screens/picking_list_screen.dart:15:20: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ] [        ]                    ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_list_screen.dart:41:32: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]       body: FutureBuilder<List<FulfillmentOrder>>(
+[        ] [        ]                                ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_list_screen.dart:77:30: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   Future<void> _startPicking(FulfillmentOrder order) async {
+[        ] [        ]                              ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:15:20: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   late Future<List<FulfillmentOrder>> _tasksFuture;
+[        ] [        ]                    ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:41:32: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]       body: FutureBuilder<List<FulfillmentOrder>>(
+[        ] [        ]                                ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_list_screen.dart:77:30: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   Future<void> _startPacking(FulfillmentOrder order) async {
+[        ] [        ]                              ^^^^^^^^^^^^^^^^
+[ +299 ms] [ +307 ms] lib/features/picking/screens/picking_screen.dart:8:9: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   final FulfillmentOrder order;
+[        ] [        ]         ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:22:3: Error: 'OrderProgress' isn't a type.
+[        ] [        ]   OrderProgress? _progress;
+[        ] [        ]   ^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:143:38: Error: 'CameraFacingState' isn't a type.
+[        ] [        ]                     switch (state as CameraFacingState) {
+[        ] [        ]                                      ^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:144:26: Error: Not a constant expression.
+[        ] [        ]                     case CameraFacingState.back:
+[        ] [        ]                          ^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:146:26: Error: Not a constant expression.
+[        ] [        ]                     case CameraFacingState.front:
+[        ] [        ]                          ^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:121:53: Error: The getter 'torchState' isn't defined for the type 'MobileScannerController'.
+[        ] [        ]  - 'MobileScannerController' is from 'package:mobile_scanner/src/mobile_scanner_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/mobile_scanner_controller.dart').
+[        ] [        ] Try correcting the name to the name of an existing getter, or defining a getter or field named 'torchState'.
+[        ] [        ]                 valueListenable: _scannerController.torchState,
+[        ] [        ]                                                     ^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:138:53: Error: The getter 'cameraFacingState' isn't defined for the type 'MobileScannerController'.
+[        ] [        ]  - 'MobileScannerController' is from 'package:mobile_scanner/src/mobile_scanner_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/mobile_scanner_controller.dart').
+[        ] [        ] Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameraFacingState'.
+[        ] [        ]                 valueListenable: _scannerController.cameraFacingState,
+[        ] [        ]                                                     ^^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/picking/screens/picking_screen.dart:139:26: Error: A non-null value must be returned since the return type 'Widget' doesn't allow null.
+[        ] [        ]  - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../F/flutter/packages/flutter/lib/src/widgets/framework.dart').
+[        ] [        ]                 builder: (context, state, child) {
+[        ] [        ]                          ^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:9:9: Error: 'FulfillmentOrder' isn't a type.
+[        ] [        ]   final FulfillmentOrder order;
+[        ] [        ]         ^^^^^^^^^^^^^^^^
+[        ] [        ] lib/features/packing/screens/packing_screen.dart:22:3: Error: 'OrderProgress' isn't a type.
+[        ] [        ]   OrderProgress? _progress;
+[        ] [        ]   ^^^^^^^^^^^^^
+[ +901 ms] [ +877 ms] lib/features/picking/screens/picking_screen.dart:126:35: Error: The type 'TorchState' is not exhaustively matched by the switch cases since it doesn't match 'TorchState.auto'.
+[        ] [        ]  - 'TorchState' is from 'package:mobile_scanner/src/enums/torch_state.dart' ('../../../../.pub-cache/hosted/pub.dev/mobile_scanner-5.2.3/lib/src/enums/torch_state.dart').
+[        ] [        ] Try adding a default case or cases that match 'TorchState.auto'.
+[        ] [        ]                     switch (state as TorchState) {
+[        ] [        ]                                   ^
+[ +601 ms] [ +594 ms] Unhandled exception:
+[        ]            FileSystemException(uri=org-dartlang-untranslatable-uri:package%3Aurl_launcher%2Furl_launcher.dart; message=StandardFileSystem only supports file:* and data:* URIs)
+[        ]            #0      StandardFileSystem.entityForUri (package:front_end/src/api_prototype/standard_file_system.dart:45)
+[        ]            #1      asFileUri (package:vm/kernel_front_end.dart:1002)
+[        ]            #2      writeDepfile (package:vm/kernel_front_end.dart:1165)
+[        ]            <asynchronous suspension>
+[        ]            #3      FrontendCompiler.compile (package:frontend_server/frontend_server.dart:729)
+[        ]            <asynchronous suspension>
+[        ]            #4      starter (package:frontend_server/starter.dart:102)
+[        ]            <asynchronous suspension>
+[        ]            #5      main (file:///Volumes/Work/s/w/ir/x/w/sdk/pkg/frontend_server/bin/frontend_server_starter.dart:13)
+[        ]            <asynchronous suspension>
+[        ] [   +3 ms] Target kernel_snapshot_program failed: Exception
+[        ]            #0      KernelSnapshot.build (package:flutter_tools/src/build_system/targets/common.dart:282:7)
+[        ]            <asynchronous suspension>
+[        ]            #1      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:873:9)
+[        ]            <asynchronous suspension>
+[        ]            #2      Future.wait.<anonymous closure> (dart:async/future.dart:525:21)
+[        ]            <asynchronous suspension>
+[        ]            #3      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:811:32)
+[        ]            <asynchronous suspension>
+[        ]            #4      FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:631:16)
+[        ]            <asynchronous suspension>
+[        ]            #5      AssembleCommand.runCommand (package:flutter_tools/src/commands/assemble.dart:346:32)
+[        ]            <asynchronous suspension>
+[        ]            #6      FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1581:27)
+[        ]            <asynchronous suspension>
+[        ]            #7      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #8      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+[        ]            <asynchronous suspension>
+[        ]            #9      FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:503:9)
+[        ]            <asynchronous suspension>
+[        ]            #10     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #11     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:438:5)
+[        ]            <asynchronous suspension>
+[        ]            #12     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:98:11)
+[        ]            <asynchronous suspension>
+[        ]            #13     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #14     main (package:flutter_tools/executable.dart:101:3)
+[        ]            <asynchronous suspension>
+[        ] [  +12 ms] Persisting file store
+[        ] [   +1 ms] Done persisting file store
+[        ] [   +8 ms] "flutter assemble" took 3,762ms.
+[        ] [  +14 ms] executing: sw_vers -productName
+[  +98 ms] [  +17 ms] Exit code 0 from: sw_vers -productName
+[        ] [        ] macOS
+[        ] [        ] executing: sw_vers -productVersion
+[        ] [   +7 ms] Exit code 0 from: sw_vers -productVersion
+[        ] [        ] 26.0.1
+[        ] [        ] executing: sw_vers -buildVersion
+[        ] [   +7 ms] Exit code 0 from: sw_vers -buildVersion
+[        ] [        ] 25A362
+[        ] [        ] executing: uname -m
+[        ] [   +3 ms] Exit code 0 from: uname -m
+[        ] [        ] arm64
+[        ] [        ] Running 1 shutdown hook
+[        ] [        ] Shutdown hooks complete
+[        ] [  +30 ms] 
+[        ]            #0      throwToolExit (package:flutter_tools/src/base/common.dart:34:3)
+[        ]            #1      AssembleCommand.runCommand (package:flutter_tools/src/commands/assemble.dart:364:7)
+[        ]            <asynchronous suspension>
+[        ]            #2      FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1581:27)
+[        ]            <asynchronous suspension>
+[        ]            #3      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #4      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+[        ]            <asynchronous suspension>
+[        ]            #5      FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:503:9)
+[        ]            <asynchronous suspension>
+[        ]            #6      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #7      FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:438:5)
+[        ]            <asynchronous suspension>
+[        ]            #8      run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:98:11)
+[        ]            <asynchronous suspension>
+[        ]            #9      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+[        ]            <asynchronous suspension>
+[        ]            #10     main (package:flutter_tools/executable.dart:101:3)
+[        ]            <asynchronous suspension>
+[ +298 ms] [ +255 ms] exiting with code 1
+[        ] > Task :app:compileFlutterBuildDebug FAILED
+[        ] [Incubating] Problems report is available at: file:///Users/gashawarega/Documents/Projects/Js/warehouse_mobile/build/reports/problems/problems-report.html
+[        ] FAILURE: Build failed with an exception.
+[        ] * What went wrong:
+[        ] Execution failed for task ':app:compileFlutterBuildDebug'.
+[        ] > Process 'command '/Users/gashawarega/Documents/F/flutter/bin/flutter'' finished with non-zero exit value 1
+[        ] * Try:
+[        ] > Run with --debug option to get more log output.
+[        ] > Run with --scan to get full insights.
+[        ] > Get more help at https://help.gradle.org.
+[        ] * Exception is:
+[        ] org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileFlutterBuildDebug'.
+[        ] 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+[        ] 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+[        ] 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+[        ] 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+[        ] 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:40)
+[        ] 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+[        ] 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+[        ] 	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+[        ] 	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+[        ] 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+[        ] 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+[        ] 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+[        ] 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+[        ] 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+[        ] 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+[        ] 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+[        ] 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+[        ] 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+[        ] 	at java.base/java.lang.Thread.run(Unknown Source)
+[        ] Caused by: org.gradle.process.internal.ExecException: Process 'command '/Users/gashawarega/Documents/F/flutter/bin/flutter'' finished with non-zero exit value 1
+[        ] 	at org.gradle.process.internal.DefaultExecHandle$ExecResultImpl.assertNormalExitValue(DefaultExecHandle.java:442)
+[        ] 	at org.gradle.process.internal.DefaultExecAction.execute(DefaultExecAction.java:49)
+[        ] 	at org.gradle.process.internal.DefaultExecActionFactory.exec(DefaultExecActionFactory.java:218)
+[        ] 	at org.gradle.process.internal.DefaultExecOperations.exec(DefaultExecOperations.java:37)
+[        ] 	at com.flutter.gradle.tasks.BaseFlutterTaskHelper.buildBundle(BaseFlutterTaskHelper.kt:174)
+[        ] 	at com.flutter.gradle.tasks.BaseFlutterTask.buildBundle(BaseFlutterTask.kt:147)
+[        ] 	at com.flutter.gradle.tasks.FlutterTaskHelper.build$gradle(FlutterTaskHelper.kt:90)
+[        ] 	at com.flutter.gradle.tasks.FlutterTask.build(FlutterTask.kt:49)
+[        ] 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+[        ] 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+[        ] 	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+[        ] 	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+[        ] 	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+[        ] 	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+[        ] 	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+[        ] 	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+[        ] 	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+[        ] 	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+[        ] 	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+[        ] 	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+[        ] 	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+[        ] 	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+[        ] 	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+[        ] 	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+[        ] 	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+[        ] 	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+[        ] 	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+[        ] 	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+[        ] 	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+[        ] 	at org.gradle.internal.Either$Right.fold(Either.java:175)
+[        ] 	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+[        ] 	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+[        ] 	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+[        ] 	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+[        ] 	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+[        ] 	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+[        ] 	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+[        ] 	at java.base/java.util.Optional.orElseGet(Unknown Source)
+[        ] 	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+[        ] 	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+[        ] 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+[        ] 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+[        ] 	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+[        ] 	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+[        ] 	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+[        ] 	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+[        ] 	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+[        ] 	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+[        ] 	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+[        ] 	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+[        ] 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+[        ] 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+[        ] 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+[        ] 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+[        ] 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+[        ] 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+[        ] 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+[        ] 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+[        ] 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+[        ] 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+[        ] 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+[        ] 	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+[        ] 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+[        ] 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+[        ] 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+[        ] 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+[        ] 	at java.base/java.util.Optional.orElseGet(Unknown Source)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+[        ] 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+[        ] 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+[        ] 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+[        ] 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+[        ] 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+[        ] 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+[        ] 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+[        ] 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+[        ] 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:40)
+[        ] 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+[        ] 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+[        ] 	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+[        ] 	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+[        ] 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+[        ] 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+[        ] 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+[        ] 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+[        ] 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+[        ] 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+[        ] 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+[        ] 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+[        ] 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+[        ] 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+[        ] 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+[        ] 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+[        ] 	at java.base/java.lang.Thread.run(Unknown Source)
+[        ] BUILD FAILED in 8s
+[        ] Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+[        ] You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+[        ] For more on this, please refer to https://docs.gradle.org/8.12/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+[        ] 6 actionable tasks: 2 executed, 4 up-to-date
+[        ] Watched directory hierarchies: [/Users/gashawarega/Documents/F/flutter/packages/flutter_tools/gradle]
+[  +22 ms] Running Gradle task 'assembleDebug'... (completed in 9.0s)
+[  +27 ms] Error: Gradle task assembleDebug failed with exit code 1
+[   +1 ms] "flutter run" took 12,440ms.
+[   +3 ms] executing: sw_vers -productName
+[  +11 ms] Exit code 0 from: sw_vers -productName
+[        ] macOS
+[        ] executing: sw_vers -productVersion
+[  +12 ms] Exit code 0 from: sw_vers -productVersion
+[        ] 26.0.1
+[        ] executing: sw_vers -buildVersion
+[  +10 ms] Exit code 0 from: sw_vers -buildVersion
+[        ] 25A362
+[        ] executing: uname -m
+[   +3 ms] Exit code 0 from: uname -m
+[        ] arm64
+[  +31 ms] 
+           #0      throwToolExit (package:flutter_tools/src/base/common.dart:34:3)
+           #1      RunCommand.runCommand (package:flutter_tools/src/commands/run.dart:872:9)
+           <asynchronous suspension>
+           #2      FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1581:27)
+           <asynchronous suspension>
+           #3      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #4      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+           <asynchronous suspension>
+           #5      FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:503:9)
+           <asynchronous suspension>
+           #6      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #7      FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:438:5)
+           <asynchronous suspension>
+           #8      run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:98:11)
+           <asynchronous suspension>
+           #9      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #10     main (package:flutter_tools/executable.dart:101:3)
+           <asynchronous suspension>
+
+
+[        ] Running 3 shutdown hooks
+[   +1 ms] Shutdown hooks complete
+[ +256 ms] exiting with code 1

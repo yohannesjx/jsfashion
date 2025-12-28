@@ -101,21 +101,22 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.GET("/analytics/sales", analyticsHandler.GetSalesAnalytics)
 
 	// Fulfillment Routes
-	fulfillmentHandler := NewFulfillmentHandler(repo, db)
+	// Fulfillment Routes
+	fulfillmentHandler := NewFulfillmentHandler(db)
 	fulfillment := admin.Group("/fulfillment")
 
 	// Picking
-	fulfillment.GET("/pick/pending", fulfillmentHandler.GetPendingPicking)
+	fulfillment.GET("/pick/pending", fulfillmentHandler.ListPendingPicking)
 	fulfillment.POST("/pick/:id/start", fulfillmentHandler.StartPicking)
-	fulfillment.POST("/pick/scan", fulfillmentHandler.ScanPickItem)
+	fulfillment.POST("/pick/scan", fulfillmentHandler.ScanPick)
 	fulfillment.POST("/pick/:id/complete", fulfillmentHandler.CompletePicking)
 
 	// Packing
-	fulfillment.GET("/pack/pending", fulfillmentHandler.GetPendingPacking)
+	fulfillment.GET("/pack/pending", fulfillmentHandler.ListPendingPacking)
 	fulfillment.POST("/pack/:id/start", fulfillmentHandler.StartPacking)
-	fulfillment.POST("/pack/scan", fulfillmentHandler.ScanPackItem)
+	fulfillment.POST("/pack/scan", fulfillmentHandler.ScanPack)
 	fulfillment.POST("/pack/:id/complete", fulfillmentHandler.CompletePacking)
-	fulfillment.GET("/pack/:id/label", fulfillmentHandler.GetZplLabel)
+	fulfillment.GET("/pack/:id/label", fulfillmentHandler.GenerateLabel)
 	admin.GET("/analytics/top-products", analyticsHandler.GetTopProducts)
 	admin.GET("/analytics/customer-metrics", analyticsHandler.GetCustomerMetrics)
 	admin.GET("/analytics/revenue-chart", analyticsHandler.GetRevenueChart)
