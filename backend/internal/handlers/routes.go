@@ -97,7 +97,25 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 
 	// Analytics Routes
 	analyticsHandler := NewAnalyticsHandler(repo)
+	analyticsHandler := NewAnalyticsHandler(repo)
 	admin.GET("/analytics/sales", analyticsHandler.GetSalesAnalytics)
+
+	// Fulfillment Routes
+	fulfillmentHandler := NewFulfillmentHandler(repo, db)
+	fulfillment := admin.Group("/fulfillment")
+
+	// Picking
+	fulfillment.GET("/pick/pending", fulfillmentHandler.GetPendingPicking)
+	fulfillment.POST("/pick/:id/start", fulfillmentHandler.StartPicking)
+	fulfillment.POST("/pick/scan", fulfillmentHandler.ScanPickItem)
+	fulfillment.POST("/pick/:id/complete", fulfillmentHandler.CompletePicking)
+
+	// Packing
+	fulfillment.GET("/pack/pending", fulfillmentHandler.GetPendingPacking)
+	fulfillment.POST("/pack/:id/start", fulfillmentHandler.StartPacking)
+	fulfillment.POST("/pack/scan", fulfillmentHandler.ScanPackItem)
+	fulfillment.POST("/pack/:id/complete", fulfillmentHandler.CompletePacking)
+	fulfillment.GET("/pack/:id/label", fulfillmentHandler.GetZplLabel)
 	admin.GET("/analytics/top-products", analyticsHandler.GetTopProducts)
 	admin.GET("/analytics/customer-metrics", analyticsHandler.GetCustomerMetrics)
 	admin.GET("/analytics/revenue-chart", analyticsHandler.GetRevenueChart)
