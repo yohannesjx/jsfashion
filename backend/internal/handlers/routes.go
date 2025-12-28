@@ -145,6 +145,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	fulfillment.GET("/orders/:id", fulfillmentHandler.GetFulfillmentOrder)
 	fulfillment.GET("/orders/tracking/:tracking", fulfillmentHandler.GetFulfillmentOrderByTracking)
 	fulfillment.PUT("/orders/:id/status", fulfillmentHandler.UpdateFulfillmentStatus, auth.RequireRole("super_admin", "admin"))
+	fulfillment.GET("/orders/:id/label", fulfillmentHandler.GenerateLabel, auth.RequireRole("super_admin", "admin", "editor"))
 	fulfillment.GET("/orders/:id/items", fulfillmentHandler.GetFulfillmentOrderItems)
 	fulfillment.GET("/orders/:id/history", fulfillmentHandler.GetStatusHistory)
 	fulfillment.GET("/stats", fulfillmentHandler.GetFulfillmentStats)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/luxe-fashion/backend/internal/zpl"
 )
 
 // FulfillmentHandler handles all fulfillment-related API endpoints
@@ -1239,6 +1240,72 @@ func (h *FulfillmentHandler) processScan(c echo.Context, scanType string) error 
 			IsComplete:   scannedItems >= totalItems,
 		},
 	})
+}
+
+// GenerateLabel generates ZPL code for shipping labels
+func (h *FulfillmentHandler) GenerateLabel(c echo.Context) error {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
+	}
+
+	// Get order details
+	var orderID uuid.UUID
+	var labelData zpl.LabelData
+	var firstName, lastName string
+
+	query := `
+		SELECT 
+			fo.order_id, fo.tracking_number, fo.created_at,
+			o.order_number,
+			COALESCE(c.first_name, '') as first_name,
+			COALESCE(c.last_name, '') as last_name,
+			COALESCE(fo.delivery_phone, '') as phone
+		FROM fulfillment_orders fo
+		JOIN orders o ON fo.order_id = o.id
+		LEFT JOIN customers c ON o.customer_id = c.id
+		WHERE fo.id = $1
+	`
+
+	err = h.DB.QueryRowContext(c.Request().Context(), query, id).Scan(
+		&orderID,
+		&labelData.TrackingNumber,
+		&labelData.Date,
+		&labelData.OrderNumber,
+		&firstName,
+		&lastName,
+		&labelData.CustomerPhone,
+	)
+
+	if err == sql.ErrNoRows {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Order not found"})
+	}
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch order details"})
+	}
+
+	labelData.CustomerName = fmt.Sprintf("%s %s", firstName, lastName)
+
+	// Get items
+	items, err := h.getOrderItemsWithScanStatus(c.Request().Context(), orderID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch items"})
+	}
+
+	// Convert items to ZPL items
+	for _, item := range items {
+		labelData.Items = append(labelData.Items, zpl.LabelItem{
+			SKU:      item.SKU,
+			Variant:  item.VariantName,
+			Quantity: int(item.Quantity),
+		})
+	}
+
+	// Generate ZPL
+	zplCode := zpl.GenerateLabels(labelData)
+
+	return c.String(http.StatusOK, zplCode)
 }
 
 func (h *FulfillmentHandler) logStatusChange(ctx interface{}, fulfillmentOrderID int64, previousStatus, newStatus string, adminID, driverID *int64, source, notes string) {
