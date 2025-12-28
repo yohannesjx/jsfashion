@@ -130,6 +130,71 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.DELETE("/media/:filename", mediaHandler.DeleteMedia, auth.RequireRole("super_admin", "admin"))
 
 	// ============================================================================
+	// FULFILLMENT SYSTEM ROUTES
+	// ============================================================================
+
+	// Initialize fulfillment handlers
+	fulfillmentHandler := NewFulfillmentHandler(db)
+	driverHandler := NewDriverHandler(db)
+	returnHandler := NewReturnHandler(db)
+
+	// Fulfillment Order Routes (Admin)
+	fulfillment := admin.Group("/fulfillment")
+	fulfillment.POST("/orders", fulfillmentHandler.CreateFulfillmentOrder, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.GET("/orders", fulfillmentHandler.ListFulfillmentOrders)
+	fulfillment.GET("/orders/:id", fulfillmentHandler.GetFulfillmentOrder)
+	fulfillment.GET("/orders/tracking/:tracking", fulfillmentHandler.GetFulfillmentOrderByTracking)
+	fulfillment.PUT("/orders/:id/status", fulfillmentHandler.UpdateFulfillmentStatus, auth.RequireRole("super_admin", "admin"))
+	fulfillment.GET("/orders/:id/items", fulfillmentHandler.GetFulfillmentOrderItems)
+	fulfillment.GET("/orders/:id/history", fulfillmentHandler.GetStatusHistory)
+	fulfillment.GET("/stats", fulfillmentHandler.GetFulfillmentStats)
+
+	// Picker/Packer Routes (Admin - for warehouse staff)
+	fulfillment.GET("/pick/pending", fulfillmentHandler.ListPendingPicking)
+	fulfillment.POST("/pick/start/:orderId", fulfillmentHandler.StartPicking, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.POST("/pick/scan", fulfillmentHandler.ScanPick, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.POST("/pick/complete/:orderId", fulfillmentHandler.CompletePicking, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.GET("/pack/pending", fulfillmentHandler.ListPendingPacking)
+	fulfillment.POST("/pack/start/:orderId", fulfillmentHandler.StartPacking, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.POST("/pack/scan", fulfillmentHandler.ScanPack, auth.RequireRole("super_admin", "admin", "editor"))
+	fulfillment.POST("/pack/complete/:orderId", fulfillmentHandler.CompletePacking, auth.RequireRole("super_admin", "admin", "editor"))
+
+	// Driver Management Routes (Admin)
+	drivers := admin.Group("/drivers")
+	drivers.POST("", driverHandler.CreateDriver, auth.RequireRole("super_admin", "admin"))
+	drivers.GET("", driverHandler.ListDrivers)
+	drivers.GET("/:id", driverHandler.GetDriver)
+	drivers.PUT("/:id", driverHandler.UpdateDriver, auth.RequireRole("super_admin", "admin"))
+	drivers.DELETE("/:id", driverHandler.DeleteDriver, auth.RequireRole("super_admin", "admin"))
+	drivers.GET("/:id/assignments", driverHandler.GetDriverAssignments)
+	drivers.GET("/:id/workload", driverHandler.GetDriverWorkload)
+	drivers.POST("/auto-assign/:orderId", driverHandler.AutoAssignDriver, auth.RequireRole("super_admin", "admin"))
+	drivers.POST("/assign/:orderId", driverHandler.ManualAssignDriver, auth.RequireRole("super_admin", "admin"))
+
+	// Return Management Routes (Admin)
+	returns := admin.Group("/returns")
+	returns.POST("", returnHandler.CreateReturnRequest, auth.RequireRole("super_admin", "admin"))
+	returns.GET("", returnHandler.ListReturnRequests)
+	returns.GET("/:id", returnHandler.GetReturnRequest)
+	returns.PUT("/:id/approve", returnHandler.ApproveReturn, auth.RequireRole("super_admin", "admin"))
+	returns.PUT("/:id/reject", returnHandler.RejectReturn, auth.RequireRole("super_admin", "admin"))
+	returns.PUT("/:id/assign-pickup", returnHandler.AssignPickupDriver, auth.RequireRole("super_admin", "admin"))
+	returns.PUT("/:id/received", returnHandler.MarkReturnReceived, auth.RequireRole("super_admin", "admin"))
+	returns.PUT("/:id/complete", returnHandler.CompleteReturn, auth.RequireRole("super_admin", "admin"))
+
+	// ============================================================================
+	// DRIVER APP ROUTES (For driver mobile app)
+	// ============================================================================
+	driverApp := api.Group("/driver-app")
+	driverApp.GET("/assignments", driverHandler.GetMyAssignments)
+	driverApp.PUT("/assignments/:id/status", driverHandler.UpdateAssignmentStatus)
+	driverApp.PUT("/delivery/:orderId/delivered", driverHandler.MarkDelivered)
+	driverApp.PUT("/return/:id/picked-up", returnHandler.MarkReturnPickedUp)
+
+	// Public tracking endpoint (no auth required)
+	api.GET("/tracking/:tracking", fulfillmentHandler.GetFulfillmentOrderByTracking)
+
+	// ============================================================================
 	// PUBLIC SHOP ROUTES (No authentication required)
 	// ============================================================================
 	api.GET("/products", productHandler.ListProducts)
