@@ -151,13 +151,11 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	// FULFILLMENT SYSTEM ROUTES
 	// ============================================================================
 
-	// Initialize fulfillment handlers
-	fulfillmentHandler := NewFulfillmentHandler(db)
+	// Initialize driver and return handlers
 	driverHandler := NewDriverHandler(db)
 	returnHandler := NewReturnHandler(db)
 
 	// Fulfillment Order Routes (Admin)
-	fulfillment := admin.Group("/fulfillment")
 	fulfillment.POST("/orders", fulfillmentHandler.CreateFulfillmentOrder, auth.RequireRole("super_admin", "admin", "editor"))
 	fulfillment.GET("/orders", fulfillmentHandler.ListFulfillmentOrders)
 	fulfillment.GET("/orders/:id", fulfillmentHandler.GetFulfillmentOrder)

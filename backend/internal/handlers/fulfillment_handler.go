@@ -128,7 +128,7 @@ func (h *FulfillmentHandler) CreateFulfillmentOrder(c echo.Context) error {
 	}
 
 	// Generate tracking number
-	trackingNumber := generateTrackingNumber()
+	trackingNumber := GenerateTrackingNumber()
 
 	// Create fulfillment order
 	query := `
@@ -1036,7 +1036,7 @@ func (h *FulfillmentHandler) GetFulfillmentStats(c echo.Context) error {
 // HELPER FUNCTIONS
 // ============================================================================
 
-func generateTrackingNumber() string {
+func GenerateTrackingNumber() string {
 	now := time.Now()
 	return fmt.Sprintf("TRK-%s-%06d", now.Format("20060102"), now.UnixNano()%1000000)
 }

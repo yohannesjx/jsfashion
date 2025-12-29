@@ -48,7 +48,7 @@ func (h *OrderHandler) ConfirmOrder(c echo.Context) error {
 	}
 
 	// Generate tracking number
-	trackingNumber := generateTrackingNumber()
+	trackingNumber := GenerateTrackingNumber()
 
 	// Prepare delivery details from customer info
 	deliveryAddress := ""
