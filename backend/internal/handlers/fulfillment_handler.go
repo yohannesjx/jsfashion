@@ -740,7 +740,7 @@ func (h *FulfillmentHandler) ListPendingPacking(c echo.Context) error {
 
 // StartPicking starts the picking process for an order
 func (h *FulfillmentHandler) StartPicking(c echo.Context) error {
-	idStr := c.Param("orderId")
+	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
@@ -803,7 +803,7 @@ func (h *FulfillmentHandler) ScanPick(c echo.Context) error {
 
 // CompletePicking completes the picking process
 func (h *FulfillmentHandler) CompletePicking(c echo.Context) error {
-	idStr := c.Param("orderId")
+	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
@@ -875,7 +875,7 @@ func (h *FulfillmentHandler) CompletePicking(c echo.Context) error {
 
 // StartPacking starts the packing process
 func (h *FulfillmentHandler) StartPacking(c echo.Context) error {
-	idStr := c.Param("orderId")
+	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
@@ -935,7 +935,7 @@ func (h *FulfillmentHandler) ScanPack(c echo.Context) error {
 
 // CompletePacking completes the packing process
 func (h *FulfillmentHandler) CompletePacking(c echo.Context) error {
-	idStr := c.Param("orderId")
+	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID"})
