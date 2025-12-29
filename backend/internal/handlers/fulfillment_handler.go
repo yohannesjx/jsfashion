@@ -760,7 +760,8 @@ func (h *FulfillmentHandler) StartPicking(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Fulfillment order not found"})
 	}
-	if currentStatus != "placed" {
+	// Allow if 'placed' (start new) or 'picking' (resume)
+	if currentStatus != "placed" && currentStatus != "picking" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": fmt.Sprintf("Order is not ready for picking. Current status: %s", currentStatus),
 		})
@@ -893,7 +894,8 @@ func (h *FulfillmentHandler) StartPacking(c echo.Context) error {
 	if err == sql.ErrNoRows {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Fulfillment order not found"})
 	}
-	if currentStatus != "picked" {
+	// Allow if 'picked' (start new packing) or 'packing' (resume)
+	if currentStatus != "picked" && currentStatus != "packing" {
 		return c.JSON(http.StatusBadRequest, map[string]string{
 			"error": fmt.Sprintf("Order is not ready for packing. Current status: %s", currentStatus),
 		})
