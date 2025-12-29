@@ -87,6 +87,31 @@ export default function OrdersPage() {
         }
     };
 
+    const confirmOrder = async (orderId: string) => {
+        try {
+            const token = localStorage.getItem('access_token');
+            const response = await fetch(`${API_URL}/api/v1/admin/orders/${orderId}/confirm`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                // Refresh orders list
+                fetchOrders();
+                alert('Order confirmed successfully! It will now appear in the warehouse app.');
+            } else {
+                const error = await response.json();
+                alert(`Failed to confirm order: ${error.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Failed to confirm order:', error);
+            alert('Failed to confirm order. Please try again.');
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
             case 'delivered':
@@ -135,13 +160,14 @@ export default function OrdersPage() {
                             <TableHead>Date</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Total</TableHead>
+                            <TableHead>Actions</TableHead>
                             <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
+                                <TableCell colSpan={7} className="h-24 text-center">
                                     <div className="flex justify-center items-center">
                                         <Loader2 className="h-6 w-6 animate-spin text-neutral-500" />
                                     </div>
@@ -149,7 +175,7 @@ export default function OrdersPage() {
                             </TableRow>
                         ) : orders.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-neutral-500">
+                                <TableCell colSpan={7} className="h-24 text-center text-neutral-500">
                                     No orders found.
                                 </TableCell>
                             </TableRow>
@@ -181,6 +207,17 @@ export default function OrdersPage() {
                                     </TableCell>
                                     <TableCell>
                                         {parseFloat(order.total_amount).toLocaleString()} Birr
+                                    </TableCell>
+                                    <TableCell>
+                                        {order.status === 'pending' && (
+                                            <Button
+                                                size="sm"
+                                                onClick={() => confirmOrder(order.id)}
+                                                className="bg-green-600 hover:bg-green-700"
+                                            >
+                                                Confirm
+                                            </Button>
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <DropdownMenu>
