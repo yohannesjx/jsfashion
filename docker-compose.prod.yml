@@ -57,10 +57,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: https://api.jsfashion.et/api/v1
+        NEXT_PUBLIC_API_URL: https://api.jsfashion.et
     container_name: jsfashion_frontend
     environment:
-      NEXT_PUBLIC_API_URL: https://api.jsfashion.et/api/v1
+      NEXT_PUBLIC_API_URL: https://api.jsfashion.et
     ports:
       - "4000:4000"
     depends_on:
