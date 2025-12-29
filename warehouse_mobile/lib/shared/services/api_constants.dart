@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://jsfashion.et:8081/api/v1'; // Remote Backend Port 8081
+  static const String baseUrl = 'https://api.jsfashion.et/api/v1'; // Production API
   
   // Auth
   static const String login = '$baseUrl/admin/auth/login';
