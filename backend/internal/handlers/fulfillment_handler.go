@@ -3,13 +3,14 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/luxe-fashion/backend/internal/zpl"
 )
 
 // FulfillmentHandler handles all fulfillment-related API endpoints
@@ -1252,7 +1253,7 @@ func (h *FulfillmentHandler) GenerateLabel(c echo.Context) error {
 
 	// Get order details
 	var orderID uuid.UUID
-	var labelData zpl.LabelData
+	var labelData LabelData
 	var firstName, lastName string
 
 	query := `
@@ -1295,7 +1296,7 @@ func (h *FulfillmentHandler) GenerateLabel(c echo.Context) error {
 
 	// Convert items to ZPL items
 	for _, item := range items {
-		labelData.Items = append(labelData.Items, zpl.LabelItem{
+		labelData.Items = append(labelData.Items, LabelItem{
 			SKU:      item.SKU,
 			Variant:  item.VariantName,
 			Quantity: int(item.Quantity),
@@ -1303,7 +1304,7 @@ func (h *FulfillmentHandler) GenerateLabel(c echo.Context) error {
 	}
 
 	// Generate ZPL
-	zplCode := zpl.GenerateLabels(labelData)
+	zplCode := generateZPLLabels(labelData)
 
 	return c.String(http.StatusOK, zplCode)
 }
@@ -1319,4 +1320,137 @@ func (h *FulfillmentHandler) logStatusChange(ctx interface{}, fulfillmentOrderID
 	} else {
 		h.DB.Exec(query, fulfillmentOrderID, previousStatus, newStatus, adminID, driverID, source, notes)
 	}
+}
+
+// ============================================================================
+// ZPL LABEL GENERATION (INLINE)
+// ============================================================================
+
+// LabelData contains all information needed to print a shipping/fulfillment label
+type LabelData struct {
+	OrderNumber    string
+	TrackingNumber string
+	CustomerName   string
+	CustomerPhone  string
+	Date           time.Time
+	Items          []LabelItem
+	CurrentLabel   int
+	TotalLabels    int
+	IsLastLabel    bool
+}
+
+// LabelItem represents a single line item on the label
+type LabelItem struct {
+	SKU      string
+	Variant  string
+	Quantity int
+}
+
+const (
+	// Printer settings for Zebra GC420t (203 dpi)
+	LabelWidthDots   = 800 // 100mm
+	LabelHeightDots  = 560 // 70mm
+	MaxItemsPerLabel = 10
+)
+
+// generateZPLLabels creates ZPL code for one or more labels depending on item count
+func generateZPLLabels(data LabelData) string {
+	var zplBuilder strings.Builder
+
+	totalItems := len(data.Items)
+	if totalItems == 0 {
+		return generateSingleZPLLabel(data)
+	}
+
+	numLabels := int(math.Ceil(float64(totalItems) / float64(MaxItemsPerLabel)))
+	data.TotalLabels = numLabels
+
+	for i := 0; i < numLabels; i++ {
+		start := i * MaxItemsPerLabel
+		end := start + MaxItemsPerLabel
+		if end > totalItems {
+			end = totalItems
+		}
+
+		chunkData := data
+		chunkData.Items = data.Items[start:end]
+		chunkData.CurrentLabel = i + 1
+		chunkData.IsLastLabel = (i == numLabels-1)
+
+		zplBuilder.WriteString(generateSingleZPLLabel(chunkData))
+	}
+
+	return zplBuilder.String()
+}
+
+func generateSingleZPLLabel(data LabelData) string {
+	zpl := fmt.Sprintf(`
+^XA
+^PW%d
+^LL%d
+^CI28
+`, LabelWidthDots, LabelHeightDots)
+
+	// Order Number
+	zpl += fmt.Sprintf(`^FO20,20^A0N,40,40^FDORDER: %s^FS`, cleanZPL(data.OrderNumber))
+
+	// Date
+	zpl += fmt.Sprintf(`^FO550,25^A0N,25,25^FD%s^FS`, data.Date.Format("2006-01-02"))
+
+	// Customer Name
+	custName := data.CustomerName
+	if len(custName) > 30 {
+		custName = custName[:30]
+	}
+	zpl += fmt.Sprintf(`^FO20,65^A0N,25,25^FDCustomer: %s^FS`, cleanZPL(custName))
+
+	// Separator Line
+	zpl += `^FO10,95^GB780,1,3^FS`
+
+	// Tracking Number Text
+	zpl += fmt.Sprintf(`^FO20,110^A0N,20,20^FDTracking #: %s^FS`, data.TrackingNumber)
+
+	// Barcode (Code 128)
+	zpl += fmt.Sprintf(`^FO100,135^BCN,70,Y,N,N^FD%s^FS`, data.TrackingNumber)
+
+	// Separator Line
+	zpl += `^FO10,230^GB780,1,3^FS`
+
+	// Items Header
+	zpl += `^FO20,240^A0N,20,20^FDQTY   SKU                     VARIANT^FS`
+
+	// Items List
+	y := 265
+	for _, item := range data.Items {
+		zpl += fmt.Sprintf(`^FO20,%d^A0N,20,20^FD%d^FS`, y, item.Quantity)
+
+		sku := item.SKU
+		if len(sku) > 18 {
+			sku = sku[:18]
+		}
+		zpl += fmt.Sprintf(`^FO80,%d^A0N,20,20^FD%s^FS`, y, cleanZPL(sku))
+
+		variant := item.Variant
+		if len(variant) > 25 {
+			variant = variant[:25] + ".."
+		}
+		zpl += fmt.Sprintf(`^FO350,%d^A0N,20,20^FD%s^FS`, y, cleanZPL(variant))
+
+		y += 25
+	}
+
+	// Label X of Y
+	zpl += fmt.Sprintf(`^FO650,530^A0N,20,20^FDLabel %d of %d^FS`, data.CurrentLabel, data.TotalLabels)
+
+	// End Format
+	zpl += `^XZ`
+
+	return zpl
+}
+
+func cleanZPL(s string) string {
+	s = strings.ReplaceAll(s, "^", "")
+	s = strings.ReplaceAll(s, "~", "")
+	s = strings.ReplaceAll(s, "\n", " ")
+	return s
 }
