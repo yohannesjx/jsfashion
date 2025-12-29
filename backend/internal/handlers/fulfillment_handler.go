@@ -611,7 +611,7 @@ func (h *FulfillmentHandler) ListPendingPicking(c echo.Context) error {
 		FROM fulfillment_orders fo
 		JOIN orders o ON fo.order_id = o.id
 		LEFT JOIN customers c ON o.customer_id = c.id
-		WHERE fo.fulfillment_status = 'placed'
+		WHERE fo.fulfillment_status IN ('placed', 'picking')
 		ORDER BY fo.created_at ASC
 		LIMIT $1 OFFSET $2
 	`
