@@ -58,6 +58,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.GET("/orders", orderHandler.ListOrders)
 	admin.GET("/orders/:id", orderHandler.GetOrder)
 	admin.PUT("/orders/:id", orderHandler.UpdateOrderStatus, auth.RequireRole("super_admin", "admin"))
+	admin.POST("/orders/:id/confirm", orderHandler.ConfirmOrder, auth.RequireRole("super_admin", "admin"))
 
 	// Customer Routes
 	admin.GET("/customers", customerHandler.ListCustomers)
@@ -97,10 +98,8 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 
 	// Analytics Routes
 	analyticsHandler := NewAnalyticsHandler(repo)
-	analyticsHandler := NewAnalyticsHandler(repo)
 	admin.GET("/analytics/sales", analyticsHandler.GetSalesAnalytics)
 
-	// Fulfillment Routes
 	// Fulfillment Routes
 	fulfillmentHandler := NewFulfillmentHandler(db)
 	fulfillment := admin.Group("/fulfillment")
