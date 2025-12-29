@@ -537,7 +537,7 @@ func (h *FulfillmentHandler) GetStatusHistory(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var history []map[string]interface{}
+	history := []map[string]interface{}{}
 	for rows.Next() {
 		var entry struct {
 			ID              int64          `json:"id"`
@@ -622,7 +622,7 @@ func (h *FulfillmentHandler) ListPendingPicking(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var orders []map[string]interface{}
+	orders := []map[string]interface{}{}
 	for rows.Next() {
 		var id int64
 		var orderID uuid.UUID
@@ -697,7 +697,7 @@ func (h *FulfillmentHandler) ListPendingPacking(c echo.Context) error {
 	}
 	defer rows.Close()
 
-	var orders []map[string]interface{}
+	orders := []map[string]interface{}{}
 	for rows.Next() {
 		var id int64
 		var orderID uuid.UUID
