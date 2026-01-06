@@ -689,12 +689,23 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 
 	// 1. Sync single ImageUrl to product_images (if provided and Images array is NOT provided)
 	if req.ImageUrl != nil && req.Images == nil {
+		c.Logger().Infof("Syncing ImageUrl to product_images for product %s. New URL: %s", idStr, *req.ImageUrl)
+
 		// We treat this as "updating the main image"
 		// Delete existing images to ensure this one becomes the main one
-		// or just update/insert at position 0. For simplicity and to clear "copied" images, we'll reset.
-		existingImages, _ := h.Repo.ListProductImages(ctx, idStr)
-		for _, img := range existingImages {
-			_ = h.Repo.DeleteProductImage(ctx, img.ID)
+		existingImages, err := h.Repo.ListProductImages(ctx, idStr)
+		if err != nil {
+			c.Logger().Errorf("Failed to list existing images: %v", err)
+		} else {
+			c.Logger().Infof("Found %d existing images for product %s", len(existingImages), idStr)
+			for _, img := range existingImages {
+				err := h.Repo.DeleteProductImage(ctx, img.ID)
+				if err != nil {
+					c.Logger().Errorf("Failed to delete image %s: %v", img.ID, err)
+				} else {
+					c.Logger().Infof("Deleted image %s", img.ID)
+				}
+			}
 		}
 
 		_, err = h.Repo.AddProductImage(ctx, repository.AddProductImageParams{
@@ -704,6 +715,8 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 		if err != nil {
 			c.Logger().Errorf("Failed to add new main image %s: %v", *req.ImageUrl, err)
+		} else {
+			c.Logger().Infof("Added new main image to product_images")
 		}
 	}
 
