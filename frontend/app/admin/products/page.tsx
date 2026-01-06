@@ -825,9 +825,9 @@ export default function ProductsPage() {
             // Optimistic update
             setProducts(prev => prev.map(p => p.id === productId ? { ...p, image_url: url } : p));
             toast.success('Image updated successfully');
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to update image');
+        } catch (error: any) {
+            console.error('Quick upload error:', error);
+            toast.error(`Failed to update image: ${error.message || 'Unknown error'}`);
         } finally {
             setIsUploading(null);
             if (e.target) e.target.value = '';
