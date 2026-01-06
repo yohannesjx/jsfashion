@@ -1293,7 +1293,6 @@ LEFT JOIN LATERAL (
     ORDER BY position ASC
     LIMIT 1
 ) pi ON true
-	) pi ON true
 ORDER BY p.created_at DESC NULLS LAST, p.id DESC
 LIMIT $1 OFFSET $2
 `
