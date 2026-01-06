@@ -786,7 +786,27 @@ export default function ProductsPage() {
     // New Feature Handlers
     const handleDuplicate = (product: Product) => {
         if (confirm(`Are you sure you want to duplicate "${product.name}"?`)) {
-            duplicateProduct.mutate(product.id);
+            duplicateProduct.mutate(product.id, {
+                onSuccess: (newProductData: any) => {
+                    // Create new product object from response
+                    const newProduct: Product = {
+                        id: newProductData.id,
+                        name: newProductData.name,
+                        description: product.description, // Copy description from original
+                        base_price: newProductData.base_price,
+                        image_url: product.image_url, // Images are copied backend side, assume main image is same
+                        is_active: newProductData.is_active,
+                        created_at: newProductData.created_at,
+                        variants: [] // Variants are copied backend side, but we don't have them in response yet
+                    };
+
+                    // Prepend to list
+                    setProducts(prev => [newProduct, ...prev]);
+
+                    // Trigger variant fetch for the new product
+                    fetchVariantsInBackground([newProduct], false);
+                }
+            });
         }
     };
 
