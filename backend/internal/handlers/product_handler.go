@@ -880,6 +880,20 @@ func (h *ProductHandler) DuplicateProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to duplicate product"})
 	}
 
+	// 3.5 Copy Categories
+	categories, err := h.Repo.ListProductCategories(ctx, idStr)
+	if err == nil {
+		for _, cat := range categories {
+			err := h.Repo.AddProductCategory(ctx, repository.AddProductCategoryParams{
+				ProductID:  newProduct.ID,
+				CategoryID: cat.ID,
+			})
+			if err != nil {
+				c.Logger().Warnf("Failed to add category %s directly to duplicate product %s: %v", cat.ID, newProduct.ID, err)
+			}
+		}
+	}
+
 	// 4. Copy Images
 	images, err := h.Repo.ListProductImages(ctx, idStr)
 	if err == nil {
