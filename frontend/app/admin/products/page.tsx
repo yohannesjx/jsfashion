@@ -25,6 +25,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
@@ -861,6 +862,24 @@ export default function ProductsPage() {
         }
     };
 
+    const handleStatusToggle = async (product: Product) => {
+        const newStatus = !product.is_active;
+        // Optimistic update
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, is_active: newStatus } : p));
+
+        try {
+            await updateProduct.mutateAsync({
+                id: product.id,
+                is_active: newStatus
+            });
+            toast.success(newStatus ? 'Product activated' : 'Product deactivated');
+        } catch (error) {
+            // Revert on error
+            setProducts(prev => prev.map(p => p.id === product.id ? { ...p, is_active: !newStatus } : p));
+            toast.error('Failed to update status');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -1235,9 +1254,15 @@ export default function ProductsPage() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={product.is_active ? 'default' : 'secondary'}>
-                                                    {product.is_active ? 'Active' : 'Inactive'}
-                                                </Badge>
+                                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                                    <Switch
+                                                        checked={product.is_active}
+                                                        onCheckedChange={() => handleStatusToggle(product)}
+                                                    />
+                                                    <span className="text-xs text-muted-foreground w-12">
+                                                        {product.is_active ? 'Active' : 'Draft'}
+                                                    </span>
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Button

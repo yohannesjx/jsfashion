@@ -788,12 +788,18 @@ type CreateVariantRequest struct {
 
 func (h *ProductHandler) CreateVariant(c echo.Context) error {
 	var req CreateVariantRequest
+	// Parse request
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
+	// Auto-generate SKU if not provided
 	if req.Sku == "" {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "SKU is required"})
+		err := h.Repo.DB().QueryRowContext(c.Request().Context(), "SELECT nextval('product_variant_sku_seq')::text").Scan(&req.Sku)
+		if err != nil {
+			c.Logger().Errorf("Failed to generate SKU: %v", err)
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to generate SKU"})
+		}
 	}
 
 	if req.ProductID == "" {
@@ -893,11 +899,15 @@ func (h *ProductHandler) DuplicateProduct(c echo.Context) error {
 	variants, err := h.Repo.ListProductVariants(ctx, idStr)
 	if err == nil {
 		for _, v := range variants {
-			// Generate unique SKU
-			timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
-			// Take last 6 digits of nano timestamp to keep it reasonably short but unique enough with base SKU
-			suffix := timestamp[len(timestamp)-6:]
-			newSku := fmt.Sprintf("%s-copy-%s", v.Sku, suffix)
+			// Generate unique SKU using sequence
+			var newSku string
+			err = h.Repo.DB().QueryRowContext(ctx, "SELECT nextval('product_variant_sku_seq')::text").Scan(&newSku)
+			if err != nil {
+				c.Logger().Errorf("Failed to generate SKU from sequence: %v", err)
+				// Fallback to timestamp if sequence fails
+				timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
+				newSku = fmt.Sprintf("%s-copy-%s", v.Sku, timestamp[len(timestamp)-6:])
+			}
 
 			createParams := repository.CreateProductVariantParams{
 				ProductID:     newProduct.ID,
