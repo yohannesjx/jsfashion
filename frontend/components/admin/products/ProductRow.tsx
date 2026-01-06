@@ -104,25 +104,11 @@ export function ProductRow({
                 </TableCell>
                 <TableCell>
 
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="w-12 h-12 bg-muted rounded border border-border overflow-hidden relative group">
-                            {product.image_url ? (
-                                <img
-                                    src={product.image_url}
-                                    alt={product.name}
-                                    className={`w-full h-full object-cover transition-transform group-hover:scale-110 ${isUploading ? 'opacity-50' : ''}`}
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
-                                    No Img
-                                </div>
-                            )}
-                        </div>
-
+                    <div className="flex flex-row items-center gap-2">
                         <Button
                             variant="outline"
                             size="icon"
-                            className="h-6 w-6"
+                            className="h-8 w-8 shrink-0"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 fileInputRef.current?.click();
@@ -133,9 +119,23 @@ export function ProductRow({
                             {isUploading ? (
                                 <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <Upload className="w-3 h-3" />
+                                <Upload className="w-4 h-4 text-muted-foreground" />
                             )}
                         </Button>
+
+                        <div className="w-12 h-12 bg-muted rounded border border-border overflow-hidden relative group shrink-0">
+                            {product.image_url ? (
+                                <img
+                                    src={product.image_url}
+                                    alt={product.name}
+                                    className={`w-full h-full object-cover transition-transform group-hover:scale-150 ${isUploading ? 'opacity-50' : ''}`}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
+                                    No Img
+                                </div>
+                            )}
+                        </div>
 
                         <input
                             type="file"
