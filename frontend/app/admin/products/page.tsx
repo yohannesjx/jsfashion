@@ -1048,13 +1048,13 @@ export default function ProductsPage() {
 
                                                         {/* Enlarged Preview on Hover */}
                                                         {product.image_url && (
-                                                            <div className="absolute left-0 top-0 w-64 h-64 bg-white border-2 border-border rounded-lg shadow-2xl opacity-0 invisible group-hover/image:opacity-100 group-hover/image:visible transition-all duration-200 z-50 pointer-events-none">
+                                                            <div className="absolute left-0 top-0 w-80 h-80 bg-white border-2 border-border rounded-lg shadow-2xl opacity-0 invisible group-hover/image:opacity-100 group-hover/image:visible transition-all duration-200 z-50 pointer-events-none">
                                                                 <Image
                                                                     src={product.image_url}
                                                                     alt={product.name}
                                                                     fill
                                                                     className="object-contain p-2"
-                                                                    sizes="256px"
+                                                                    sizes="320px"
                                                                 />
                                                             </div>
                                                         )}
