@@ -1029,18 +1029,33 @@ export default function ProductsPage() {
                                                         )}
                                                     </Button>
 
-                                                    <div className="relative w-12 h-12 bg-muted rounded border border-border overflow-hidden flex-shrink-0 group/image">
-                                                        {product.image_url ? (
-                                                            <Image
-                                                                src={product.image_url}
-                                                                alt={product.name}
-                                                                fill
-                                                                className={`object-cover transition-transform group-hover/image:scale-150 ${isUploading === product.id ? 'opacity-50' : ''}`}
-                                                                sizes="48px"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
-                                                                No Img
+                                                    <div className="relative w-12 h-12 bg-muted rounded border border-border overflow-visible flex-shrink-0 group/image">
+                                                        <div className="w-full h-full rounded overflow-hidden">
+                                                            {product.image_url ? (
+                                                                <Image
+                                                                    src={product.image_url}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className={`object-cover ${isUploading === product.id ? 'opacity-50' : ''}`}
+                                                                    sizes="48px"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
+                                                                    No Img
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Enlarged Preview on Hover */}
+                                                        {product.image_url && (
+                                                            <div className="absolute left-0 top-0 w-64 h-64 bg-white border-2 border-border rounded-lg shadow-2xl opacity-0 invisible group-hover/image:opacity-100 group-hover/image:visible transition-all duration-200 z-50 pointer-events-none">
+                                                                <Image
+                                                                    src={product.image_url}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className="object-contain p-2"
+                                                                    sizes="256px"
+                                                                />
                                                             </div>
                                                         )}
                                                     </div>
