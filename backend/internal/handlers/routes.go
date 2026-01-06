@@ -46,6 +46,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.POST("/products", productHandler.CreateProduct, auth.RequireRole("super_admin", "admin", "editor"))
 	admin.PUT("/products/:id", productHandler.UpdateProduct, auth.RequireRole("super_admin", "admin", "editor"))
 	admin.DELETE("/products/:id", productHandler.DeleteProduct, auth.RequireRole("super_admin", "admin"))
+	admin.POST("/products/:id/duplicate", productHandler.DuplicateProduct, auth.RequireRole("super_admin", "admin", "editor"))
 
 	// Product Variant Routes
 	admin.GET("/products/variants/:id", productHandler.GetVariant)
