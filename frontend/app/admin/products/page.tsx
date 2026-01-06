@@ -366,7 +366,8 @@ export default function ProductsPage() {
     };
 
     const handleAddVariant = async (productId: string) => {
-        const sku = `VAR-${Date.now()}`;
+        // Generate random 6-digit number (100000 to 999999)
+        const sku = Math.floor(100000 + Math.random() * 900000).toString();
         try {
             await createVariant.mutateAsync({
                 product_id: productId,
