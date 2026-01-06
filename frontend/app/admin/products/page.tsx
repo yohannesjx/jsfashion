@@ -1487,10 +1487,11 @@ export default function ProductsPage() {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
                                                         onClick={() => handleDeleteVariant(product.id, variant.id)}
+                                                        title="Delete variant"
                                                     >
-                                                        <X className="h-4 w-4" />
+                                                        <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
