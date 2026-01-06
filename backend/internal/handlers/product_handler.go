@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -793,15 +794,6 @@ func (h *ProductHandler) CreateVariant(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
 	}
 
-	// Auto-generate SKU if not provided
-	if req.Sku == "" {
-		err := h.Repo.DB().QueryRowContext(c.Request().Context(), "SELECT nextval('product_variant_sku_seq')::text").Scan(&req.Sku)
-		if err != nil {
-			c.Logger().Errorf("Failed to generate SKU: %v", err)
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to generate SKU"})
-		}
-	}
-
 	if req.ProductID == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Product ID is required"})
 	}
@@ -812,6 +804,44 @@ func (h *ProductHandler) CreateVariant(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
+
+	// Auto-generate SKU if not provided (random 6-digit)
+	if req.Sku == "" {
+		maxRetries := 5
+		for i := 0; i < maxRetries; i++ {
+			rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+			req.Sku = fmt.Sprintf("%06d", rnd.Intn(900000)+100000)
+
+			// Try to insert with this SKU
+			// We can't check uniqueness easily without a separate query or try-insert.
+			// Ideally we should just proceed to insert and handle error, but CreateVariant logic below does the insert.
+			// So for now, we just pick one and let the insert below fail if duplicate (user will have to retry or we loop here if we refactor).
+			// Refactoring to loop the insert:
+
+			variant, err := h.Repo.CreateProductVariant(ctx, repository.CreateProductVariantParams{
+				ProductID:     req.ProductID,
+				Sku:           req.Sku,
+				Size:          toNullString(req.Size),
+				Color:         toNullString(req.Color),
+				Image:         toNullString(req.Image),
+				StockQuantity: sql.NullInt32{Int32: stockQty, Valid: true},
+			})
+
+			if err == nil {
+				return c.JSON(http.StatusCreated, variant)
+			}
+
+			if !strings.Contains(err.Error(), "duplicate key") && !strings.Contains(err.Error(), "unique constraint") {
+				// If error is NOT a duplicate SKU error, return it immediately
+				c.Logger().Errorf("Failed to create variant: %v", err)
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create variant", "details": err.Error()})
+			}
+			// If it WAS a duplicate, loop continues to try new SKU
+		}
+		return c.JSON(http.StatusConflict, map[string]string{"error": "Failed to generate unique SKU after retries"})
+	}
+
+	// Manual SKU provided
 	variant, err := h.Repo.CreateProductVariant(ctx, repository.CreateProductVariantParams{
 		ProductID:     req.ProductID,
 		Sku:           req.Sku,
@@ -913,52 +943,52 @@ func (h *ProductHandler) DuplicateProduct(c echo.Context) error {
 	variants, err := h.Repo.ListProductVariants(ctx, idStr)
 	if err == nil {
 		for _, v := range variants {
-			// Generate unique SKU using sequence
+			// Generate unique SKU (random 6-digit)
 			var newSku string
-			err = h.Repo.DB().QueryRowContext(ctx, "SELECT nextval('product_variant_sku_seq')::text").Scan(&newSku)
-			if err != nil {
-				c.Logger().Errorf("Failed to generate SKU from sequence: %v", err)
-				// Fallback to timestamp if sequence fails
-				timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
-				newSku = fmt.Sprintf("%s-copy-%s", v.Sku, timestamp[len(timestamp)-6:])
-			}
+			maxRetries := 5
+			for i := 0; i < maxRetries; i++ {
+				// Generate random 6-digit number
+				rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+				newSku = fmt.Sprintf("%06d", rnd.Intn(900000)+100000)
 
-			createParams := repository.CreateProductVariantParams{
-				ProductID:     newProduct.ID,
-				Sku:           newSku,
-				StockQuantity: v.StockQuantity,
-			}
+				createParams := repository.CreateProductVariantParams{
+					ProductID:     newProduct.ID,
+					Sku:           newSku,
+					StockQuantity: v.StockQuantity,
+				}
 
-			if v.Size.Valid {
-				createParams.Size = v.Size
-			}
-			if v.Color.Valid {
-				createParams.Color = v.Color
-			}
-			if v.Image.Valid {
-				createParams.Image = v.Image
-			}
+				if v.Size.Valid {
+					createParams.Size = v.Size
+				}
+				if v.Color.Valid {
+					createParams.Color = v.Color
+				}
+				if v.Image.Valid {
+					createParams.Image = v.Image
+				}
 
-			newVariant, err := h.Repo.CreateProductVariant(ctx, createParams)
-			if err != nil {
-				// Retry with a slightly different SKU if there's a collision (unlikely with nano, but basic safety)
-				// Or log and skip
-				c.Logger().Errorf("Failed to copy variant %s for duplicate product %s: %v", v.Sku, newProduct.ID, err)
-				continue
-			}
+				newVariant, err := h.Repo.CreateProductVariant(ctx, createParams)
+				if err == nil {
+					// Success, fix price and continue to next variant
+					// Copy Price
+					err = h.Repo.UpdateVariantPrice(ctx, newVariant.ID, v.Price, "Br")
+					if err != nil {
+						c.Logger().Warnf("Failed to set price for duplicate variant %s: %v", newVariant.ID, err)
+					}
 
-			// Copy Price
-			err = h.Repo.UpdateVariantPrice(ctx, newVariant.ID, v.Price, "Br")
-			if err != nil {
-				c.Logger().Warnf("Failed to set price for duplicate variant %s: %v", newVariant.ID, err)
-			}
+					// Copy Sale Price
+					if v.SalePrice.Valid {
+						salePrice := v.SalePrice.Int64
+						err = h.Repo.UpdateVariantSalePriceOnly(ctx, newVariant.ID, &salePrice)
+						if err != nil {
+							c.Logger().Warnf("Failed to set sale price for duplicate variant %s: %v", newVariant.ID, err)
+						}
+					}
+					break // Break retry loop
+				}
 
-			// Copy Sale Price
-			if v.SalePrice.Valid {
-				salePrice := v.SalePrice.Int64
-				err = h.Repo.UpdateVariantSalePriceOnly(ctx, newVariant.ID, &salePrice)
-				if err != nil {
-					c.Logger().Warnf("Failed to set sale price for duplicate variant %s: %v", newVariant.ID, err)
+				if i == maxRetries-1 {
+					c.Logger().Errorf("Failed to copy variant %s after retries: %v", v.Sku, err)
 				}
 			}
 		}
