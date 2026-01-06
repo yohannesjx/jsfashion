@@ -800,9 +800,6 @@ func (h *ProductHandler) CreateVariant(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Product ID is required"})
 	}
 
-	// name, displayOrder, isActive are not used in the repo call anymore as we use product_variants table directly
-	// which doesn't have these columns (except stock_quantity, size, color, image)
-
 	stockQty := int32(0)
 	if req.StockQuantity != nil {
 		stockQty = *req.StockQuantity
@@ -827,6 +824,132 @@ func (h *ProductHandler) CreateVariant(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, variant)
+}
+
+func (h *ProductHandler) DuplicateProduct(c echo.Context) error {
+	idStr := c.Param("id")
+	ctx := c.Request().Context()
+
+	// 1. Fetch original product
+	original, err := h.Repo.GetProduct(ctx, idStr)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Product not found"})
+		}
+		c.Logger().Errorf("Failed to fetch product %s for duplication: %v", idStr, err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch original product"})
+	}
+
+	// 2. Prepare new product data
+	newName := fmt.Sprintf("%s (Copy)", original.Name)
+	newSlug := generateSlug(newName) // This includes timestamp, ensuring uniqueness
+
+	// 3. Create new product
+	var newProduct struct {
+		ID        string
+		Name      string
+		Slug      string
+		BasePrice string
+		CreatedAt string
+		UpdatedAt string
+	}
+
+	// Default active to false for the copy
+	isActive := false
+
+	err = h.Repo.DB().QueryRowContext(ctx, `
+		INSERT INTO products (title, description, active, slug, base_price, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5::bigint, NOW(), NOW())
+		RETURNING
+			id::text,
+			title as name,
+			slug,
+			COALESCE(base_price, 0)::text as base_price,
+			created_at::text,
+			updated_at::text
+	`, newName, original.Description, isActive, newSlug, original.BasePrice).Scan(&newProduct.ID, &newProduct.Name, &newProduct.Slug, &newProduct.BasePrice, &newProduct.CreatedAt, &newProduct.UpdatedAt)
+
+	if err != nil {
+		c.Logger().Errorf("Failed to duplicate product: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to duplicate product"})
+	}
+
+	// 4. Copy Images
+	images, err := h.Repo.ListProductImages(ctx, idStr)
+	if err == nil {
+		for i, img := range images {
+			_, err := h.Repo.AddProductImage(ctx, repository.AddProductImageParams{
+				ProductID: newProduct.ID,
+				Url:       img.Url,
+				Position:  int64(i),
+			})
+			if err != nil {
+				c.Logger().Warnf("Failed to copy image %s for duplicate product %s: %v", img.Url, newProduct.ID, err)
+			}
+		}
+	}
+
+	// 5. Copy Variants
+	variants, err := h.Repo.ListProductVariants(ctx, idStr)
+	if err == nil {
+		for _, v := range variants {
+			// Generate unique SKU
+			timestamp := strconv.FormatInt(time.Now().UnixNano(), 10)
+			// Take last 6 digits of nano timestamp to keep it reasonably short but unique enough with base SKU
+			suffix := timestamp[len(timestamp)-6:]
+			newSku := fmt.Sprintf("%s-copy-%s", v.Sku, suffix)
+
+			createParams := repository.CreateProductVariantParams{
+				ProductID:     newProduct.ID,
+				Sku:           newSku,
+				StockQuantity: v.StockQuantity,
+			}
+
+			if v.Size.Valid {
+				createParams.Size = v.Size
+			}
+			if v.Color.Valid {
+				createParams.Color = v.Color
+			}
+			if v.Image.Valid {
+				createParams.Image = v.Image
+			}
+
+			newVariant, err := h.Repo.CreateProductVariant(ctx, createParams)
+			if err != nil {
+				// Retry with a slightly different SKU if there's a collision (unlikely with nano, but basic safety)
+				// Or log and skip
+				c.Logger().Errorf("Failed to copy variant %s for duplicate product %s: %v", v.Sku, newProduct.ID, err)
+				continue
+			}
+
+			// Copy Price
+			err = h.Repo.UpdateVariantPrice(ctx, newVariant.ID, v.Price, "Br")
+			if err != nil {
+				c.Logger().Warnf("Failed to set price for duplicate variant %s: %v", newVariant.ID, err)
+			}
+
+			// Copy Sale Price
+			if v.SalePrice.Valid {
+				salePrice := v.SalePrice.Int64
+				err = h.Repo.UpdateVariantSalePriceOnly(ctx, newVariant.ID, &salePrice)
+				if err != nil {
+					c.Logger().Warnf("Failed to set sale price for duplicate variant %s: %v", newVariant.ID, err)
+				}
+			}
+		}
+	}
+
+	return c.JSON(http.StatusCreated, map[string]interface{}{
+		"id":         newProduct.ID,
+		"name":       newProduct.Name,
+		"slug":       newProduct.Slug,
+		"base_price": newProduct.BasePrice,
+		"is_active":  isActive,
+		"created_at": newProduct.CreatedAt,
+		"updated_at": newProduct.UpdatedAt,
+		"message":    "Product duplicated successfully",
+	})
 }
 
 type UpdateVariantRequest struct {

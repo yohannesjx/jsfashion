@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight, Edit, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Trash2, Upload, Check, X, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useVariants, useDeleteVariant } from "@/lib/api/admin/products";
 import { Input } from "@/components/ui/input";
 import { useUpdateVariant } from "@/lib/api/admin/products";
 import { toast } from "sonner";
+import { useDuplicateProduct } from "@/lib/api/admin/products";
+import { uploadApi } from "@/lib/api/admin/upload";
 
 export function ProductRow({
     product,
@@ -23,6 +25,53 @@ export function ProductRow({
     const { data: variants = [], isLoading: variantsLoading } = useVariants(product.id);
     const updateVariant = useUpdateVariant();
     const deleteVariant = useDeleteVariant();
+    const duplicateProduct = useDuplicateProduct();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editedTitle, setEditedTitle] = useState(product.name);
+
+    const handleTitleSave = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (editedTitle === product.name) {
+            setIsEditingTitle(false);
+            return;
+        }
+        try {
+            await updateProduct.mutateAsync({
+                id: product.id,
+                name: editedTitle,
+            });
+            toast.success('Product title updated');
+            setIsEditingTitle(false);
+        } catch (error) {
+            toast.error('Failed to update product title');
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        e.stopPropagation(); // Prevent row click
+        setIsUploading(true);
+        try {
+            const url = await uploadApi.uploadFile(file);
+            await updateProduct.mutateAsync({
+                id: product.id,
+                image_url: url,
+            });
+            toast.success('Image updated successfully');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to update image');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
 
     const handleVariantUpdate = async (variantId: string, field: string, value: any) => {
         try {
@@ -54,18 +103,43 @@ export function ProductRow({
                     />
                 </TableCell>
                 <TableCell>
-                    <div className="w-10 h-10 bg-muted rounded border border-border overflow-hidden">
+
+                    <div
+                        className="w-10 h-10 bg-muted rounded border border-border overflow-hidden relative group cursor-pointer"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            fileInputRef.current?.click();
+                        }}
+                    >
                         {product.image_url ? (
                             <img
                                 src={product.image_url}
                                 alt={product.name}
-                                className="w-full h-full object-cover"
+                                className={`w-full h-full object-cover transition-opacity ${isUploading ? 'opacity-50' : ''}`}
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                                 No Image
                             </div>
                         )}
+
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            {isUploading ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Upload className="w-4 h-4 text-white" />
+                            )}
+                        </div>
+
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            onClick={(e) => e.stopPropagation()}
+                        />
                     </div>
                 </TableCell>
                 <TableCell className="font-medium">
@@ -85,9 +159,55 @@ export function ProductRow({
                                 <ChevronRight className="w-4 h-4" />
                             )}
                         </Button>
-                        <Link href={`/admin/products/${product.id}`} className="hover:underline">
-                            {product.name}
-                        </Link>
+
+                        {isEditingTitle ? (
+                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <Input
+                                    value={editedTitle}
+                                    onChange={(e) => setEditedTitle(e.target.value)}
+                                    className="h-8 w-64"
+                                    autoFocus
+                                />
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-green-500 hover:text-green-700 hover:bg-green-50"
+                                    onClick={handleTitleSave}
+                                >
+                                    <Check className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsEditingTitle(false);
+                                        setEditedTitle(product.name);
+                                    }}
+                                >
+                                    <X className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 group/title">
+                                <Link href={`/admin/products/${product.id}`} className="hover:underline">
+                                    {product.name}
+                                </Link>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditedTitle(product.name);
+                                        setIsEditingTitle(true);
+                                    }}
+                                >
+                                    <Pencil className="w-3 h-3" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
@@ -128,6 +248,19 @@ export function ProductRow({
                             }}
                         >
                             Quick Edit
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm('Are you sure you want to duplicate this product?')) {
+                                    duplicateProduct.mutate(product.id);
+                                }
+                            }}
+                            disabled={duplicateProduct.isPending}
+                        >
+                            {duplicateProduct.isPending ? 'Copying...' : 'Duplicate'}
                         </Button>
                         <Button variant="ghost" size="sm" asChild>
                             <Link href={`/admin/products/${product.id}`}>

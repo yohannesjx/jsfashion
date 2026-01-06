@@ -4,9 +4,16 @@ import 'features/picking/screens/picking_list_screen.dart';
 import 'features/packing/screens/packing_list_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'shared/services/auth_service.dart';
+import 'shared/services/background_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
+
+  if (Platform.isAndroid) {
+    await BackgroundService.initialize();
+  }
+
   runApp(const WarehouseApp());
 }
 
@@ -62,9 +69,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const PackingListScreen(),
   ];
 
+  Future<void> _logout() async {
+    await AuthService().logout();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Warehouse'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
+        ],
+      ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -83,3 +109,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+

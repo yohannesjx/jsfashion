@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from './client';
+import { toast } from 'sonner';
 
 // Types
 export interface Product {
@@ -202,3 +203,26 @@ export function useBulkUpdateVariants() {
     });
 }
 
+
+export function useDuplicateProduct() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (productId: string) => {
+            const token = localStorage.getItem('access_token');
+            const response = await adminApi.post<{
+                id: string;
+                name: string;
+                slug: string;
+                message: string;
+            }>(`/products/${productId}/duplicate`, {});
+            return response;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+            toast.success('Product duplicated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to duplicate product');
+        },
+    });
+}
