@@ -12,7 +12,6 @@ import 'product_detail_screen.dart';
 import 'cart_screen.dart';
 import '../widgets/floating_contact_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'pos_scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -354,24 +353,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton(
-            heroTag: 'scanner_fab',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const PosScannerScreen()),
-              );
-            },
-            backgroundColor: Colors.black,
-            child: const Icon(Icons.qr_code_scanner, color: Colors.white),
-          ),
-          const SizedBox(height: 16),
-          const FloatingContactButton(),
-        ],
-      ),
+      floatingActionButton: const FloatingContactButton(),
       backgroundColor: Colors.white,
       drawerEnableOpenDragGesture: false, // Disable swipe to open drawer
       drawer: Drawer(
