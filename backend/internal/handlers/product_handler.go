@@ -687,6 +687,26 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		})
 	}
 
+	// 1. Sync single ImageUrl to product_images (if provided and Images array is NOT provided)
+	if req.ImageUrl != nil && req.Images == nil {
+		// We treat this as "updating the main image"
+		// Delete existing images to ensure this one becomes the main one
+		// or just update/insert at position 0. For simplicity and to clear "copied" images, we'll reset.
+		existingImages, _ := h.Repo.ListProductImages(ctx, idStr)
+		for _, img := range existingImages {
+			_ = h.Repo.DeleteProductImage(ctx, img.ID)
+		}
+
+		_, err = h.Repo.AddProductImage(ctx, repository.AddProductImageParams{
+			ProductID: idStr,
+			Url:       *req.ImageUrl,
+			Position:  0,
+		})
+		if err != nil {
+			c.Logger().Errorf("Failed to add new main image %s: %v", *req.ImageUrl, err)
+		}
+	}
+
 	// Handle multiple images
 	if req.Images != nil {
 		// Fetch existing images
