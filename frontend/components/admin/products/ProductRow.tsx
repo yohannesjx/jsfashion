@@ -104,33 +104,38 @@ export function ProductRow({
                 </TableCell>
                 <TableCell>
 
-                    <div
-                        className="w-10 h-10 bg-muted rounded border border-border overflow-hidden relative group cursor-pointer"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            fileInputRef.current?.click();
-                        }}
-                    >
-                        {product.image_url ? (
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className={`w-full h-full object-cover transition-opacity ${isUploading ? 'opacity-50' : ''}`}
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                                No Image
-                            </div>
-                        )}
-
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            {isUploading ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 bg-muted rounded border border-border overflow-hidden relative group">
+                            {product.image_url ? (
+                                <img
+                                    src={product.image_url}
+                                    alt={product.name}
+                                    className={`w-full h-full object-cover transition-transform group-hover:scale-110 ${isUploading ? 'opacity-50' : ''}`}
+                                />
                             ) : (
-                                <Upload className="w-4 h-4 text-white" />
+                                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
+                                    No Img
+                                </div>
                             )}
                         </div>
+
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                fileInputRef.current?.click();
+                            }}
+                            disabled={isUploading}
+                            title="Upload Image"
+                        >
+                            {isUploading ? (
+                                <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Upload className="w-3 h-3" />
+                            )}
+                        </Button>
 
                         <input
                             type="file"
