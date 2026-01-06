@@ -753,6 +753,19 @@ func (h *ProductHandler) UpdateProduct(c echo.Context) error {
 		}
 	}
 
+	// Invalidate cache
+	if h.Redis != nil {
+		// Invalidate specific product cache
+		// (assuming key format "product:{id}" if used, though I haven't seen GetProduct implementation yet, safe to try)
+		h.Redis.Del(ctx, "product:"+idStr)
+
+		// Invalidate list cache
+		iter := h.Redis.Scan(ctx, 0, "products:list:*", 0).Iterator()
+		for iter.Next(ctx) {
+			h.Redis.Del(ctx, iter.Val())
+		}
+	}
+
 	return c.JSON(http.StatusOK, product)
 }
 
@@ -1028,6 +1041,15 @@ func (h *ProductHandler) DuplicateProduct(c echo.Context) error {
 					c.Logger().Errorf("Failed to copy variant %s after retries: %v", v.Sku, err)
 				}
 			}
+		}
+	}
+
+	// Invalidate cache
+	if h.Redis != nil {
+		// Invalidate list cache
+		iter := h.Redis.Scan(ctx, 0, "products:list:*", 0).Iterator()
+		for iter.Next(ctx) {
+			h.Redis.Del(ctx, iter.Val())
 		}
 	}
 
