@@ -1053,7 +1053,6 @@ export default function ProductsPage() {
                                                         onChange={(e) => handleQuickImageUpload(e, product.id)}
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
-                                                        />
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {editingProductTitleId === product.id ? (
