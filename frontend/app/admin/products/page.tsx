@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -42,13 +42,17 @@ import {
     Edit2,
     Check,
     X,
-    Download
+    Download,
+    Copy,
+    Upload,
+    Pencil
 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useCategories, useSetProductCategories, useProductCategories } from '@/lib/api/admin/categories';
-import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct, useUpdateProduct } from '@/lib/api/admin/products';
+import { useCreateVariant, useUpdateVariant, useDeleteVariant, useDeleteProduct, useUpdateProduct, useDuplicateProduct } from '@/lib/api/admin/products';
+import { uploadApi } from '@/lib/api/admin/upload';
 import { MediaPicker } from '@/components/admin/MediaPicker';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
@@ -109,6 +113,12 @@ export default function ProductsPage() {
     // Category assignment state
     const [categoryEditingProductId, setCategoryEditingProductId] = useState<string | null>(null);
     const [productCategoriesCache, setProductCategoriesCache] = useState<Record<string, string[]>>({});
+
+    // New Features State
+    const duplicateProduct = useDuplicateProduct();
+    const [editingProductTitleId, setEditingProductTitleId] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState<string | null>(null); // productId being uploaded
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const limit = 100;
 
@@ -773,6 +783,64 @@ export default function ProductsPage() {
         }
     };
 
+    // New Feature Handlers
+    const handleDuplicate = (product: Product) => {
+        if (confirm(`Are you sure you want to duplicate "${product.name}"?`)) {
+            duplicateProduct.mutate(product.id);
+        }
+    };
+
+    const handleQuickImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, productId: string) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(productId);
+        try {
+            const url = await uploadApi.uploadFile(file);
+            await updateProduct.mutateAsync({
+                id: productId,
+                image_url: url,
+            });
+            // Optimistic update
+            setProducts(prev => prev.map(p => p.id === productId ? { ...p, image_url: url } : p));
+            toast.success('Image updated successfully');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to update image');
+        } finally {
+            setIsUploading(null);
+            if (e.target) e.target.value = '';
+        }
+    };
+
+    const startProductTitleEdit = (productId: string, currentName: string) => {
+        setEditingProductTitleId(productId);
+        setEditValue(currentName);
+    };
+
+    const cancelProductTitleEdit = () => {
+        setEditingProductTitleId(null);
+        setEditValue('');
+    };
+
+    const saveProductTitleEdit = async (productId: string) => {
+        if (!editValue || editValue.trim() === '') return;
+
+        try {
+            await updateProduct.mutateAsync({
+                id: productId,
+                name: editValue
+            });
+
+            setProducts(prev => prev.map(p => p.id === productId ? { ...p, name: editValue } : p));
+
+            toast.success('Product name updated');
+            cancelProductTitleEdit();
+        } catch (error) {
+            toast.error('Failed to update product name');
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -854,18 +922,19 @@ export default function ProductsPage() {
                             <TableHead>Sale</TableHead>
                             <TableHead>Variants</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {isLoading && products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="h-24 text-center">
+                                <TableCell colSpan={8} className="h-24 text-center">
                                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-neutral-500" />
                                 </TableCell>
                             </TableRow>
                         ) : products.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} className="h-24 text-center text-neutral-500">
+                                <TableCell colSpan={8} className="h-24 text-center text-neutral-500">
                                     No products found
                                 </TableCell>
                             </TableRow>
@@ -902,45 +971,88 @@ export default function ProductsPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    {product.image_url && (
-                                                        <div
-                                                            className="relative group/image cursor-pointer"
-                                                            onClick={() => setEditingProductId(product.id)}
-                                                            title="Click to change image"
-                                                        >
-                                                            {/* Thumbnail Image */}
-                                                            <div className="h-10 w-10 rounded overflow-hidden bg-neutral-100 group-hover/image:ring-2 group-hover/image:ring-primary transition-all">
-                                                                <Image
-                                                                    src={product.image_url}
-                                                                    alt={product.name}
-                                                                    fill
-                                                                    className="object-cover"
-                                                                    sizes="40px"
-                                                                />
+                                                    <div
+                                                        className="relative group/image cursor-pointer w-10 h-10 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const input = document.getElementById(`upload-${product.id}`) as HTMLInputElement;
+                                                            if (input) input.click();
+                                                        }}
+                                                    >
+                                                        {product.image_url ? (
+                                                            <Image
+                                                                src={product.image_url}
+                                                                alt={product.name}
+                                                                fill
+                                                                className={`object-cover transition-opacity ${isUploading === product.id ? 'opacity-50' : ''}`}
+                                                                sizes="40px"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+                                                                <Upload className="h-3 w-3" />
                                                             </div>
+                                                        )}
 
-                                                            {/* Hover zoom preview */}
-                                                            <div className="absolute left-12 top-0 z-[100] opacity-0 invisible group-hover/image:opacity-100 group-hover/image:visible transition-all duration-200 pointer-events-none min-w-[500px]">
-                                                                <div className="relative h-[500px] w-[500px] rounded-lg overflow-hidden shadow-2xl border-2 border-white bg-white">
-                                                                    <Image
-                                                                        src={product.image_url}
-                                                                        alt={product.name}
-                                                                        fill
-                                                                        className="object-cover"
-                                                                        sizes="500px"
-                                                                        priority
-                                                                    />
-                                                                </div>
-                                                            </div>
+                                                        {/* Hover Overlay */}
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 flex items-center justify-center transition-opacity">
+                                                            {isUploading === product.id ? (
+                                                                <Loader2 className="w-4 h-4 text-white animate-spin" />
+                                                            ) : (
+                                                                <Upload className="w-4 h-4 text-white" />
+                                                            )}
                                                         </div>
-                                                    )}
+
+                                                        <input
+                                                            type="file"
+                                                            id={`upload-${product.id}`}
+                                                            className="hidden"
+                                                            accept="image/*"
+                                                            onChange={(e) => handleQuickImageUpload(e, product.id)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                    </div>
                                                     <div className="flex items-center gap-2">
-                                                        <Link
-                                                            href={`/admin/products/${product.id}`}
-                                                            className="font-medium hover:text-blue-600 hover:underline"
-                                                        >
-                                                            {product.name}
-                                                        </Link>
+                                                        {editingProductTitleId === product.id ? (
+                                                            <div className="flex items-center gap-1">
+                                                                <Input
+                                                                    value={editValue}
+                                                                    onChange={(e) => setEditValue(e.target.value)}
+                                                                    className="h-7 min-w-[180px] text-sm"
+                                                                    autoFocus
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') saveProductTitleEdit(product.id);
+                                                                        if (e.key === 'Escape') cancelProductTitleEdit();
+                                                                    }}
+                                                                />
+                                                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); saveProductTitleEdit(product.id); }}>
+                                                                    <Check className="h-3 w-3 text-green-600" />
+                                                                </Button>
+                                                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); cancelProductTitleEdit(); }}>
+                                                                    <X className="h-3 w-3 text-red-600" />
+                                                                </Button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-2 group/title">
+                                                                <Link
+                                                                    href={`/admin/products/${product.id}`}
+                                                                    className="font-medium hover:text-blue-600 hover:underline"
+                                                                >
+                                                                    {product.name}
+                                                                </Link>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        startProductTitleEdit(product.id, product.name);
+                                                                    }}
+                                                                >
+                                                                    <Pencil className="h-3 w-3 text-muted-foreground" />
+                                                                </Button>
+                                                            </div>
+                                                        )}
 
                                                         {/* Quick Category Assignment */}
                                                         <Popover
@@ -1106,6 +1218,21 @@ export default function ProductsPage() {
                                                 <Badge variant={product.is_active ? 'default' : 'secondary'}>
                                                     {product.is_active ? 'Active' : 'Inactive'}
                                                 </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    disabled={duplicateProduct.isPending}
+                                                    onClick={() => handleDuplicate(product)}
+                                                    title="Duplicate Product"
+                                                >
+                                                    {duplicateProduct.isPending ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                                    )}
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
 
@@ -1290,8 +1417,10 @@ export default function ProductsPage() {
                                                         </div>
                                                     )}
                                                 </TableCell>
-                                                {/* Status column - Delete button */}
-                                                <TableCell>
+                                                {/* Status column - Empty for variant */}
+                                                <TableCell></TableCell>
+                                                {/* Actions column - Delete button */}
+                                                <TableCell className="text-right">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
