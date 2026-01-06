@@ -1009,559 +1009,566 @@ export default function ProductsPage() {
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <div
-                                                        className="relative group/image cursor-pointer w-10 h-10 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 shrink-0"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             const input = document.getElementById(`upload-${product.id}`) as HTMLInputElement;
                                                             if (input) input.click();
                                                         }}
+                                                        disabled={isUploading === product.id}
+                                                        title="Upload Image"
                                                     >
+                                                        {isUploading === product.id ? (
+                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <Upload className="w-4 h-4 text-muted-foreground" />
+                                                        )}
+                                                    </Button>
+
+                                                    <div className="relative w-12 h-12 bg-muted rounded border border-border overflow-hidden flex-shrink-0 group/image">
                                                         {product.image_url ? (
                                                             <Image
                                                                 src={product.image_url}
                                                                 alt={product.name}
                                                                 fill
-                                                                className={`object-cover transition-opacity ${isUploading === product.id ? 'opacity-50' : ''}`}
-                                                                sizes="40px"
+                                                                className={`object-cover transition-transform group-hover/image:scale-150 ${isUploading === product.id ? 'opacity-50' : ''}`}
+                                                                sizes="48px"
                                                             />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                                                                <Upload className="h-3 w-3" />
+                                                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
+                                                                No Img
                                                             </div>
                                                         )}
+                                                    </div>
 
-                                                        {/* Hover Overlay */}
-                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 flex items-center justify-center transition-opacity">
-                                                            {isUploading === product.id ? (
-                                                                <Loader2 className="w-4 h-4 text-white animate-spin" />
-                                                            ) : (
-                                                                <Upload className="w-4 h-4 text-white" />
-                                                            )}
-                                                        </div>
-
-                                                        <input
-                                                            type="file"
-                                                            id={`upload-${product.id}`}
-                                                            className="hidden"
-                                                            accept="image/*"
-                                                            onChange={(e) => handleQuickImageUpload(e, product.id)}
-                                                            onClick={(e) => e.stopPropagation()}
+                                                    <input
+                                                        type="file"
+                                                        id={`upload-${product.id}`}
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={(e) => handleQuickImageUpload(e, product.id)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
                                                         />
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        {editingProductTitleId === product.id ? (
-                                                            <div className="flex items-center gap-1">
-                                                                <Input
-                                                                    value={editValue}
-                                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                                    className="h-7 min-w-[180px] text-sm"
-                                                                    autoFocus
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') saveProductTitleEdit(product.id);
-                                                                        if (e.key === 'Escape') cancelProductTitleEdit();
-                                                                    }}
-                                                                />
-                                                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); saveProductTitleEdit(product.id); }}>
-                                                                    <Check className="h-3 w-3 text-green-600" />
-                                                                </Button>
-                                                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); cancelProductTitleEdit(); }}>
-                                                                    <X className="h-3 w-3 text-red-600" />
-                                                                </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="flex items-center gap-2 group/title">
-                                                                <Link
-                                                                    href={`/admin/products/${product.id}`}
-                                                                    className="font-medium hover:text-blue-600 hover:underline"
-                                                                >
-                                                                    {product.name}
-                                                                </Link>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        startProductTitleEdit(product.id, product.name);
-                                                                    }}
-                                                                >
-                                                                    <Pencil className="h-3 w-3 text-muted-foreground" />
-                                                                </Button>
-                                                            </div>
-                                                        )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {editingProductTitleId === product.id ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-7 min-w-[180px] text-sm"
+                                                                autoFocus
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveProductTitleEdit(product.id);
+                                                                    if (e.key === 'Escape') cancelProductTitleEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); saveProductTitleEdit(product.id); }}>
+                                                                <Check className="h-3 w-3 text-green-600" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); cancelProductTitleEdit(); }}>
+                                                                <X className="h-3 w-3 text-red-600" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2 group/title">
+                                                            <Link
+                                                                href={`/admin/products/${product.id}`}
+                                                                className="font-medium hover:text-blue-600 hover:underline"
+                                                            >
+                                                                {product.name}
+                                                            </Link>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    startProductTitleEdit(product.id, product.name);
+                                                                }}
+                                                            >
+                                                                <Pencil className="h-3 w-3 text-muted-foreground" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
 
-                                                        {/* Quick Category Assignment */}
-                                                        <Popover
-                                                            open={categoryEditingProductId === product.id}
-                                                            onOpenChange={(open) => {
-                                                                if (open) {
-                                                                    handleOpenCategoryPopover(product.id);
-                                                                } else {
-                                                                    setCategoryEditingProductId(null);
-                                                                }
-                                                            }}
-                                                        >
-                                                            <PopoverTrigger asChild>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                                    title="Assign categories"
-                                                                >
-                                                                    <Tags className="h-3 w-3" />
-                                                                </Button>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent className="w-64" align="start">
-                                                                <div className="space-y-3">
-                                                                    <div className="space-y-2">
-                                                                        <h4 className="font-medium text-sm">Categories</h4>
-                                                                        <p className="text-xs text-muted-foreground">
-                                                                            Select categories for this product
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-2">
-                                                                        {categories.map((cat) => (
-                                                                            <div key={cat.id} className="flex items-center space-x-2">
-                                                                                <Checkbox
-                                                                                    id={`quick-cat-${product.id}-${cat.id}`}
-                                                                                    checked={productCategoriesCache[product.id]?.includes(cat.id) || false}
-                                                                                    onCheckedChange={() => toggleProductCategory(product.id, cat.id)}
-                                                                                />
-                                                                                <Label
-                                                                                    htmlFor={`quick-cat-${product.id}-${cat.id}`}
-                                                                                    className="text-sm cursor-pointer"
-                                                                                >
-                                                                                    {cat.name}
-                                                                                </Label>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                    <div className="flex gap-2">
-                                                                        <Button
-                                                                            size="sm"
-                                                                            onClick={() => handleSaveCategories(product.id)}
-                                                                            className="flex-1"
-                                                                        >
-                                                                            Save
-                                                                        </Button>
-                                                                        <Button
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            onClick={() => setCategoryEditingProductId(null)}
-                                                                        >
-                                                                            Cancel
-                                                                        </Button>
-                                                                    </div>
+                                                    {/* Quick Category Assignment */}
+                                                    <Popover
+                                                        open={categoryEditingProductId === product.id}
+                                                        onOpenChange={(open) => {
+                                                            if (open) {
+                                                                handleOpenCategoryPopover(product.id);
+                                                            } else {
+                                                                setCategoryEditingProductId(null);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                title="Assign categories"
+                                                            >
+                                                                <Tags className="h-3 w-3" />
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-64" align="start">
+                                                            <div className="space-y-3">
+                                                                <div className="space-y-2">
+                                                                    <h4 className="font-medium text-sm">Categories</h4>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        Select categories for this product
+                                                                    </p>
                                                                 </div>
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                    </div>
+                                                                <div className="space-y-2 max-h-60 overflow-y-auto border rounded-md p-2">
+                                                                    {categories.map((cat) => (
+                                                                        <div key={cat.id} className="flex items-center space-x-2">
+                                                                            <Checkbox
+                                                                                id={`quick-cat-${product.id}-${cat.id}`}
+                                                                                checked={productCategoriesCache[product.id]?.includes(cat.id) || false}
+                                                                                onCheckedChange={() => toggleProductCategory(product.id, cat.id)}
+                                                                            />
+                                                                            <Label
+                                                                                htmlFor={`quick-cat-${product.id}-${cat.id}`}
+                                                                                className="text-sm cursor-pointer"
+                                                                            >
+                                                                                {cat.name}
+                                                                            </Label>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="flex gap-2">
+                                                                    <Button
+                                                                        size="sm"
+                                                                        onClick={() => handleSaveCategories(product.id)}
+                                                                        className="flex-1"
+                                                                    >
+                                                                        Save
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        onClick={() => setCategoryEditingProductId(null)}
+                                                                    >
+                                                                        Cancel
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        {/* Price Column */}
+                                        <TableCell className="font-medium">
+                                            {editingProductPrice === product.id ? (
+                                                <div className="flex items-center gap-1">
+                                                    <Input
+                                                        type="number"
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        className="h-8 w-32"
+                                                        placeholder="Price"
+                                                        autoFocus
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') saveProductPrice(product.id);
+                                                            if (e.key === 'Escape') cancelProductPriceEdit();
+                                                        }}
+                                                    />
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
+                                                    onClick={() => startProductPriceEdit(product.id, product.base_price)}
+                                                    title="Click to edit price"
+                                                >
+                                                    <span className={product.variants?.[0]?.sale_price ? 'line-through text-muted-foreground' : ''}>
+                                                        {parseInt(product.base_price).toLocaleString()} Birr
+                                                    </span>
+                                                    <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                        {/* Sale Column */}
+                                        <TableCell>
+                                            {editingProductSalePrice === product.id ? (
+                                                <div className="flex items-center gap-1">
+                                                    <Input
+                                                        type="number"
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        className="h-8 w-32"
+                                                        placeholder="Sale Price"
+                                                        autoFocus
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') saveProductSalePrice(product.id);
+                                                            if (e.key === 'Escape') cancelProductSalePriceEdit();
+                                                        }}
+                                                    />
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductSalePrice(product.id)}>
+                                                        <Check className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductSalePriceEdit}>
+                                                        <X className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
+                                                    onClick={() => startProductSalePriceEdit(product.id, product.variants?.[0]?.sale_price?.toString() || '')}
+                                                    title="Click to edit sale price"
+                                                >
+                                                    {product.variants?.[0]?.sale_price ? (
+                                                        <>
+                                                            <span className="text-red-600 font-semibold">
+                                                                {parseInt(product.variants[0].sale_price.toString()).toLocaleString()} Birr
+                                                            </span>
+                                                            <Badge variant="destructive" className="text-xs">SALE</Badge>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">—</span>
+                                                    )}
+                                                    <Edit2 className="h-3 w-3 opacity-0 group-hover/saleprice:opacity-100 transition-opacity" />
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline">{variantCount} variants</Badge>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => handleAddVariant(product.id)}
+                                                >
+                                                    <Plus className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                                <Switch
+                                                    checked={product.is_active}
+                                                    onCheckedChange={() => handleStatusToggle(product)}
+                                                />
+                                                <span className="text-xs text-muted-foreground w-12">
+                                                    {product.is_active ? 'Active' : 'Draft'}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                disabled={duplicateProduct.isPending}
+                                                onClick={() => handleDuplicate(product)}
+                                                title="Duplicate Product"
+                                            >
+                                                {duplicateProduct.isPending ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                                                )}
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow >
+
+                                        {/* Variant Rows (Collapsible) */ }
+                                {
+                                    isExpanded && product.variants?.map((variant) => (
+                                        <TableRow key={variant.id} className="bg-muted/30">
+                                            <TableCell></TableCell>
+                                            <TableCell></TableCell>
+                                            <TableCell className="pl-12">
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <span className="font-mono text-xs">{variant.sku}</span>
+
+                                                    {/* Editable Size */}
+                                                    {editingCell?.variantId === variant.id && editingCell.field === 'size' ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                type="text"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-6 w-16 text-xs"
+                                                                placeholder="Size"
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveEdit(product.id);
+                                                                    if (e.key === 'Escape') cancelEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => saveEdit(product.id)}>
+                                                                <Check className="h-3 w-3" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={cancelEdit}>
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="cursor-pointer hover:bg-muted"
+                                                            onClick={() => startEdit(variant.id, 'size', variant.size ?? null)}
+                                                        >
+                                                            {variant.size || 'Add Size'}
+                                                        </Badge>
+                                                    )}
+
+                                                    {/* Editable Color */}
+                                                    {editingCell?.variantId === variant.id && editingCell.field === 'color' ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <Input
+                                                                type="text"
+                                                                value={editValue}
+                                                                onChange={(e) => setEditValue(e.target.value)}
+                                                                className="h-6 w-20 text-xs"
+                                                                placeholder="Color"
+                                                                autoFocus
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') saveEdit(product.id);
+                                                                    if (e.key === 'Escape') cancelEdit();
+                                                                }}
+                                                            />
+                                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => saveEdit(product.id)}>
+                                                                <Check className="h-3 w-3" />
+                                                            </Button>
+                                                            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={cancelEdit}>
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="cursor-pointer hover:bg-muted"
+                                                            onClick={() => startEdit(variant.id, 'color', variant.color ?? null)}
+                                                        >
+                                                            {variant.color || 'Add Color'}
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                             </TableCell>
-                                            {/* Price Column */}
-                                            <TableCell className="font-medium">
-                                                {editingProductPrice === product.id ? (
+                                            <TableCell>
+                                                {editingCell?.variantId === variant.id && editingCell.field === 'price' ? (
                                                     <div className="flex items-center gap-1">
                                                         <Input
                                                             type="number"
                                                             value={editValue}
                                                             onChange={(e) => setEditValue(e.target.value)}
-                                                            className="h-8 w-32"
-                                                            placeholder="Price"
+                                                            className="h-7 w-24"
                                                             autoFocus
                                                             onKeyDown={(e) => {
-                                                                if (e.key === 'Enter') saveProductPrice(product.id);
-                                                                if (e.key === 'Escape') cancelProductPriceEdit();
+                                                                if (e.key === 'Enter') saveEdit(product.id);
+                                                                if (e.key === 'Escape') cancelEdit();
                                                             }}
                                                         />
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductPrice(product.id)}>
-                                                            <Check className="h-4 w-4" />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
+                                                            <Check className="h-3 w-3" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductPriceEdit}>
-                                                            <X className="h-4 w-4" />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
+                                                            <X className="h-3 w-3" />
                                                         </Button>
                                                     </div>
                                                 ) : (
                                                     <div
-                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/price"
-                                                        onClick={() => startProductPriceEdit(product.id, product.base_price)}
-                                                        title="Click to edit price"
+                                                        className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
+                                                        onClick={() => startEdit(variant.id, 'price', variant.price)}
                                                     >
-                                                        <span className={product.variants?.[0]?.sale_price ? 'line-through text-muted-foreground' : ''}>
-                                                            {parseInt(product.base_price).toLocaleString()} Birr
-                                                        </span>
-                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/price:opacity-100 transition-opacity" />
+                                                        <span className="text-sm">{variant.price.toLocaleString()} Birr</span>
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
                                                     </div>
                                                 )}
                                             </TableCell>
-                                            {/* Sale Column */}
+                                            {/* Sale column - Variant Sale Price */}
                                             <TableCell>
-                                                {editingProductSalePrice === product.id ? (
+                                                {editingCell?.variantId === variant.id && editingCell.field === 'sale_price' ? (
                                                     <div className="flex items-center gap-1">
                                                         <Input
                                                             type="number"
                                                             value={editValue}
                                                             onChange={(e) => setEditValue(e.target.value)}
-                                                            className="h-8 w-32"
-                                                            placeholder="Sale Price"
+                                                            className="h-7 w-24"
                                                             autoFocus
+                                                            placeholder="Sale price"
                                                             onKeyDown={(e) => {
-                                                                if (e.key === 'Enter') saveProductSalePrice(product.id);
-                                                                if (e.key === 'Escape') cancelProductSalePriceEdit();
+                                                                if (e.key === 'Enter') saveEdit(product.id);
+                                                                if (e.key === 'Escape') cancelEdit();
                                                             }}
                                                         />
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => saveProductSalePrice(product.id)}>
-                                                            <Check className="h-4 w-4" />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
+                                                            <Check className="h-3 w-3" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8" onClick={cancelProductSalePriceEdit}>
-                                                            <X className="h-4 w-4" />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
+                                                            <X className="h-3 w-3" />
                                                         </Button>
                                                     </div>
                                                 ) : (
                                                     <div
-                                                        className="cursor-pointer hover:bg-muted px-2 py-1 rounded inline-flex items-center gap-2 group/saleprice"
-                                                        onClick={() => startProductSalePriceEdit(product.id, product.variants?.[0]?.sale_price?.toString() || '')}
-                                                        title="Click to edit sale price"
+                                                        className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
+                                                        onClick={() => startEdit(variant.id, 'sale_price', variant.sale_price || 0)}
                                                     >
-                                                        {product.variants?.[0]?.sale_price ? (
+                                                        {variant.sale_price ? (
                                                             <>
-                                                                <span className="text-red-600 font-semibold">
-                                                                    {parseInt(product.variants[0].sale_price.toString()).toLocaleString()} Birr
+                                                                <span className="text-red-600 font-semibold text-sm">
+                                                                    {variant.sale_price.toLocaleString()} Birr
                                                                 </span>
                                                                 <Badge variant="destructive" className="text-xs">SALE</Badge>
                                                             </>
                                                         ) : (
-                                                            <span className="text-xs text-muted-foreground">—</span>
+                                                            <span className="text-xs text-muted-foreground">Add Sale</span>
                                                         )}
-                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover/saleprice:opacity-100 transition-opacity" />
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
                                                     </div>
                                                 )}
                                             </TableCell>
+                                            {/* Variants column - Stock */}
                                             <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="outline">{variantCount} variants</Badge>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        onClick={() => handleAddVariant(product.id)}
+                                                {editingCell?.variantId === variant.id && editingCell.field === 'stock' ? (
+                                                    <div className="flex items-center gap-1">
+                                                        <Input
+                                                            type="number"
+                                                            value={editValue}
+                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                            className="h-7 w-20"
+                                                            autoFocus
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') saveEdit(product.id);
+                                                                if (e.key === 'Escape') cancelEdit();
+                                                            }}
+                                                        />
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
+                                                            <Check className="h-3 w-3" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
+                                                            <X className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
+                                                        onClick={() => startEdit(variant.id, 'stock', variant.stock_quantity)}
                                                     >
-                                                        <Plus className="h-3 w-3" />
-                                                    </Button>
-                                                </div>
+                                                        <Badge variant={variant.stock_quantity > 0 ? 'default' : 'destructive'}>
+                                                            {variant.stock_quantity} in stock
+                                                        </Badge>
+                                                        <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
+                                                    </div>
+                                                )}
                                             </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                                    <Switch
-                                                        checked={product.is_active}
-                                                        onCheckedChange={() => handleStatusToggle(product)}
-                                                    />
-                                                    <span className="text-xs text-muted-foreground w-12">
-                                                        {product.is_active ? 'Active' : 'Draft'}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
+                                            {/* Status column - Empty for variant */}
+                                            <TableCell></TableCell>
+                                            {/* Actions column - Delete button */}
                                             <TableCell className="text-right">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    disabled={duplicateProduct.isPending}
-                                                    onClick={() => handleDuplicate(product)}
-                                                    title="Duplicate Product"
+                                                    className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => handleDeleteVariant(product.id, variant.id)}
                                                 >
-                                                    {duplicateProduct.isPending ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                    ) : (
-                                                        <Copy className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                                                    )}
+                                                    <X className="h-4 w-4" />
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
-
-                                        {/* Variant Rows (Collapsible) */}
-                                        {isExpanded && product.variants?.map((variant) => (
-                                            <TableRow key={variant.id} className="bg-muted/30">
-                                                <TableCell></TableCell>
-                                                <TableCell></TableCell>
-                                                <TableCell className="pl-12">
-                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                                        <span className="font-mono text-xs">{variant.sku}</span>
-
-                                                        {/* Editable Size */}
-                                                        {editingCell?.variantId === variant.id && editingCell.field === 'size' ? (
-                                                            <div className="flex items-center gap-1">
-                                                                <Input
-                                                                    type="text"
-                                                                    value={editValue}
-                                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                                    className="h-6 w-16 text-xs"
-                                                                    placeholder="Size"
-                                                                    autoFocus
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') saveEdit(product.id);
-                                                                        if (e.key === 'Escape') cancelEdit();
-                                                                    }}
-                                                                />
-                                                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => saveEdit(product.id)}>
-                                                                    <Check className="h-3 w-3" />
-                                                                </Button>
-                                                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={cancelEdit}>
-                                                                    <X className="h-3 w-3" />
-                                                                </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="cursor-pointer hover:bg-muted"
-                                                                onClick={() => startEdit(variant.id, 'size', variant.size ?? null)}
-                                                            >
-                                                                {variant.size || 'Add Size'}
-                                                            </Badge>
-                                                        )}
-
-                                                        {/* Editable Color */}
-                                                        {editingCell?.variantId === variant.id && editingCell.field === 'color' ? (
-                                                            <div className="flex items-center gap-1">
-                                                                <Input
-                                                                    type="text"
-                                                                    value={editValue}
-                                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                                    className="h-6 w-20 text-xs"
-                                                                    placeholder="Color"
-                                                                    autoFocus
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') saveEdit(product.id);
-                                                                        if (e.key === 'Escape') cancelEdit();
-                                                                    }}
-                                                                />
-                                                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => saveEdit(product.id)}>
-                                                                    <Check className="h-3 w-3" />
-                                                                </Button>
-                                                                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={cancelEdit}>
-                                                                    <X className="h-3 w-3" />
-                                                                </Button>
-                                                            </div>
-                                                        ) : (
-                                                            <Badge
-                                                                variant="outline"
-                                                                className="cursor-pointer hover:bg-muted"
-                                                                onClick={() => startEdit(variant.id, 'color', variant.color ?? null)}
-                                                            >
-                                                                {variant.color || 'Add Color'}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    {editingCell?.variantId === variant.id && editingCell.field === 'price' ? (
-                                                        <div className="flex items-center gap-1">
-                                                            <Input
-                                                                type="number"
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                className="h-7 w-24"
-                                                                autoFocus
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') saveEdit(product.id);
-                                                                    if (e.key === 'Escape') cancelEdit();
-                                                                }}
-                                                            />
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
-                                                                <Check className="h-3 w-3" />
-                                                            </Button>
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
-                                                                <X className="h-3 w-3" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
-                                                            onClick={() => startEdit(variant.id, 'price', variant.price)}
-                                                        >
-                                                            <span className="text-sm">{variant.price.toLocaleString()} Birr</span>
-                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
-                                                        </div>
-                                                    )}
-                                                </TableCell>
-                                                {/* Sale column - Variant Sale Price */}
-                                                <TableCell>
-                                                    {editingCell?.variantId === variant.id && editingCell.field === 'sale_price' ? (
-                                                        <div className="flex items-center gap-1">
-                                                            <Input
-                                                                type="number"
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                className="h-7 w-24"
-                                                                autoFocus
-                                                                placeholder="Sale price"
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') saveEdit(product.id);
-                                                                    if (e.key === 'Escape') cancelEdit();
-                                                                }}
-                                                            />
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
-                                                                <Check className="h-3 w-3" />
-                                                            </Button>
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
-                                                                <X className="h-3 w-3" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
-                                                            onClick={() => startEdit(variant.id, 'sale_price', variant.sale_price || 0)}
-                                                        >
-                                                            {variant.sale_price ? (
-                                                                <>
-                                                                    <span className="text-red-600 font-semibold text-sm">
-                                                                        {variant.sale_price.toLocaleString()} Birr
-                                                                    </span>
-                                                                    <Badge variant="destructive" className="text-xs">SALE</Badge>
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-xs text-muted-foreground">Add Sale</span>
-                                                            )}
-                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
-                                                        </div>
-                                                    )}
-                                                </TableCell>
-                                                {/* Variants column - Stock */}
-                                                <TableCell>
-                                                    {editingCell?.variantId === variant.id && editingCell.field === 'stock' ? (
-                                                        <div className="flex items-center gap-1">
-                                                            <Input
-                                                                type="number"
-                                                                value={editValue}
-                                                                onChange={(e) => setEditValue(e.target.value)}
-                                                                className="h-7 w-20"
-                                                                autoFocus
-                                                                onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') saveEdit(product.id);
-                                                                    if (e.key === 'Escape') cancelEdit();
-                                                                }}
-                                                            />
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveEdit(product.id)}>
-                                                                <Check className="h-3 w-3" />
-                                                            </Button>
-                                                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={cancelEdit}>
-                                                                <X className="h-3 w-3" />
-                                                            </Button>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 px-2 py-1 rounded"
-                                                            onClick={() => startEdit(variant.id, 'stock', variant.stock_quantity)}
-                                                        >
-                                                            <Badge variant={variant.stock_quantity > 0 ? 'default' : 'destructive'}>
-                                                                {variant.stock_quantity} in stock
-                                                            </Badge>
-                                                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100" />
-                                                        </div>
-                                                    )}
-                                                </TableCell>
-                                                {/* Status column - Empty for variant */}
-                                                <TableCell></TableCell>
-                                                {/* Actions column - Delete button */}
-                                                <TableCell className="text-right">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        onClick={() => handleDeleteVariant(product.id, variant.id)}
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
+                                    ))
+                                }
                                     </>
-                                );
+                    );
                             })
                         )}
-                    </TableBody>
-                </Table>
-            </div>
+                </TableBody>
+            </Table>
+        </div>
 
-            {/* Bulk Category Assignment Dialog */}
-            <Dialog open={isBulkCategoryDialogOpen} onOpenChange={setIsBulkCategoryDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Assign Categories</DialogTitle>
-                        <DialogDescription>
-                            Select categories to assign to {selectedIds.size} selected product(s)
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                        {categories.map((cat) => (
-                            <div key={cat.id} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={`bulk-cat-${cat.id}`}
-                                    checked={selectedCategoryIds.includes(cat.id)}
-                                    onCheckedChange={(checked) => {
-                                        if (checked) {
-                                            setSelectedCategoryIds([...selectedCategoryIds, cat.id]);
-                                        } else {
-                                            setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== cat.id));
-                                        }
-                                    }}
-                                />
-                                <Label htmlFor={`bulk-cat-${cat.id}`} className="cursor-pointer">
-                                    {cat.name}
-                                </Label>
-                            </div>
-                        ))}
+            {/* Bulk Category Assignment Dialog */ }
+    <Dialog open={isBulkCategoryDialogOpen} onOpenChange={setIsBulkCategoryDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Assign Categories</DialogTitle>
+                <DialogDescription>
+                    Select categories to assign to {selectedIds.size} selected product(s)
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+                {categories.map((cat) => (
+                    <div key={cat.id} className="flex items-center space-x-2">
+                        <Checkbox
+                            id={`bulk-cat-${cat.id}`}
+                            checked={selectedCategoryIds.includes(cat.id)}
+                            onCheckedChange={(checked) => {
+                                if (checked) {
+                                    setSelectedCategoryIds([...selectedCategoryIds, cat.id]);
+                                } else {
+                                    setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== cat.id));
+                                }
+                            }}
+                        />
+                        <Label htmlFor={`bulk-cat-${cat.id}`} className="cursor-pointer">
+                            {cat.name}
+                        </Label>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsBulkCategoryDialogOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleBulkCategoryAssign}>
-                            Assign Categories
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* Pagination */}
-            <div className="flex items-center justify-between">
-                <span className="text-sm text-neutral-500">
-                    Page {page} • {products.length} products
-                </span>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            setPage(p => p - 1);
-                            fetchProducts(page - 1, false);
-                        }}
-                        disabled={page === 1 || isLoading}
-                    >
-                        <ChevronLeft className="h-4 w-4 mr-2" />
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            setPage(p => p + 1);
-                            fetchProducts(page + 1, false);
-                        }}
-                        disabled={!hasMore || isLoading}
-                    >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-2" />
-                    </Button>
-                </div>
+                ))}
             </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setIsBulkCategoryDialogOpen(false)}>
+                    Cancel
+                </Button>
+                <Button onClick={handleBulkCategoryAssign}>
+                    Assign Categories
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 
-            {/* Media Picker Modal */}
-            <MediaPicker
-                isOpen={editingProductId !== null}
-                onClose={() => setEditingProductId(null)}
-                onSelect={handleImageSelect}
-            />
+    {/* Pagination */ }
+    <div className="flex items-center justify-between">
+        <span className="text-sm text-neutral-500">
+            Page {page} • {products.length} products
+        </span>
+        <div className="flex gap-2">
+            <Button
+                variant="outline"
+                onClick={() => {
+                    setPage(p => p - 1);
+                    fetchProducts(page - 1, false);
+                }}
+                disabled={page === 1 || isLoading}
+            >
+                <ChevronLeft className="h-4 w-4 mr-2" />
+                Previous
+            </Button>
+            <Button
+                variant="outline"
+                onClick={() => {
+                    setPage(p => p + 1);
+                    fetchProducts(page + 1, false);
+                }}
+                disabled={!hasMore || isLoading}
+            >
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+        </div>
+    </div>
+
+    {/* Media Picker Modal */ }
+    <MediaPicker
+        isOpen={editingProductId !== null}
+        onClose={() => setEditingProductId(null)}
+        onSelect={handleImageSelect}
+    />
         </div >
     );
 }
