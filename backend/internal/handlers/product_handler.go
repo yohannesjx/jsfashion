@@ -94,9 +94,13 @@ func (h *ProductHandler) ListProducts(c echo.Context) error {
 		}
 
 		// Build WHERE clause
-		whereClause := "WHERE p.active = true"
+		whereClause := "WHERE 1=1"
+		if !isAdmin {
+			whereClause += " AND p.active = true"
+		}
+
 		if searchQuery != "" {
-			whereClause = "WHERE p.title ILIKE $1 AND p.active = true"
+			whereClause += " AND p.title ILIKE $1"
 		}
 
 		// Search products by name and/or category
