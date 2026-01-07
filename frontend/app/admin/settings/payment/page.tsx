@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Move, Banknote, CheckCircle2, XCircle } from 'lucide-react';
-import AdminSidebar from '../../../components/admin/AdminSidebar';
+import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useRouter } from 'next/navigation';
 
 interface PaymentAccount {
@@ -182,8 +182,8 @@ export default function PaymentAccountsPage() {
                                             <button
                                                 onClick={() => handleToggleActive(account.id, account.is_active)}
                                                 className={`p-2 rounded-lg transition-colors ${account.is_active
-                                                        ? 'text-green-600 hover:bg-green-50'
-                                                        : 'text-gray-400 hover:bg-gray-100'
+                                                    ? 'text-green-600 hover:bg-green-50'
+                                                    : 'text-gray-400 hover:bg-gray-100'
                                                     }`}
                                                 title={account.is_active ? 'Deactivate' : 'Activate'}
                                             >
