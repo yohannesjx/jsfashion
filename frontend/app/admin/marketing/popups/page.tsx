@@ -115,11 +115,11 @@ export default function PopupsPage() {
 
             const method = isEditMode ? 'PUT' : 'POST';
 
-            // Convert empty dates to null for backend
+            // Convert dates to proper ISO format or null
             const payload = {
                 ...currentPopup,
-                start_date: currentPopup.start_date || null,
-                end_date: currentPopup.end_date || null,
+                start_date: currentPopup.start_date ? new Date(currentPopup.start_date).toISOString() : null,
+                end_date: currentPopup.end_date ? new Date(currentPopup.end_date).toISOString() : null,
             };
 
             const response = await fetch(url, {
