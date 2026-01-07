@@ -179,11 +179,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
     _fetchProductDetails();
   }
 
+  OverlayEntry? _overlayEntry;
+
   @override
   void dispose() {
     _pageController.dispose();
     _animationController?.dispose();
     _cartPulseController?.dispose();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     super.dispose();
   }
 
@@ -201,8 +205,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
     final Size startSize = imageBox.size;
     final Size endSize = const Size(24, 24); // Approximate cart icon size
 
-    OverlayEntry? entry;
-    
+    // Remove any existing overlay
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+
     // Lazy initialization if null (handles hot reload/restart edge case)
     if (_animationController == null) {
       _animationController = AnimationController(
@@ -220,7 +226,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
       );
     }
 
-    entry = OverlayEntry(builder: (context) {
+    _overlayEntry = OverlayEntry(builder: (context) {
       if (_animationController == null) return const SizedBox(); 
 
       return AnimatedBuilder(
@@ -272,18 +278,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
       );
     });
 
-    Overlay.of(context).insert(entry);
+    Overlay.of(context).insert(_overlayEntry!);
     
     // Trigger impact slightly before end
     Future.delayed(const Duration(milliseconds: 600), () {
-      _cartPulseController?.forward().then((_) => _cartPulseController?.reverse());
+      if (mounted) {
+        _cartPulseController?.forward().then((_) => _cartPulseController?.reverse());
+      }
     });
 
     _animationController?.reset();
     _animationController?.forward().then((_) {
-      entry?.remove();
+      _overlayEntry?.remove();
+      _overlayEntry = null;
       onComplete();
     });
+  }
     // Removed duplicate forward call that was in original logs
   }
 
