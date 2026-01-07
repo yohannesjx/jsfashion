@@ -10,7 +10,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cart_model.dart';
+import '../models/payment_account.dart';
 import '../constants.dart';
+import '../utils/logger.dart';
 import 'thank_you_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -32,9 +34,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String? _copiedAccount;
   File? _uploadedFile;
   String? _uploadError;
-  bool _highlightUpload = false;
   bool _isLoading = false;
+  bool _isSubmitting = false; // Prevent double submissions
   final ImagePicker _picker = ImagePicker();
+
+  List<PaymentAccount> _paymentAccounts = [];
+  bool _loadingAccounts = false;
 
   @override
   void initState() {
@@ -42,7 +47,58 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     // Load saved details after the first frame to ensure plugin is ready
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSavedDetails();
+      _fetchPaymentAccounts();
     });
+  }
+
+  Future<void> _fetchPaymentAccounts() async {
+    if (!mounted) return;
+    setState(() => _loadingAccounts = true);
+    
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConstants.baseUrl}/payment-accounts'),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            _paymentAccounts = (data['accounts'] as List)
+                .map((a) => PaymentAccount.fromJson(a))
+                .toList();
+          });
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Failed to fetch payment accounts', e);
+      // Fallback to defaults handled by empty list check in UI
+      if (mounted) {
+        setState(() {
+          // Add defaults if fetch fails to ensure user can still pay
+          if (_paymentAccounts.isEmpty) {
+            _paymentAccounts = [
+              PaymentAccount(
+                id: 'default_cbe',
+                bankName: 'Commercial Bank of Ethiopia',
+                accountName: 'Js Fashion',
+                accountNumber: '1000484381047',
+                accountType: 'CBE',
+              ),
+              PaymentAccount(
+                id: 'default_tele',
+                bankName: 'TeleBirr',
+                accountName: 'Js Fashion',
+                accountNumber: '0912345678',
+                accountType: 'Telebirr',
+              ),
+            ];
+          }
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _loadingAccounts = false);
+    }
   }
 
   Future<void> _loadSavedDetails() async {
@@ -57,7 +113,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       // Silently fail if preferences aren't available
-      print('Failed to load saved details: $e');
+      AppLogger.warning('Failed to load saved details', e);
     }
   }
 
@@ -69,7 +125,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       await prefs.setString('checkout_address', _addressController.text);
     } catch (e) {
       // Silently fail if preferences aren't available
-      print('Failed to save details: $e');
+      AppLogger.warning('Failed to save details', e);
     }
   }
 
@@ -98,47 +154,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     });
   }
 
-  Future<void> _handleFileSelect() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1920,
-        maxHeight: 1920,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        final file = File(image.path);
-        final fileSize = await file.length();
-        
-        // Validate file size (10MB)
-        if (fileSize > 10 * 1024 * 1024) {
-          setState(() {
-            _uploadError = 'File size must be less than 10MB';
-            _uploadedFile = null;
-          });
-          return;
-        }
-        
-        setState(() {
-          _uploadedFile = file;
-          _uploadError = null;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _uploadError = 'Failed to select image';
-        _uploadedFile = null;
-      });
-    }
-  }
 
-  void _handleRemoveFile() {
-    setState(() {
-      _uploadedFile = null;
-      _uploadError = null;
-    });
-  }
 
   void _placeOrder() {
     if (!_formKey.currentState!.validate()) return;
@@ -344,7 +360,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Future<void> _submitOrder() async {
-    setState(() => _isLoading = true);
+    // Prevent double submissions
+    if (_isSubmitting) return;
+    
+    setState(() {
+      _isSubmitting = true;
+      _isLoading = true;
+    });
     final cart = Provider.of<CartModel>(context, listen: false);
 
     try {
@@ -430,7 +452,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       }
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) setState(() {
+        _isSubmitting = false;
+        _isLoading = false;
+      });
     }
   }
 
@@ -476,10 +501,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartModel>(context);
-    final formatter = NumberFormat("#,##0", "en_US");
     final subtotal = cart.totalAmount;
-    final deliveryFee = _calculateDeliveryFee(subtotal);
-    final total = subtotal + deliveryFee;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -784,31 +806,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   const SizedBox(height: 8),
                   
-                  // CBE Account
-                  _buildPaymentAccount(
-                    'CBE',
-                    '1000484381047',
-                    'Betelhem Aklilu',
-                    'cbe',
-                  ),
-                  const SizedBox(height: 12),
+                  if (_loadingAccounts)
+                    const Center(child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: CircularProgressIndicator(),
+                    ))
+                  else if (_paymentAccounts.isEmpty)
+                     // Fallback if no accounts loaded and no defaults (shouldn't happen with fallback logic)
+                    Center(child: Text('No payment methods available', style: GoogleFonts.inter(color: Colors.red)))
+                  else
+                    Column(
+                      children: _paymentAccounts.map((account) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: _buildPaymentAccount(
+                          account.bankName,
+                          account.accountNumber,
+                          account.accountName,
+                          account.accountType?.toLowerCase() ?? 'bank',
+                        ),
+                      )).toList(),
+                    ),
                   
-                  // TeleBirr Account
-                  _buildPaymentAccount(
-                    'TeleBirr',
-                    '0984666187',
-                    'Betelhem',
-                    'telebirr',
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // BOA Account
-                  _buildPaymentAccount(
-                    'BOA',
-                    '170930177',
-                    'Betelhem Aklilu',
-                    'boa',
-                  ),
+
                   
                 ],
               ),
