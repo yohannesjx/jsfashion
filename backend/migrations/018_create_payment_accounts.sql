@@ -1,3 +1,6 @@
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Payment Accounts Table for Dynamic Bank Account Management
 CREATE TABLE IF NOT EXISTS payment_accounts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
