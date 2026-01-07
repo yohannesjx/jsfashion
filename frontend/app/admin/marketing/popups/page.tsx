@@ -34,9 +34,12 @@ export default function PopupsPage() {
     // Fetch popups
     const fetchPopups = async () => {
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/popups`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             if (response.ok) {
@@ -63,10 +66,17 @@ export default function PopupsPage() {
         formData.append('file', e.target.files[0]);
 
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                setError('Session expired');
+                setUploading(false);
+                return;
+            }
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/upload`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: formData
             });
@@ -93,6 +103,12 @@ export default function PopupsPage() {
         }
 
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                setError('Session expired. Please log in again.');
+                return;
+            }
+
             const url = isEditMode
                 ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/popups/${currentPopup.id}`
                 : `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/popups`;
@@ -110,7 +126,7 @@ export default function PopupsPage() {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(payload)
             });
@@ -133,11 +149,14 @@ export default function PopupsPage() {
 
     const handleToggleActive = async (id: string, currentStatus: boolean) => {
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/popups/${id}/toggle`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ is_active: !currentStatus })
             });
@@ -151,10 +170,13 @@ export default function PopupsPage() {
         if (!confirm('Are you sure you want to delete this campaign?')) return;
 
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/popups/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
             fetchPopups();
