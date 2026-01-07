@@ -579,11 +579,12 @@ SELECT
     pv.image,
     pv.stock_quantity as stock,
     pv.stock_quantity,
-    pv.active,
-    COALESCE(pr.amount, prod.base_price, 0) as price,
-    pv.display_order,
-    pv.created_at,
-    pv.updated_at
+    	pv.active,
+	COALESCE(pr.amount, prod.base_price, 0) as price,
+	pr.sale_price,
+	pv.display_order,
+	pv.created_at,
+	pv.updated_at
 FROM product_variants pv
 LEFT JOIN prices pr ON pr.variant_id = pv.id AND pr.currency = 'Br'
 LEFT JOIN products prod ON prod.id = pv.product_id
@@ -606,6 +607,7 @@ func (q *Queries) GetProductVariant(ctx context.Context, id string) (ProductVari
 		&i.StockQuantity,
 		&i.Active,
 		&i.Price,
+		&i.SalePrice,
 		&i.DisplayOrder,
 		&i.CreatedAt,
 		&i.UpdatedAt,
