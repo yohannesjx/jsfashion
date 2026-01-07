@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Move, Banknote, CheckCircle2, XCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
