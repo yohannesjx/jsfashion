@@ -18,6 +18,7 @@ import {
     ChevronRight,
     FolderTree,
     Image,
+    CreditCard,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -89,6 +90,12 @@ const navItems: NavItem[] = [
         title: 'Notifications',
         href: '/admin/notifications',
         icon: Bell,
+    },
+    {
+        title: 'Bank Accounts',
+        href: '/admin/settings/payment',
+        icon: CreditCard,
+        roles: ['super_admin', 'admin'],
     },
     {
         title: 'Settings',
