@@ -295,7 +295,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
     });
   }
     // Removed duplicate forward call that was in original logs
-  }
+
 
   Future<void> _fetchProductDetails() async {
     try {
