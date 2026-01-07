@@ -28,7 +28,7 @@ export default function PaymentAccountsPage() {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/payment-accounts`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 }
             });
             if (response.ok) {
@@ -62,7 +62,7 @@ export default function PaymentAccountsPage() {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 },
                 body: JSON.stringify({
                     ...currentAccount,
@@ -88,7 +88,7 @@ export default function PaymentAccountsPage() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 },
                 body: JSON.stringify({ is_active: !currentStatus })
             });
@@ -105,7 +105,7 @@ export default function PaymentAccountsPage() {
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/payment-accounts/${id}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                 }
             });
             fetchAccounts();
