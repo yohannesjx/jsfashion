@@ -280,4 +280,19 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 
 	// Static Files - use absolute path since working directory is /root
 	e.Static("/uploads", "/app/uploads")
+
+	// ============================================================================
+	// POPUP / MARKETING ROUTES
+	// ============================================================================
+	popupHandler := NewPopupHandler(db)
+
+	// Admin Popup Routes
+	admin.GET("/popups", popupHandler.ListPopups)
+	admin.POST("/popups", popupHandler.CreatePopup, auth.RequireRole("super_admin", "admin", "editor"))
+	admin.PUT("/popups/:id", popupHandler.UpdatePopup, auth.RequireRole("super_admin", "admin", "editor"))
+	admin.PUT("/popups/:id/toggle", popupHandler.ToggleStatus, auth.RequireRole("super_admin", "admin", "editor"))
+	admin.DELETE("/popups/:id", popupHandler.DeletePopup, auth.RequireRole("super_admin", "admin"))
+
+	// Public Popup Routes
+	api.GET("/popups/active", popupHandler.GetActivePopup)
 }
