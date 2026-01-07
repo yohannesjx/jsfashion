@@ -690,11 +690,12 @@ func (h *OrderHandler) GetOrderPublic(c echo.Context) error {
 	}
 
 	type ItemResponse struct {
-		ProductName string  `json:"product_name"`
-		VariantName string  `json:"variant_name"`
-		Quantity    int32   `json:"quantity"`
-		UnitPrice   string  `json:"unit_price"`
-		ImageUrl    *string `json:"image_url"`
+		ProductName     string  `json:"product_name"`
+		VariantName     string  `json:"variant_name"`
+		Quantity        int32   `json:"quantity"`
+		UnitPrice       string  `json:"unit_price"`
+		ImageUrl        *string `json:"image_url"`
+		ComparisonPrice *string `json:"comparison_price,omitempty"`
 	}
 
 	itemsResponse := make([]ItemResponse, len(items))
@@ -703,12 +704,19 @@ func (h *OrderHandler) GetOrderPublic(c echo.Context) error {
 		if item.ImageUrl.Valid && item.ImageUrl.String != "" {
 			imageUrl = &item.ImageUrl.String
 		}
+
+		var comparisonPrice *string
+		if item.ComparisonPrice.Valid && item.ComparisonPrice.String != "" && item.ComparisonPrice.String != "0" {
+			comparisonPrice = &item.ComparisonPrice.String
+		}
+
 		itemsResponse[i] = ItemResponse{
-			ProductName: item.ProductName,
-			VariantName: item.VariantName,
-			Quantity:    item.Quantity,
-			UnitPrice:   item.UnitPrice,
-			ImageUrl:    imageUrl,
+			ProductName:     item.ProductName,
+			VariantName:     item.VariantName,
+			Quantity:        item.Quantity,
+			UnitPrice:       item.UnitPrice,
+			ImageUrl:        imageUrl,
+			ComparisonPrice: comparisonPrice,
 		}
 	}
 

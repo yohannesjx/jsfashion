@@ -14,6 +14,7 @@ class OrderItem {
   final int quantity;
   final String unitPrice;
   final String? imageUrl;
+  final String? comparisonPrice;
 
   OrderItem({
     required this.productName,
@@ -21,6 +22,7 @@ class OrderItem {
     required this.quantity,
     required this.unitPrice,
     this.imageUrl,
+    this.comparisonPrice,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class OrderItem {
       quantity: json['quantity'] ?? 0,
       unitPrice: json['unit_price'] ?? '0',
       imageUrl: json['image_url'],
+      comparisonPrice: json['comparison_price'],
     );
   }
 }
@@ -327,13 +330,32 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        Text(
-                                          '${item.unitPrice} ETB',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade600,
+                                        if (item.comparisonPrice != null) ...[
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            '${item.comparisonPrice} ETB',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade400,
+                                              decoration: TextDecoration.lineThrough,
+                                            ),
                                           ),
-                                        ),
+                                          Text(
+                                            '${item.unitPrice} ETB',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ] else
+                                          Text(
+                                            '${item.unitPrice} ETB',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ],

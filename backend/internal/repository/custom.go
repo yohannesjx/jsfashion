@@ -221,12 +221,14 @@ func (q *Queries) GetOrderByNumber(ctx context.Context, orderNumber int32) (GetO
 }
 
 // ListOrderItemsByOrderNumber gets order items by order_number
+// ListOrderItemsByOrderNumber gets order items by order_number
 type OrderItemPublic struct {
-	ProductName string
-	VariantName string
-	Quantity    int32
-	UnitPrice   string
-	ImageUrl    sql.NullString
+	ProductName     string
+	VariantName     string
+	Quantity        int32
+	UnitPrice       string
+	ImageUrl        sql.NullString
+	ComparisonPrice sql.NullString
 }
 
 func (q *Queries) ListOrderItemsByOrderNumber(ctx context.Context, orderNumber int32) ([]OrderItemPublic, error) {
@@ -236,11 +238,13 @@ func (q *Queries) ListOrderItemsByOrderNumber(ctx context.Context, orderNumber i
 			COALESCE(CONCAT_WS(' / ', pv.size, pv.color), pv.sku) as variant_name,
 			oi.quantity,
 			oi.unit_price,
-			COALESCE(pv.image, p.thumbnail) as image_url
+			COALESCE(pv.image, p.thumbnail) as image_url,
+			COALESCE(pr.amount, 0)::text as comparison_price
 		FROM order_items oi
 		JOIN orders o ON oi.order_id = o.id
 		LEFT JOIN product_variants pv ON oi.variant_id = pv.id
 		LEFT JOIN products p ON pv.product_id = p.id
+		LEFT JOIN prices pr ON pr.variant_id = pv.id AND pr.currency = 'Br'
 		WHERE o.order_number = $1
 	`
 	rows, err := q.db.QueryContext(ctx, query, orderNumber)
@@ -258,6 +262,7 @@ func (q *Queries) ListOrderItemsByOrderNumber(ctx context.Context, orderNumber i
 			&i.Quantity,
 			&i.UnitPrice,
 			&i.ImageUrl,
+			&i.ComparisonPrice,
 		); err != nil {
 			return nil, err
 		}
