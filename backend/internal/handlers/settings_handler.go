@@ -12,10 +12,11 @@ import (
 
 type SettingsHandler struct {
 	Repo *repository.Queries
+	DB   *sql.DB
 }
 
-func NewSettingsHandler(repo *repository.Queries) *SettingsHandler {
-	return &SettingsHandler{Repo: repo}
+func NewSettingsHandler(repo *repository.Queries, db *sql.DB) *SettingsHandler {
+	return &SettingsHandler{Repo: repo, DB: db}
 }
 
 // --- Store Settings ---
@@ -67,22 +68,6 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 	var req UpdateSettingsRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
-	}
-
-	// Ensure at least one setting exists to update
-	_, err := h.Repo.GetStoreSettings(c.Request().Context())
-	if err == sql.ErrNoRows {
-		// Insert initial record if missing (hacky but works for single row table)
-		// Ideally we'd have an InsertStoreSettings query, but Update works if row exists.
-		// For now, let's assume the row exists or we'd need an Insert query.
-		// Actually, let's just fail gracefully or handle insert in a real app.
-		// Since we created the table, it's empty. We need to insert first.
-		// Let's rely on the frontend to call this only after Get returns defaults?
-		// No, let's just assume we might need to insert. But our query is UPDATE.
-		// Let's add a check. If no rows, we can't update.
-		// For simplicity in this iteration, we'll assume the user ran the SQL to insert a row or we'll add a migration later.
-		// Wait, I didn't add an INSERT query for settings. I should have.
-		// Let's proceed with Update and if it fails, we know why.
 	}
 
 	params := repository.UpdateStoreSettingsParams{
@@ -154,13 +139,241 @@ func (h *SettingsHandler) UpdateSettings(c echo.Context) error {
 
 	settings, err := h.Repo.UpdateStoreSettings(c.Request().Context(), params)
 	if err != nil {
-		// If update fails (likely no row), we should probably insert.
-		// But for now, let's just return error.
 		c.Logger().Errorf("Failed to update settings: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update settings"})
 	}
 
 	return c.JSON(http.StatusOK, settings)
+}
+
+// --- Payment Accounts ---
+
+type PaymentAccount struct {
+	ID            string `json:"id"`
+	BankName      string `json:"bank_name"`
+	AccountName   string `json:"account_name"`
+	AccountNumber string `json:"account_number"`
+	AccountType   string `json:"account_type,omitempty"`
+	IsActive      bool   `json:"is_active"`
+	DisplayOrder  int    `json:"display_order"`
+}
+
+type CreatePaymentAccountRequest struct {
+	BankName      string `json:"bank_name"`
+	AccountName   string `json:"account_name"`
+	AccountNumber string `json:"account_number"`
+	AccountType   string `json:"account_type"`
+	DisplayOrder  int    `json:"display_order"`
+}
+
+type UpdatePaymentAccountRequest struct {
+	BankName      string `json:"bank_name"`
+	AccountName   string `json:"account_name"`
+	AccountNumber string `json:"account_number"`
+	AccountType   string `json:"account_type"`
+	DisplayOrder  int    `json:"display_order"`
+}
+
+// GetActivePaymentAccounts returns active payment accounts for public use (Flutter app)
+func (h *SettingsHandler) GetActivePaymentAccounts(c echo.Context) error {
+	query := `
+		SELECT id, bank_name, account_name, account_number, account_type, display_order
+		FROM payment_accounts
+		WHERE is_active = true
+		ORDER BY display_order ASC, created_at ASC
+	`
+
+	rows, err := h.DB.QueryContext(c.Request().Context(), query)
+	if err != nil {
+		c.Logger().Errorf("Failed to fetch payment accounts: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch payment accounts"})
+	}
+	defer rows.Close()
+
+	var accounts []PaymentAccount
+	for rows.Next() {
+		var acc PaymentAccount
+		var accountType sql.NullString
+		if err := rows.Scan(&acc.ID, &acc.BankName, &acc.AccountName, &acc.AccountNumber, &accountType, &acc.DisplayOrder); err != nil {
+			c.Logger().Errorf("Failed to scan payment account: %v", err)
+			continue
+		}
+		if accountType.Valid {
+			acc.AccountType = accountType.String
+		}
+		acc.IsActive = true
+		accounts = append(accounts, acc)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"accounts": accounts})
+}
+
+// GetAllPaymentAccounts returns all payment accounts for admin
+func (h *SettingsHandler) GetAllPaymentAccounts(c echo.Context) error {
+	query := `
+		SELECT id, bank_name, account_name, account_number, account_type, is_active, display_order
+		FROM payment_accounts
+		ORDER BY display_order ASC, created_at ASC
+	`
+
+	rows, err := h.DB.QueryContext(c.Request().Context(), query)
+	if err != nil {
+		c.Logger().Errorf("Failed to fetch payment accounts: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch payment accounts"})
+	}
+	defer rows.Close()
+
+	var accounts []PaymentAccount
+	for rows.Next() {
+		var acc PaymentAccount
+		var accountType sql.NullString
+		if err := rows.Scan(&acc.ID, &acc.BankName, &acc.AccountName, &acc.AccountNumber, &accountType, &acc.IsActive, &acc.DisplayOrder); err != nil {
+			c.Logger().Errorf("Failed to scan payment account: %v", err)
+			continue
+		}
+		if accountType.Valid {
+			acc.AccountType = accountType.String
+		}
+		accounts = append(accounts, acc)
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"accounts": accounts})
+}
+
+// CreatePaymentAccount creates a new payment account
+func (h *SettingsHandler) CreatePaymentAccount(c echo.Context) error {
+	var req CreatePaymentAccountRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	query := `
+		INSERT INTO payment_accounts (bank_name, account_name, account_number, account_type, display_order)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, bank_name, account_name, account_number, account_type, is_active, display_order
+	`
+
+	var acc PaymentAccount
+	var accountType sql.NullString
+	err := h.DB.QueryRowContext(
+		c.Request().Context(),
+		query,
+		req.BankName,
+		req.AccountName,
+		req.AccountNumber,
+		req.AccountType,
+		req.DisplayOrder,
+	).Scan(&acc.ID, &acc.BankName, &acc.AccountName, &acc.AccountNumber, &accountType, &acc.IsActive, &acc.DisplayOrder)
+
+	if err != nil {
+		c.Logger().Errorf("Failed to create payment account: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create payment account"})
+	}
+
+	if accountType.Valid {
+		acc.AccountType = accountType.String
+	}
+
+	return c.JSON(http.StatusCreated, acc)
+}
+
+// UpdatePaymentAccount updates an existing payment account
+func (h *SettingsHandler) UpdatePaymentAccount(c echo.Context) error {
+	id := c.Param("id")
+
+	var req UpdatePaymentAccountRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	query := `
+		UPDATE payment_accounts
+		SET bank_name = $2, account_name = $3, account_number = $4, account_type = $5, display_order = $6, updated_at = NOW()
+		WHERE id = $1
+		RETURNING id, bank_name, account_name, account_number, account_type, is_active, display_order
+	`
+
+	var acc PaymentAccount
+	var accountType sql.NullString
+	err := h.DB.QueryRowContext(
+		c.Request().Context(),
+		query,
+		id,
+		req.BankName,
+		req.AccountName,
+		req.AccountNumber,
+		req.AccountType,
+		req.DisplayOrder,
+	).Scan(&acc.ID, &acc.BankName, &acc.AccountName, &acc.AccountNumber, &accountType, &acc.IsActive, &acc.DisplayOrder)
+
+	if err != nil {
+		c.Logger().Errorf("Failed to update payment account: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update payment account"})
+	}
+
+	if accountType.Valid {
+		acc.AccountType = accountType.String
+	}
+
+	return c.JSON(http.StatusOK, acc)
+}
+
+// TogglePaymentAccountStatus toggles the active status of a payment account
+func (h *SettingsHandler) TogglePaymentAccountStatus(c echo.Context) error {
+	id := c.Param("id")
+
+	var req struct {
+		IsActive bool `json:"is_active"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request body"})
+	}
+
+	query := `
+		UPDATE payment_accounts
+		SET is_active = $2, updated_at = NOW()
+		WHERE id = $1
+		RETURNING id, bank_name, account_name, account_number, account_type, is_active, display_order
+	`
+
+	var acc PaymentAccount
+	var accountType sql.NullString
+	err := h.DB.QueryRowContext(
+		c.Request().Context(),
+		query,
+		id,
+		req.IsActive,
+	).Scan(&acc.ID, &acc.BankName, &acc.AccountName, &acc.AccountNumber, &accountType, &acc.IsActive, &acc.DisplayOrder)
+
+	if err != nil {
+		c.Logger().Errorf("Failed to toggle payment account status: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to toggle payment account status"})
+	}
+
+	if accountType.Valid {
+		acc.AccountType = accountType.String
+	}
+
+	return c.JSON(http.StatusOK, acc)
+}
+
+// DeletePaymentAccount soft deletes a payment account
+func (h *SettingsHandler) DeletePaymentAccount(c echo.Context) error {
+	id := c.Param("id")
+
+	query := `
+		UPDATE payment_accounts
+		SET is_active = false, updated_at = NOW()
+		WHERE id = $1
+	`
+
+	_, err := h.DB.ExecContext(c.Request().Context(), query, id)
+	if err != nil {
+		c.Logger().Errorf("Failed to delete payment account: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to delete payment account"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Payment account deleted successfully"})
 }
 
 // --- Admin Users ---

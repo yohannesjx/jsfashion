@@ -15,7 +15,7 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	orderHandler := NewOrderHandler(repo, db)
 	customerHandler := NewCustomerHandler(repo)
 	dashboardHandler := NewDashboardHandler(repo, db)
-	settingsHandler := NewSettingsHandler(repo)
+	settingsHandler := NewSettingsHandler(repo, db)
 	couponHandler := NewCouponHandler(repo)
 	discountHandler := NewDiscountHandler()
 	authHandler := &AuthHandler{Repo: repo}
@@ -89,6 +89,16 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	admin.PUT("/users/:id", settingsHandler.UpdateUser, auth.RequireRole("super_admin", "admin"))
 	admin.PUT("/users/:id/password", settingsHandler.UpdatePassword, auth.RequireRole("super_admin", "admin"))
 	admin.DELETE("/users/:id", settingsHandler.DeleteUser, auth.RequireRole("super_admin", "admin"))
+
+	// Payment Accounts Routes (Admin only)
+	admin.GET("/payment-accounts", settingsHandler.GetAllPaymentAccounts, auth.RequireRole("super_admin", "admin"))
+	admin.POST("/payment-accounts", settingsHandler.CreatePaymentAccount, auth.RequireRole("super_admin", "admin"))
+	admin.PUT("/payment-accounts/:id", settingsHandler.UpdatePaymentAccount, auth.RequireRole("super_admin", "admin"))
+	admin.PUT("/payment-accounts/:id/toggle", settingsHandler.TogglePaymentAccountStatus, auth.RequireRole("super_admin", "admin"))
+	admin.DELETE("/payment-accounts/:id", settingsHandler.DeletePaymentAccount, auth.RequireRole("super_admin", "admin"))
+
+	// Public Payment Accounts endpoint (for Flutter app)
+	api.GET("/payment-accounts", settingsHandler.GetActivePaymentAccounts)
 
 	// Inventory Routes
 	inventoryHandler := NewInventoryHandler(repo)
