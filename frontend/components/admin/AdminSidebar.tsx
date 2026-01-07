@@ -19,6 +19,7 @@ import {
     FolderTree,
     Image,
     CreditCard,
+    Megaphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -85,6 +86,12 @@ const navItems: NavItem[] = [
         title: 'Analytics',
         href: '/admin/analytics',
         icon: BarChart3,
+    },
+    {
+        title: 'Marketing',
+        href: '/admin/marketing/popups',
+        icon: Megaphone,
+        roles: ['super_admin', 'admin', 'editor'],
     },
     {
         title: 'Notifications',
