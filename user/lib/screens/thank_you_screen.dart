@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import '../constants.dart';
+import '../utils/logger.dart';
 import '../widgets/floating_contact_button.dart';
 
 class OrderItem {
@@ -63,8 +65,9 @@ class OrderData {
 
 class ThankYouScreen extends StatefulWidget {
   final String orderNumber;
+  final double? finalTotal; // Use finalTotal passed from checkout
 
-  const ThankYouScreen({super.key, required this.orderNumber});
+  const ThankYouScreen({super.key, required this.orderNumber, this.finalTotal});
 
   @override
   State<ThankYouScreen> createState() => _ThankYouScreenState();
@@ -100,7 +103,7 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching order: $e');
+      AppLogger.error('Error fetching order', e);
       setState(() {
         _error = 'Failed to load order details';
         _isLoading = false;
@@ -110,6 +113,11 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Override total amount if finalTotal is passed
+    final displayTotal = widget.finalTotal != null 
+        ? '${NumberFormat("#,##0", "en_US").format(widget.finalTotal)} ETB' 
+        : (_order?.totalAmount != null ? _order!.totalAmount : 'Loading...');
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -343,7 +351,7 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
                                 ),
                               ),
                               Text(
-                                '${_order!.totalAmount} ETB',
+                                displayTotal,
                                 style: GoogleFonts.inter(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -405,7 +413,7 @@ class _ThankYouScreenState extends State<ThankYouScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),

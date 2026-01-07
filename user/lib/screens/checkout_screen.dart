@@ -163,8 +163,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _showCheckoutDialog() {
     final cart = Provider.of<CartModel>(context, listen: false);
-    final deliveryFee = _calculateDeliveryFee(cart.totalAmount);
-    final total = cart.totalAmount + deliveryFee;
+    final deliveryFee = _calculateDeliveryFee(cart.discountedTotal);
+    final total = cart.discountedTotal + deliveryFee;
     final formatter = NumberFormat("#,##0", "en_US");
 
     showModalBottomSheet(
@@ -368,6 +368,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _isLoading = true;
     });
     final cart = Provider.of<CartModel>(context, listen: false);
+    // Capture values before clearing cart
+    final deliveryFee = _calculateDeliveryFee(cart.discountedTotal);
+    final finalTotal = cart.discountedTotal + deliveryFee;
 
     try {
       final items = cart.items.map((item) => {
@@ -434,7 +437,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => ThankYouScreen(orderNumber: orderNumber?.toString() ?? 'N/A'),
+              builder: (context) => ThankYouScreen(
+                orderNumber: orderNumber?.toString() ?? 'N/A',
+                finalTotal: finalTotal,
+              ),
             ),
           );
         }
@@ -502,6 +508,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cart = Provider.of<CartModel>(context);
     final subtotal = cart.totalAmount;
+    final deliveryFee = _calculateDeliveryFee(cart.discountedTotal);
+    final total = cart.discountedTotal + deliveryFee;
+    final formatter = NumberFormat("#,##0", "en_US");
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -742,55 +751,145 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
+                  if (cart.appliedCoupon == null)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 40,
+                            child: TextFormField(
+                              controller: _couponController,
+                              textCapitalization: TextCapitalization.characters,
+                              decoration: InputDecoration(
+                                hintText: 'Enter coupon code',
+                                filled: true,
+                                fillColor: Colors.white,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(color: Colors.grey[300]!),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
                           height: 40,
-                          child: TextFormField(
-                            controller: _couponController,
-                            textCapitalization: TextCapitalization.characters,
-                            decoration: InputDecoration(
-                              hintText: 'Enter coupon code',
-                              filled: true,
-                              fillColor: Colors.white,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                              border: OutlineInputBorder(
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              final code = _couponController.text.trim();
+                              if (code.isEmpty) return;
+                              
+                              try {
+                                setState(() => _isLoading = true);
+                                final success = await cart.applyCoupon(code);
+                                setState(() => _isLoading = false);
+                                
+                                if (success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Coupon applied successfully!'), backgroundColor: Colors.green),
+                                  );
+                                  _couponController.clear();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Invalid or expired coupon'), backgroundColor: Colors.red),
+                                  );
+                                }
+                              } catch (e) {
+                                setState(() => _isLoading = false);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red),
+                                );
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.grey[300]!),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(color: Colors.black),
                               ),
                             ),
+                            child: _isLoading 
+                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                : Text(
+                                    'Apply',
+                                    style: GoogleFonts.inter(color: Colors.black, fontSize: 13),
+                                  ),
                           ),
                         ),
+                      ],
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green[200]!),
                       ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        height: 40,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // TODO: Implement coupon logic
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey[300]!),
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        children: [
+                          Icon(Icons.local_offer, color: Colors.green[700], size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Coupon Applied: ${cart.appliedCoupon!['code']} (-${formatter.format(cart.discountAmount)} ETB)',
+                              style: GoogleFonts.inter(color: Colors.green[800], fontWeight: FontWeight.w600),
                             ),
                           ),
-                          child: Text(
-                            'Apply',
-                            style: GoogleFonts.inter(color: Colors.black, fontSize: 13),
-                          ),
-                        ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: Colors.green[700], size: 20),
+                            onPressed: () => cart.removeCoupon(),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          )
+                        ],
                       ),
+                    ),
+                  
+                  const SizedBox(height: 24),
+
+                  // Pricing Breakdown
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Subtotal:', style: GoogleFonts.inter(fontSize: 14)),
+                      Text('${formatter.format(subtotal)} ETB', style: GoogleFonts.inter(fontSize: 14)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (cart.discountAmount > 0) ...[
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Discount:', style: GoogleFonts.inter(fontSize: 14, color: Colors.green)),
+                        Text('-${formatter.format(cart.discountAmount)} ETB', style: GoogleFonts.inter(fontSize: 14, color: Colors.green)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Delivery:', style: GoogleFonts.inter(fontSize: 14)),
+                      Text(deliveryFee == 0 ? 'Free' : '${formatter.format(deliveryFee)} ETB', style: GoogleFonts.inter(fontSize: 14)),
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Total:', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text('${formatter.format(total)} ETB', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold)),
                     ],
                   ),
                   

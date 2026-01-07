@@ -370,8 +370,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
       variantId: currentVariant.id,
       variantName: currentVariant.name,
       price: currentVariant.price,
+      comparisonPrice: currentVariant.comparisonPrice, // Added comparison price
       maxStockInt: currentVariant.stock,
-      imageUrl: _product!.imageUrl,
+      imageUrl: currentVariant.imageUrl ?? _product!.imageUrl,
       quantity: _quantity,
     ));
   }
@@ -662,7 +663,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                                     color: const Color(0xFFFFEBEE), // Light red background (same as above)
                                     borderRadius: BorderRadius.circular(100), // Fully rounded pill
                                   ),
-                                  constraints: BoxConstraints(
+                                  constraints: const BoxConstraints(
                                     minWidth: 80, // Ensure pill has width
                                   ),
                                   child: Row(
@@ -677,18 +678,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                                         child: const Icon(Icons.shopping_bag_outlined, size: 14, color: Colors.black),
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        'ETB ${formatter.format(displayPrice)}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w900,
-                                          color: const Color(0xFFE53935), // Red (same as above)
+                                      if (currentVariant != null && currentVariant.comparisonPrice != null && currentVariant.comparisonPrice! > currentVariant.price) ...[
+                                        Text(
+                                          '${formatter.format(currentVariant.comparisonPrice)}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                              decoration: TextDecoration.lineThrough,
+                                              color: Colors.black.withOpacity(0.5),
+                                          ),
                                         ),
-                                      ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '${formatter.format(currentVariant.price)} Br',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: const Color(0xFFE53935), // Red
+                                          ),
+                                        ),
+                                      ] else 
+                                        Text(
+                                          '${formatter.format(displayPrice)} Br',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w900,
+                                            color: const Color(0xFFE53935), // Red
+                                          ),
+                                        ),
                                     ],
                                   ),
                                 ),
-                              const Spacer(), // Push "Add to Cart" to the right
+                              const Spacer(),
                               Text(
                                 maxStock > 0 ? 'Add to Cart' : 'Out of Stock',
                                 style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),

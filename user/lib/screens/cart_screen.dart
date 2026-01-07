@@ -183,10 +183,29 @@ class CartScreen extends StatelessWidget {
                               style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              '${formatter.format(item.price)} Br',
-                              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
+                            if (item.comparisonPrice != null && item.comparisonPrice! > item.price) ...[
+                              Text(
+                                '${formatter.format(item.comparisonPrice)} Br',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${formatter.format(item.price)} Br',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ] else
+                              Text(
+                                '${formatter.format(item.price)} Br',
+                                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
                             const SizedBox(height: 8),
                             Text(
                               'Size: ${item.variantName}',

@@ -320,3 +320,54 @@ func (h *CouponHandler) DeleteCoupon(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Coupon deleted successfully"})
 }
+
+func (h *CouponHandler) ValidateCoupon(c echo.Context) error {
+	code := c.QueryParam("code")
+	if code == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Coupon code is required"})
+	}
+
+	ctx := c.Request().Context()
+
+	// Fetch all coupons and filter (since we don't have GetByCode exposed comfortably yet)
+	coupons, err := h.Repo.ListCoupons(ctx)
+	if err != nil {
+		c.Logger().Errorf("Failed to list coupons: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to validate coupon"})
+	}
+
+	var foundCoupon *repository.Coupon
+	for _, coupon := range coupons {
+		if coupon.Code == code {
+			foundCoupon = &coupon
+			break
+		}
+	}
+
+	if foundCoupon == nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "Invalid coupon code"})
+	}
+
+	// 1. Check Active Status
+	if foundCoupon.IsActive.Valid && !foundCoupon.IsActive.Bool {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Coupon is inactive"})
+	}
+
+	// 2. Check Expiry
+	now := time.Now()
+	if foundCoupon.StartsAt.Valid && now.Before(foundCoupon.StartsAt.Time) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Coupon has not started yet"})
+	}
+	if foundCoupon.ExpiresAt.Valid && now.After(foundCoupon.ExpiresAt.Time) {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Coupon has expired"})
+	}
+
+	// 3. Check Usage Limit
+	if foundCoupon.UsageLimit.Valid && foundCoupon.UsageLimit.Int32 > 0 {
+		if foundCoupon.UsageCount.Valid && foundCoupon.UsageCount.Int32 >= foundCoupon.UsageLimit.Int32 {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Coupon usage limit reached"})
+		}
+	}
+
+	return c.JSON(http.StatusOK, mapToJSONCoupon(*foundCoupon))
+}

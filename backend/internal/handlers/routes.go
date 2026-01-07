@@ -261,6 +261,9 @@ func RegisterRoutes(e *echo.Echo, repo *repository.Queries, db *sql.DB, rdb *red
 	api.PUT("/discounts/:id", discountHandler.UpdateDiscount)
 	api.DELETE("/discounts/:id", discountHandler.DeleteDiscount)
 
+	// Public Coupon Validation
+	api.GET("/coupons/validate", couponHandler.ValidateCoupon)
+
 	// Category Routes (Public for shop)
 	api.GET("/categories", categoryHandler.ListCategories)
 	api.GET("/categories/:id", categoryHandler.GetCategory)
