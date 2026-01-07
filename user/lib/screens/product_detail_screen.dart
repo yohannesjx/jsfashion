@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import '../constants.dart';
 import '../models/cart_model.dart';
-import '../widgets/related_products_list.dart';
 import 'cart_screen.dart';
 
 class ProductVariant {
@@ -131,6 +130,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String? previewName;
   final String? previewImage;
   final String? previewPrice;
+  final bool isInScrollView;
 
   const ProductDetailScreen({
     super.key,
@@ -138,6 +138,7 @@ class ProductDetailScreen extends StatefulWidget {
     this.previewName,
     this.previewImage,
     this.previewPrice,
+    this.isInScrollView = false,
   });
 
   @override
@@ -148,7 +149,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
   ProductDetail? _product;
   bool _isLoading = true;
   String? _error;
-  int _selectedVariantIndex = 0;
+  int _selectedVariantIndex = -1; // Default to no selection
+  bool _showVariantError = false; // Validation state
   int _quantity = 1;
   int _currentImageIndex = 0;
   final PageController _pageController = PageController();
@@ -200,13 +202,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
     final Size endSize = const Size(24, 24); // Approximate cart icon size
 
     OverlayEntry? entry;
-    
-    // Create a curved path mechanism
-    // We'll separate X and Y curves to create an arc
-    // X goes linear or EaseInOut
-    // Y goes with a bounce or easeIn to simulate gravity/fly
-    // Actually, user asked for "slight arc". 
-    // We can simulate arc by adding an offset based on sine wave or just using separate curves.
     
     // Lazy initialization if null (handles hot reload/restart edge case)
     if (_animationController == null) {
@@ -289,11 +284,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
       entry?.remove();
       onComplete();
     });
-    _animationController?.reset();
-    _animationController?.forward().then((_) {
-      entry?.remove();
-      onComplete();
-    });
+    // Removed duplicate forward call that was in original logs
   }
 
   Future<void> _fetchProductDetails() async {
@@ -308,9 +299,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
             _product = ProductDetail.fromJson(data);
             _isLoading = false;
             
-            final firstInStock = _product!.variants.indexWhere((v) => v.stock > 0);
-            if (firstInStock != -1) {
-              _selectedVariantIndex = firstInStock;
+            // Auto-select ONLY if there is exactly 1 variant
+            if (_product!.variants.length == 1) {
+               final firstInStock = _product!.variants.indexWhere((v) => v.stock > 0);
+               if (firstInStock != -1) {
+                 _selectedVariantIndex = firstInStock;
+               }
+            } else {
+               _selectedVariantIndex = -1; // Force user selection
             }
           });
         }
@@ -341,8 +337,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
   void _addToCart() {
     if (_product == null) return;
     
+    // Validation: Check if variant is selected
+    if (_selectedVariantIndex == -1 && _product!.variants.length > 1) {
+      setState(() {
+        _showVariantError = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a size/variant'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     final variants = _product!.variants;
-    final currentVariant = variants[_selectedVariantIndex];
+    // Safety check
+    if (_selectedVariantIndex == -1 && variants.length > 1) return;
+    
+    // If only 1 variant/default to 0 if something weird happens
+    final actualIndex = _selectedVariantIndex == -1 ? 0 : _selectedVariantIndex;
+    if (actualIndex >= variants.length) return; // double safety
+
+    final currentVariant = variants[actualIndex];
     
     // Add to cart provider
     Provider.of<CartModel>(context, listen: false).addItem(CartItem(
@@ -366,15 +384,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
     final displayName = _product?.name ?? widget.previewName ?? 'Loading...';
     
     final displayPrice = _product != null 
-        ? (_product!.variants.isNotEmpty ? _product!.variants[_selectedVariantIndex].price : double.parse(_product!.basePrice))
+        ? ((_product!.variants.isNotEmpty && _selectedVariantIndex != -1) 
+            ? _product!.variants[_selectedVariantIndex].price 
+            : double.tryParse(_product!.basePrice) ?? 0)
         : (double.tryParse(widget.previewPrice ?? '0') ?? 0);
     final displayImage = _product != null && _product!.images.isNotEmpty
         ? _product!.images[_currentImageIndex]
         : widget.previewImage;
     
     final variants = _product?.variants ?? [];
-    final currentVariant = variants.isNotEmpty ? variants[_selectedVariantIndex] : null;
-    final maxStock = currentVariant?.stock ?? 0;
+    final currentVariant = (variants.isNotEmpty && _selectedVariantIndex != -1) ? variants[_selectedVariantIndex] : null;
+    final maxStock = currentVariant?.stock ?? (variants.isNotEmpty ? 999 : 0); // Allow click if variants exist but none selected
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -448,7 +468,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                                     borderRadius: BorderRadius.circular(4),
                                     color: _currentImageIndex == entry.key
                                         ? Colors.black
-                                        : Colors.black.withOpacity(0.2),
+                                        : Colors.black.withValues(alpha: 0.2),
                                   ),
                                 );
                               }).toList(),
@@ -509,83 +529,99 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                       // Show if more than 1 variant OR if 1 variant and it's not a generic "Default"/ "Default Title"
                       if (!_isLoading && variants.isNotEmpty && 
                           (variants.length > 1 || !variants[0].name.toLowerCase().contains('default'))) ...[
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: variants.asMap().entries.where((entry) => entry.value.stock > 0).map((entry) {
-                            final idx = entry.key;
-                            final variant = entry.value;
-                            final isSelected = _selectedVariantIndex == idx;
-                            final variantLabel = cleanVariantName(variant.name, displayName); // displayName here is Product Name from outer scope
-                            final bool isLongText = variantLabel.length > 3;
-
-                            return GestureDetector(
-                              onTap: () => setState(() => _selectedVariantIndex = idx),
-                              child: Container(
-                                width: isLongText ? null : 44.0, 
-                                constraints: const BoxConstraints(minWidth: 44),
-                                padding: isLongText ? const EdgeInsets.symmetric(horizontal: 16) : EdgeInsets.zero,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: isSelected ? Colors.black : Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                     BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2)
-                                     )
-                                  ]
-                                ),
-                                child: Center(
-                                  widthFactor: 1.0,
-                                  child: Text(
-                                    variantLabel,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: isSelected ? Colors.white : Colors.black,
-                                    ),
+                        
+                        // Error Message (Top of variants)
+                        if (_showVariantError)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline, size: 14, color: Colors.red),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Please select a size',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.red,
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              ],
+                            ),
+                          ),
+
+                        // Error Boundary for Selector
+                        Container(
+                          padding: _showVariantError ? const EdgeInsets.all(8) : EdgeInsets.zero,
+                          decoration: _showVariantError ? BoxDecoration(
+                            border: Border.all(color: Colors.red, width: 2),
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.red.withOpacity(0.05),
+                          ) : null,
+                          child: Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: variants.asMap().entries
+                              .where((entry) => entry.value.stock > 0)
+                              .map((entry) {
+                                final idx = entry.key;
+                                final variant = entry.value;
+                                final variantLabel = cleanVariantName(variant.name, displayName);
+                                return variantLabel;
+                              })
+                              .where((label) => label.isNotEmpty)
+                              .toSet() // Deduplicate labels
+                              .map((label) {
+                                final idx = variants.indexWhere((v) => 
+                                  cleanVariantName(v.name, displayName) == label && v.stock > 0
+                                );
+                                final variant = variants[idx];
+                                final isSelected = _selectedVariantIndex == idx;
+                                final variantLabel = label;
+                                final bool isLongText = variantLabel.length > 3;
+
+                                return GestureDetector(
+                                  onTap: () => setState(() {
+                                    _selectedVariantIndex = idx;
+                                    _showVariantError = false; // Clear error on selection
+                                  }),
+                                  child: Container(
+                                    width: isLongText ? null : 44.0, 
+                                    constraints: const BoxConstraints(minWidth: 44),
+                                    padding: isLongText ? const EdgeInsets.symmetric(horizontal: 16) : EdgeInsets.zero,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? Colors.black : Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: isSelected ? null : Border.all(
+                                        color: Colors.grey.withValues(alpha: 0.2),
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                         BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.05),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2)
+                                         )
+                                      ]
+                                    ),
+                                    child: Center(
+                                      widthFactor: 1.0,
+                                      child: Text(
+                                        variantLabel,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                          ),
                         ),
                         const SizedBox(height: 20), // Reduced from 32
-                      ],
-                      
-                      // Sale Price Display
-                      if (currentVariant != null && 
-                          currentVariant.comparisonPrice != null && 
-                          currentVariant.comparisonPrice! > currentVariant.price) ...[
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${formatter.format(currentVariant.price)} Br',
-                              style: GoogleFonts.inter(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                color: const Color(0xFFE53935), // Red
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                '${formatter.format(currentVariant.comparisonPrice)} Br',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
                       ],
 
                       // Full Width Add to Cart Button with Price
@@ -596,6 +632,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                           onPressed: (_product == null || maxStock <= 0) 
                               ? null 
                               : () {
+                                  // Validation BEFORE animation
+                                  if (_selectedVariantIndex == -1 && variants.length > 1) {
+                                      setState(() {
+                                        _showVariantError = true;
+                                      });
+                                      // Optional: Vibrate or simple feedback
+                                      return; 
+                                  }
+
                                   _runAddToCartAnimation(() {
                                     _addToCart();
                                   });
@@ -604,28 +649,51 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 8), // Start content close to edge
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              if (maxStock > 0)
-                                Text(
-                                  (currentVariant != null && 
-                                   currentVariant.comparisonPrice != null && 
-                                   currentVariant.comparisonPrice! > currentVariant.price)
-                                      ? '${formatter.format(currentVariant.price)} Br'
-                                      : '${formatter.format(displayPrice)} Br',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16, 
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                // Price Pill in Button
+                                Container(
+                                  padding: const EdgeInsets.fromLTRB(6, 8, 8, 8), // Left padding reduced to 6 (moved left by 2px)
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFEBEE), // Light red background (same as above)
+                                    borderRadius: BorderRadius.circular(100), // Fully rounded pill
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 80, // Ensure pill has width
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.shopping_bag_outlined, size: 14, color: Colors.black),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'ETB ${formatter.format(displayPrice)}',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          color: const Color(0xFFE53935), // Red (same as above)
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                              const Spacer(), // Push "Add to Cart" to the right
                               Text(
                                 maxStock > 0 ? 'Add to Cart' : 'Out of Stock',
                                 style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
                               ),
+                              const SizedBox(width: 4), // Move text to left by adding spacing on right
                             ],
                           ),
                         ),
@@ -639,26 +707,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> with TickerPr
 
 
 
-          // 3. Custom Top Bar (Back & Cart)
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 20,
-                      child: BackButton(color: Colors.black),
-                    ),
-                  ],
+          // 3. Custom Top Bar (Back & Cart) - Only show back button if not in scroll view
+          if (!widget.isInScrollView)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.white,
+                        radius: 20,
+                        child: BackButton(color: Colors.black),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

@@ -5,13 +5,20 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constants.dart';
 import '../widgets/product_card.dart';
 import '../models/cart_model.dart';
+import '../utils/logger.dart';
+import '../widgets/marketing_popup.dart';
+import '../widgets/home/hero_banner.dart';
+import '../widgets/home/home_app_bar.dart';
+import '../services/popup_service.dart';
 import 'product_detail_screen.dart';
+import 'product_scroll_view.dart';
 import 'cart_screen.dart';
 import '../widgets/floating_contact_button.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,29 +47,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   
   final int _productsPerPage = 40;
   int _currentPage = 0;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    print('🚀 [TIMING] initState started');
+    AppLogger.timing('initState started', 0);
     final startTime = DateTime.now();
     
     _marqueeController = AnimationController(
       duration: const Duration(seconds: 25),
       vsync: this,
     )..repeat();
-    print('🚀 [TIMING] Animation controller created: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+    AppLogger.timing('Animation controller created', DateTime.now().difference(startTime).inMilliseconds);
     
     // Load cached data first for instant display
     _loadCachedData().then((_) {
-      print('🚀 [TIMING] Cache loaded: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+      AppLogger.timing('Cache loaded', DateTime.now().difference(startTime).inMilliseconds);
     });
     
     // Then fetch fresh data in background
     _fetchHeroBanner();
     _fetchCategories();
     _fetchProducts();
-    print('🚀 [TIMING] initState completed: ${DateTime.now().difference(startTime).inMilliseconds}ms');
+    _checkMarketingPopup();
+    AppLogger.timing('initState completed', DateTime.now().difference(startTime).inMilliseconds);
   }
 
   Future<void> _loadCachedData() async {
@@ -81,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             _displayedProducts = products.take(_productsPerPage).toList();
             _isLoading = false;
           });
-          print('✅ Loaded ${products.length} products from cache');
+          AppLogger.info('Loaded \${products.length} products from cache');
         }
       }
       
@@ -94,26 +103,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {
             _categories = categoriesData;
           });
-          print('✅ Loaded ${categoriesData.length} categories from cache');
+          AppLogger.info('Loaded \${categoriesData.length} categories from cache');
         }
       }
     } catch (e) {
-      print('⚠️ Error loading cache: $e');
+      AppLogger.warning('Error loading cache', e);
     }
   }
 
   Future<void> _fetchHeroBanner() async {
     try {
       final url = Uri.parse('${ApiConstants.baseUrl}/settings');
-      print('🎨 Fetching hero banner from: $url');
+      AppLogger.api('GET', '/settings');
       final response = await http.get(url);
       
-      print('📡 Hero Banner Response Status: ${response.statusCode}');
-      print('📦 Hero Banner Response Body: ${response.body}');
+      AppLogger.debug('Hero Banner Response Status: \${response.statusCode}');
+      AppLogger.debug('Hero Banner Response Body: \${response.body}');
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print('🔧 Decoded hero banner data: $data');
+        AppLogger.debug('Decoded hero banner data: \$data');
         
         // Check both possible response formats
         String? bannerUrl;
@@ -144,9 +153,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           }
         }
         
-        print('🖼️ Extracted banner URL: $bannerUrl');
-        print('📝 Extracted title: $title');
-        print('📝 Extracted subtitle: $subtitle');
+        AppLogger.debug('Extracted banner URL: \$bannerUrl');
+        AppLogger.debug('Extracted title: \$title');
+        AppLogger.debug('Extracted subtitle: \$subtitle');
         
         if (mounted) {
           setState(() {
@@ -160,11 +169,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               _heroSubtitle = subtitle;
             }
           });
-          print('✅ Hero settings updated');
+          AppLogger.info('Hero settings updated');
         }
       }
     } catch (e) {
-      print('❌ Error fetching hero banner: $e');
+      AppLogger.error('Error fetching hero banner', e);
       // Keep default values on error
     }
   }
@@ -174,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _searchController.dispose();
     _debounce?.cancel();
     _marqueeController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -189,38 +199,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     try {
       final url = Uri.parse('${ApiConstants.baseUrl}/categories');
-      print('🔍 Fetching categories from: $url');
+      AppLogger.api('GET', '/categories');
       final response = await http.get(url);
-      print('📡 Categories Response Status: ${response.statusCode}');
-      print('📦 Categories Response Body: ${response.body}');
+      AppLogger.debug('Categories Response Status: \${response.statusCode}');
+      AppLogger.debug('Categories Response Body: \${response.body}');
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
-        print('🔧 Decoded data type: ${data.runtimeType}');
+        AppLogger.debug('Decoded data type: \${data.runtimeType}');
         
         List<dynamic> categoryList = [];
         if (data is List) {
-           print('✅ Data is a List with ${data.length} items');
+           AppLogger.debug('Data is a List with \${data.length} items');
            categoryList = data;
         } else if (data is Map<String, dynamic>) {
-           print('📋 Data is a Map with keys: ${data.keys}');
+           AppLogger.debug('Data is a Map with keys: \${data.keys}');
            if (data.containsKey('categories')) {
               categoryList = data['categories'];
-              print('✅ Found categories key with ${categoryList.length} items');
+              AppLogger.debug('Found categories key with \${categoryList.length} items');
            }
         }
         
-        print('📊 Final categoryList length: ${categoryList.length}');
+        AppLogger.debug('Final categoryList length: \${categoryList.length}');
         if (categoryList.isNotEmpty) {
-          print('📝 First category: ${categoryList[0]}');
+          AppLogger.debug('First category: \${categoryList[0]}');
           
           // Save to cache
           try {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('cached_categories', json.encode(categoryList));
-            print('💾 Categories saved to cache');
+            AppLogger.debug('Categories saved to cache');
           } catch (e) {
-            print('⚠️ Failed to cache categories: $e');
+            AppLogger.warning('Failed to cache categories', e);
           }
         }
         
@@ -233,9 +243,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       } else {
         throw Exception('Status ${response.statusCode}');
       }
-    } catch (e, stackTrace) {
-      print('❌ Error fetching categories: $e');
-      print('📚 Stack trace: $stackTrace');
+    } catch (e) {
+      AppLogger.error('Error fetching categories', e);
+      // Stack trace logged
       if (mounted) {
         setState(() {
           _isCategoriesLoading = false;
@@ -246,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchProducts({String searchQuery = '', String? categoryId}) async {
-    print('🔍 [DEBUG] _fetchProducts called with searchQuery="$searchQuery", categoryId="$categoryId"');
+    AppLogger.debug('_fetchProducts called with searchQuery="\$searchQuery", categoryId="\$categoryId"');
     setState(() {
       _isLoading = true;
       _currentPage = 0;
@@ -259,10 +269,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (categoryId != null) query += '&category_id=$categoryId';
 
       final url = Uri.parse('${ApiConstants.baseUrl}/products$query');
-      print('🌐 [DEBUG] Fetching from: $url');
+      AppLogger.debug('Fetching from: \$url');
       
       final response = await http.get(url);
-      print('📡 [DEBUG] Response status: ${response.statusCode}');
+      AppLogger.debug('Response status: \${response.statusCode}');
 
       if (response.statusCode == 200) {
         final dynamic data = json.decode(response.body);
@@ -273,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           productList = data['products'] ?? [];
         }
 
-        print('📦 [DEBUG] Received ${productList.length} products');
+        AppLogger.debug('Received \${productList.length} products');
 
         if (mounted) {
           // Shuffle products for randomization
@@ -294,9 +304,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               final prefs = await SharedPreferences.getInstance();
               final productsJson = products.map((p) => p.toJson()).toList();
               await prefs.setString('cached_products', json.encode(productsJson));
-              print('💾 Saved ${products.length} products to cache');
+              AppLogger.debug('Saved \${products.length} products to cache');
             } catch (e) {
-              print('⚠️ Failed to cache products: $e');
+              AppLogger.warning('Failed to cache products', e);
             }
           }
         }
@@ -304,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         throw Exception('Failed to load products: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching products: $e');
+      AppLogger.error('Error fetching products', e);
       if (mounted) {
         setState(() {
           _error = e.toString();
@@ -443,7 +453,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           color: _selectedCategoryName == cat['name'] 
-                              ? Colors.black.withOpacity(0.03)
+                              ? Colors.black.withValues(alpha: 0.03)
                               : Colors.transparent,
                           border: Border(
                             left: BorderSide(
@@ -584,28 +594,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       },
                     ),
                     const SizedBox(width: 12),
-                    // Cart Icon with Badge
-                    Consumer<CartModel>(
-                      builder: (context, cart, child) {
-                        final itemCount = cart.itemCount;
+                    // Cart Icon with Badge - Optimized to rebuild only when count changes
+                    Selector<CartModel, int>(
+                      selector: (context, cart) => cart.itemCount,
+                      builder: (context, itemCount, child) {
                         return Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            IconButton(
-                              icon: const Icon(Icons.shopping_bag_outlined, size: 30), // Increased from 26
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-                              },
-                            ),
+                            child!,
                             if (itemCount > 0)
                               Positioned(
                                 right: 0,
                                 top: 0,
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Colors.red,
                                     shape: BoxShape.circle,
                                   ),
@@ -627,6 +630,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ],
                         );
                       },
+                      child: IconButton(
+                        icon: const Icon(Icons.shopping_bag_outlined, size: 30),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
+                        },
+                      ),
                     ),
                     const SizedBox(width: 12),
                   ],
@@ -700,85 +711,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ]);
                       },
                       child: SingleChildScrollView(
+                        controller: _scrollController,
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Hero Banner - Only show on home page (no category, no search)
                             if (_selectedCategoryName == null && _searchController.text.isEmpty) ...[
-                              // Hero Banner
-                              Container(
-                                height: MediaQuery.of(context).size.height * 0.6,
-                                width: double.infinity,
-                                child: Stack(
-                                  children: [
-                                    // Background Image
-                                    CachedNetworkImage(
-                                      imageUrl: _heroBannerUrl,
-                                      cacheKey: _heroBannerUrl, // Force refresh when URL changes
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      color: Colors.black.withOpacity(0.3),
-                                      colorBlendMode: BlendMode.darken,
-                                      placeholder: (context, url) => Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Colors.grey.shade300,
-                                              Colors.grey.shade100,
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) => Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Colors.grey.shade300,
-                                              Colors.grey.shade100,
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    // Text Overlay
-                                    Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            _heroTitle,
-                                            textAlign: TextAlign.center,
-                                            style: GoogleFonts.inter(
-                                              fontSize: 64,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: -2.0,
-                                              height: 0.9,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          if (_heroSubtitle.isNotEmpty) ...[
-                                            const SizedBox(height: 16),
-                                            Text(
-                                              _heroSubtitle,
-                                              textAlign: TextAlign.center,
-                                              style: GoogleFonts.inter(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              HeroBanner(
+                                imageUrl: _heroBannerUrl,
+                                title: _heroTitle,
+                                subtitle: _heroSubtitle,
                               ),
 
                               // Scrolling Marquee
@@ -893,6 +836,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     shrinkWrap: true,
                                     physics: const NeverScrollableScrollPhysics(),
                                     padding: const EdgeInsets.all(0),
+                                    cacheExtent: 200, // Pre-render items for smoother scrolling
                                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
                                       childAspectRatio: 3 / 4.7,
@@ -907,13 +851,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => ProductDetailScreen(
-                                                slug: _displayedProducts[index].slug.isNotEmpty 
+                                              builder: (context) => ProductScrollView(
+                                                initialSlug: _displayedProducts[index].slug.isNotEmpty 
                                                     ? _displayedProducts[index].slug 
                                                     : _displayedProducts[index].id,
-                                                previewName: _displayedProducts[index].name,
-                                                previewPrice: _displayedProducts[index].salePrice ?? _displayedProducts[index].basePrice,
-                                                previewImage: _displayedProducts[index].imageUrl,
+                                                initialName: _displayedProducts[index].name,
+                                                initialPrice: _displayedProducts[index].salePrice ?? _displayedProducts[index].basePrice,
+                                                initialImage: _displayedProducts[index].imageUrl,
                                               ),
                                             ),
                                           );
@@ -994,5 +938,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         style: TextStyle(color: Colors.white, fontSize: 14),
       ),
     );
+  }
+
+  Future<void> _checkMarketingPopup() async {
+    // Small delay to ensure UI is ready
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    try {
+      final popup = await PopupService.getActivePopup();
+      if (popup != null && popup.id.isNotEmpty) {
+        
+        final prefs = await SharedPreferences.getInstance();
+        final lastShownKey = 'popup_last_shown_${popup.id}';
+        final lastShown = prefs.getString(lastShownKey);
+        
+        bool shouldShow = true;
+        
+        if (popup.frequency == 'once_per_day' && lastShown != null) {
+          final lastDate = DateTime.parse(lastShown);
+          final now = DateTime.now();
+          if (lastDate.year == now.year && lastDate.month == now.month && lastDate.day == now.day) {
+            shouldShow = false;
+          }
+        } else if (popup.frequency == 'once_per_session') {
+           if (PopupService.shownInSession.contains(popup.id)) {
+             shouldShow = false;
+           }
+        }
+
+        if (shouldShow) {
+          PopupService.shownInSession.add(popup.id);
+          if (popup.frequency == 'once_per_day') {
+             prefs.setString(lastShownKey, DateTime.now().toIso8601String());
+          }
+
+          if (mounted) {
+            showDialog(
+              context: context,
+              barrierColor: Colors.black54,
+              builder: (context) => MarketingPopup(popup: popup),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print('Popup check failed: $e');
+    }
   }
 }
