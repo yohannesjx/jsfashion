@@ -87,8 +87,7 @@ func (h *PopupHandler) ListPopups(c echo.Context) error {
 func (h *PopupHandler) CreatePopup(c echo.Context) error {
 	var input Popup
 	if err := c.Bind(&input); err != nil {
-		c.Logger().Errorf("Failed to bind popup input: %v", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input: " + err.Error()})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid input"})
 	}
 
 	query := `
