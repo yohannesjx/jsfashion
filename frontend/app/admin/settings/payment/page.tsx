@@ -1,8 +1,5 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit2, Move, Banknote, CheckCircle2, XCircle } from 'lucide-react';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { useRouter } from 'next/navigation';
 
 interface PaymentAccount {
@@ -12,7 +9,7 @@ interface PaymentAccount {
     account_number: string;
     account_type: string;
     is_active: boolean;
-    display_order: int;
+    display_order: number;
 }
 
 export default function PaymentAccountsPage() {
@@ -116,10 +113,8 @@ export default function PaymentAccountsPage() {
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            <AdminSidebar />
-
-            <main className="flex-1 p-8">
+        <div className="min-h-screen bg-gray-50">
+            <main className="p-8">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <div>
