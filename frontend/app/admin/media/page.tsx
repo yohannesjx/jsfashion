@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, Trash2, Copy, Check, Search, Image as ImageIcon } from "lucide-react";
+import { Upload, Trash2, Copy, Check, Search, Image as ImageIcon, Pencil, Layers, X, CheckSquare, Square } from "lucide-react";
+import ImageEditor from "@/components/admin/ImageEditor";
 import { toast } from "sonner";
 
 interface MediaFile {
@@ -19,6 +20,12 @@ export default function MediaLibraryPage() {
     const [uploading, setUploading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+    // Selection & Editing
+    const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
+    const [editorQueue, setEditorQueue] = useState<MediaFile[]>([]);
+    const [currentEditorIndex, setCurrentEditorIndex] = useState(0);
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
 
@@ -118,6 +125,51 @@ export default function MediaLibraryPage() {
         setTimeout(() => setCopiedUrl(null), 2000);
     };
 
+    const toggleSelection = (url: string) => {
+        const newSet = new Set(selectedFiles);
+        if (newSet.has(url)) {
+            newSet.delete(url);
+        } else {
+            newSet.add(url);
+        }
+        setSelectedFiles(newSet);
+    };
+
+    const handleSingleEdit = (file: MediaFile) => {
+        setEditorQueue([file]);
+        setCurrentEditorIndex(0);
+        setIsEditorOpen(true);
+    };
+
+    const handleBatchEdit = () => {
+        const selected = files.filter(f => selectedFiles.has(f.url));
+        if (selected.length === 0) return;
+
+        setEditorQueue(selected);
+        setCurrentEditorIndex(0);
+        setIsEditorOpen(true);
+    };
+
+    const handleEditorSave = async (newUrl: string) => {
+        // Update local file list
+        setFiles(prev => prev.map(f => {
+            if (f.url === editorQueue[currentEditorIndex].url) {
+                return { ...f, url: newUrl, filename: newUrl.split('/').pop() || f.filename };
+            }
+            return f;
+        }));
+
+        // Move to next if available
+        if (currentEditorIndex < editorQueue.length - 1) {
+            setCurrentEditorIndex(prev => prev + 1);
+        } else {
+            setIsEditorOpen(false);
+            setEditorQueue([]);
+            setSelectedFiles(new Set()); // Create new set to clear selection
+            toast.success("All images processed");
+        }
+    };
+
     const filteredFiles = files.filter(file =>
         file.filename.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -141,6 +193,17 @@ export default function MediaLibraryPage() {
                                 </span>
                             </Button>
                         </label>
+
+                        {selectedFiles.size > 0 && (
+                            <Button
+                                onClick={handleBatchEdit}
+                                className="bg-neutral-900 text-white hover:bg-neutral-800"
+                            >
+                                <Layers className="w-4 h-4 mr-2" />
+                                Batch Edit ({selectedFiles.size})
+                            </Button>
+                        )}
+
                         <input
                             id="file-upload"
                             type="file"
@@ -251,8 +314,31 @@ export default function MediaLibraryPage() {
                                         className="w-full h-full object-cover"
                                     />
 
+                                    {/* Selection Checkbox */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleSelection(file.url);
+                                        }}
+                                        className={`absolute top-2 left-2 p-1 rounded-md transition-all ${selectedFiles.has(file.url)
+                                            ? "bg-blue-600 text-white opacity-100"
+                                            : "bg-black/50 text-white/70 hover:bg-black/70 opacity-0 group-hover:opacity-100"
+                                            }`}
+                                    >
+                                        {selectedFiles.has(file.url) ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                                    </button>
+
                                     {/* Overlay on hover */}
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            onClick={() => handleSingleEdit(file)}
+                                            className="bg-white hover:bg-neutral-100"
+                                            title="Edit Image"
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                        </Button>
                                         <Button
                                             size="sm"
                                             variant="secondary"
@@ -291,6 +377,15 @@ export default function MediaLibraryPage() {
                     </div>
                 )}
             </div>
-        </div>
+
+
+            {/* Image Editor */}
+            <ImageEditor
+                isOpen={isEditorOpen}
+                onClose={() => setIsEditorOpen(false)}
+                imageUrl={editorQueue[currentEditorIndex]?.url || ""}
+                onSave={handleEditorSave}
+            />
+        </div >
     );
 }

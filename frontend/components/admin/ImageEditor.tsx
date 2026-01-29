@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-import { Loader2, Save, Undo, X } from "lucide-react";
+import { Loader2, Save, Undo, X, MoveVertical } from "lucide-react";
 import { toast } from "sonner";
 
 interface ImageEditorProps {
@@ -19,6 +19,7 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [scale, setScale] = useState(1);
+    const [offsetY, setOffsetY] = useState(0);
     const [imageObj, setImageObj] = useState<HTMLImageElement | null>(null);
 
     // Target aspect ratio 9:19.5 (approx 0.4615)
@@ -36,7 +37,7 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
         if (imageObj && canvasRef.current) {
             drawCanvas();
         }
-    }, [imageObj, scale]);
+    }, [imageObj, scale, offsetY]);
 
     const loadImage = () => {
         setLoading(true);
@@ -47,6 +48,7 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
             setImageObj(img);
             setLoading(false);
             setScale(1); // Reset scale
+            setOffsetY(0); // Reset offset
         };
         img.onerror = () => {
             setLoading(false);
@@ -105,7 +107,7 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 10;
 
-        ctx.drawImage(imageObj, fgX, fgY, fgW, fgH);
+        ctx.drawImage(imageObj, fgX, fgY + offsetY, fgW, fgH);
 
         // Reset shadow
         ctx.shadowColor = "transparent";
@@ -142,26 +144,19 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
             if (!res.ok) throw new Error("Upload failed");
 
             const data = await res.json();
-            // Expected response: { url: "...", filename: "..." }
-            // Some APIs return [url] or just url string, adjusting based on MediaPicker behavior
-            // Looking at MediaPicker, upload returns nothing but success, we might need to check response
-
-            // Assuming standard response format from common uploaders, 
-            // but if it matches MediaPicker logic, we might need to validat response structure.
-            // Let's assume standard { url: '...' } or verify later.
-            // Actually, MediaPicker upload endpoint just returns 200 OK.
-            // Wait, we need the URL. 'api/v1/admin/upload' normally returns the file info.
 
             let newUrl = "";
             if (data.url) newUrl = data.url;
             else if (Array.isArray(data) && data[0].url) newUrl = data[0].url;
 
-            // If the API doesn't return the URL directly (just saves it), we might have issues.
-            // But usually upload endpoints return the path.
-            // Let's proceed assuming we get a URL. If not we'll debug.
             if (!newUrl && typeof data === 'string') newUrl = data;
 
             await onSave(newUrl);
+            // Don't close here, let parent handle flow if needed, 
+            // but for now we follow existing logic. 
+            // Actually, for batch edit, we might want to keep it open or let parent close.
+            // But existing logic `onClose()` is called. 
+            // I'll keep it consistent with previous version for now.
             onClose();
             toast.success("Image saved successfully");
 
@@ -216,6 +211,30 @@ export default function ImageEditor({ isOpen, onClose, imageUrl, onSave }: Image
                             size="icon"
                             onClick={() => setScale(1)}
                             title="Reset Scale"
+                        >
+                            <Undo className="w-4 h-4" />
+                        </Button>
+                    </div>
+
+                    <div className="flex items-center gap-4 max-w-md mx-auto">
+                        <span className="text-sm font-medium text-neutral-400 flex items-center gap-2">
+                            <MoveVertical className="w-4 h-4" /> Pan
+                        </span>
+                        <input
+                            type="range"
+                            value={offsetY}
+                            min={-500}
+                            max={500}
+                            step={1}
+                            onChange={(e) => setOffsetY(parseFloat(e.target.value))}
+                            className="flex-1 accent-white h-2 bg-neutral-700 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <span className="text-sm w-8 text-right text-xs text-neutral-500">{offsetY}px</span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setOffsetY(0)}
+                            title="Reset Pan"
                         >
                             <Undo className="w-4 h-4" />
                         </Button>
