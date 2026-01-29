@@ -1,7 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Share2, ChevronDown, ChevronUp, X, Check } from "lucide-react";
+import { Minus, Plus, Share2, ChevronDown, ChevronUp, X, Check, Pencil } from "lucide-react";
+import ImageEditor from "@/components/admin/ImageEditor";
+import { adminApi } from "@/lib/api/admin/client";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
@@ -77,8 +79,18 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [addedToCart, setAddedToCart] = useState(false);
 
+    // Admin Image Editing
+    const [imageEditorOpen, setImageEditorOpen] = useState(false);
+    const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
     const addItem = useCartStore((state) => state.addItem);
     const { cartEnabled } = useCartStatus();
+
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        setIsAdmin(!!token);
+    }, []);
 
     useEffect(() => {
         async function load() {
@@ -143,10 +155,46 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
         }
     }, [selectedVariant, product, quantity]);
 
-    // Scroll to top when component mounts
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    const handleSaveImage = async (newUrl: string) => {
+        if (!product || editingImageIndex === null) return;
+
+        // Optimistically update local state
+        const updatedImages = product.images.length > 0
+            ? [...product.images]
+            : (product.image_url ? [product.image_url] : []);
+
+        // Ensure array has enough slots if we are editing an index that might not exist in a weird state
+        // (Though UI prevents this usually)
+        if (editingImageIndex < updatedImages.length) {
+            updatedImages[editingImageIndex] = newUrl;
+        }
+
+        const updatedProduct = {
+            ...product,
+            images: updatedImages,
+            // If we edited the first image, update the main image_url too for consistency
+            image_url: editingImageIndex === 0 ? newUrl : product.image_url
+        };
+
+        setProduct(updatedProduct);
+
+        try {
+            await adminApi.put(`/products/${product.id}`, {
+                ...product, // Send other fields to keep them safe, though API might ignore nulls
+                image_url: updatedProduct.image_url,
+                images: updatedImages
+            });
+            toast.success("Product image updated");
+        } catch (error) {
+            console.error("Failed to update product:", error);
+            toast.error("Failed to save image change to server");
+            // Could revert here if needed, but keeping it simple for now
+        }
+    };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
     if (!product) return null;
@@ -187,6 +235,20 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                                         (e.target as HTMLImageElement).src = '/placeholder-1.jpg';
                                     }}
                                 />
+
+                                {isAdmin && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingImageIndex(idx);
+                                            setImageEditorOpen(true);
+                                        }}
+                                        className="absolute bottom-2 right-2 bg-white/90 p-2 rounded-full shadow-md hover:bg-white transition-all z-20 text-neutral-800"
+                                        title="Edit Image"
+                                    >
+                                        <Pencil className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -565,6 +627,13 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                     ← Back to Shop
                 </Link>
             </div>
+            {/* Image Editor Modal */}
+            <ImageEditor
+                isOpen={imageEditorOpen}
+                onClose={() => setImageEditorOpen(false)}
+                imageUrl={editingImageIndex !== null ? images[editingImageIndex] : ""}
+                onSave={handleSaveImage}
+            />
         </main>
     );
 }
