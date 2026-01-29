@@ -5,7 +5,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ChevronDown, ChevronRight, Edit, Trash2, Upload, Check, X, Pencil } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Trash2, Upload, Check, X, Pencil, Eye } from "lucide-react";
 import Link from "next/link";
 import { useVariants, useDeleteVariant } from "@/lib/api/admin/products";
 import { Input } from "@/components/ui/input";
@@ -217,6 +217,17 @@ export function ProductRow({
                                 >
                                     <Pencil className="w-3 h-3" />
                                 </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    className="h-6 w-6 opacity-0 group-hover/title:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
+                                    title="Preview in Shop"
+                                >
+                                    <Link href={`/product/${product.slug}`} target="_blank">
+                                        <Eye className="w-3 h-3" />
+                                    </Link>
+                                </Button>
                             </div>
                         )}
                     </div>
@@ -280,7 +291,7 @@ export function ProductRow({
                         </Button>
                     </div>
                 </TableCell>
-            </TableRow>
+            </TableRow >
             {expanded && (
                 <TableRow>
                     <TableCell colSpan={7} className="bg-muted/30 p-4">
@@ -379,7 +390,8 @@ export function ProductRow({
                         </div>
                     </TableCell>
                 </TableRow>
-            )}
+            )
+            }
         </>
     );
 }
